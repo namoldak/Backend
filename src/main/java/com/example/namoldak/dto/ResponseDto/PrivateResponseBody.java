@@ -1,4 +1,4 @@
-package com.example.namoldak.dto;
+package com.example.namoldak.dto.ResponseDto;
 
 import com.example.namoldak.exception.StatusCode;
 import lombok.Getter;

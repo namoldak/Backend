@@ -1,10 +1,11 @@
-package com.example.namoldak.dto;
+package com.example.namoldak.dto.RequestDto;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class GameRoomRequestDto {
     private String gameRoomName;
