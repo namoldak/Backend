@@ -1,5 +1,6 @@
 package com.example.namoldak.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,11 +17,13 @@ public class GameRoomMember extends Timestamped{
     private Long gameRoomMemberId;
 
     // 추가
+    @JsonIgnore
     @JoinColumn(name="gameroomid")
     @ManyToOne(fetch = FetchType.LAZY)
     private GameRoom gameRoom;
 
     //TODO 왜 이렇게 했나요?
+    @JsonIgnore
     @JoinColumn(name="memberid")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
