@@ -20,6 +20,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    // 회원가입
     @Transactional
     public void signup(SignupRequestDto signupRequestDto){
         String email = signupRequestDto.getEmail();
@@ -38,6 +39,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    // 로그인
     @Transactional
     public MemberResponseDto login(SignupRequestDto signupRequestDto, HttpServletResponse response) {
         String email = signupRequestDto.getEmail();
@@ -56,6 +58,7 @@ public class MemberService {
         return new MemberResponseDto(member);
     }
 
+    // 이메일 중복 확인
     @Transactional(readOnly = true)
     public void emailCheck(SignupRequestDto signipRequesDto){
         String email = signipRequesDto.getEmail();
@@ -65,6 +68,7 @@ public class MemberService {
         }
     }
 
+    // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public void nicknameCheck(SignupRequestDto signipRequesDto){
         String nickname = signipRequesDto.getNickname();

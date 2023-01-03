@@ -14,6 +14,8 @@ import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,11 +36,12 @@ public class GameRoomService {
     private final GameRoomMemberRepository gameRoomMemberRepository;
     private final MemberRepository memberRepository;
 
+    // 게임룸 전체 조회
     @Transactional
-    public List<GameRoomResponseDto> mainPage(int pageNum){
+    public List<GameRoomResponseDto> mainPage(Pageable pageable){
 
         // DB에 저장된 모든 Room들을 리스트형으로 저장
-        List<GameRoom> rooms = gameRoomRepository.findAll();
+        Page<GameRoom> rooms = gameRoomRepository.findAll(pageable);
         // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
         List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
 
@@ -81,6 +84,7 @@ public class GameRoomService {
         return gameRoomList;
     }
 
+    // 게임룸 생성
     @Transactional
     public ResponseEntity<?> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto){
 
@@ -113,6 +117,7 @@ public class GameRoomService {
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
     }
 
+    // 게임룸 입장
     @Transactional
     public ResponseEntity<?> enterGame(Long roomId, Member member){
 //        GameRoomResponseDto gameRoomResponseDto;
