@@ -4,6 +4,7 @@ package com.example.namoldak.controller;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.service.GameRoomService;
+import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,17 +23,17 @@ public class GameRoomController {
 
     @PostMapping("/rooms")
     public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody GameRoomRequestDto gameRoomRequestDto){
-        return gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto);
+        return ResponseUtil.successResponse(gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
     }
 
     @GetMapping("/rooms/{pageNum}")
-    public List<GameRoomResponseDto> mainPage(@PathVariable int pageNum){
-        return gameRoomService.mainPage(pageNum);
+    public ResponseEntity<?> mainPage(@PathVariable int pageNum){
+        return ResponseUtil.successResponse(gameRoomService.mainPage(pageNum));
     }
 
     @PostMapping("/rooms/{roomId}")
     public ResponseEntity<?> enterGame(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return gameRoomService.enterGame(roomId, userDetails.getMember());
+        return ResponseUtil.successResponse(gameRoomService.enterGame(roomId, userDetails.getMember()));
     }
 }
 

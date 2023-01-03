@@ -32,17 +32,17 @@ public class ExceptionAdvice {
         return ResponseUtil.errorResponse(INVALID_ID_PASSWORD);
     }
 
-    // 데이터 예외
-    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
-    protected  ResponseEntity<?> handleSQLConstraintException(SQLIntegrityConstraintViolationException e){
-        log.error("====================== handleSQLConstraintException에서 처리한 에러 : {}", e.getMessage());
-        return ResponseUtil.errorResponse(SQL_CONSTRAINT_VIOLATION);
-    }
-
-    // 시큐리티 예외
-    @ExceptionHandler(value = {SecurityException.class})
-    protected  ResponseEntity<?> handleSecurityException(SecurityException e){
-        log.error("====================== handleSecurityException에서 처리한 에러 : {}", e.getMessage());
-        return ResponseUtil.errorResponse(SPRING_SECURITY_ERROR);
-    }
+//    // 데이터 예외
+//    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
+//    protected  ResponseEntity<?> handleSQLConstraintException(SQLIntegrityConstraintViolationException e){
+//        log.error("====================== handleSQLConstraintException에서 처리한 에러 : {}", e.getMessage());
+//        return ResponseUtil.errorResponse(SQL_CONSTRAINT_VIOLATION);
+//    }
+//
+//    // 시큐리티 예외
+//    @ExceptionHandler(value = {SecurityException.class})
+//    protected  ResponseEntity<?> handleSecurityException(SecurityException e){
+//        log.error("====================== handleSecurityException에서 처리한 에러 : {}", e.getMessage());
+//        return ResponseUtil.errorResponse(SPRING_SECURITY_ERROR);
+//    }
 }
