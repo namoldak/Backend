@@ -49,6 +49,7 @@ public class MemberController {
         return ResponseUtil.successResponse(AVAILABLE_NICKNAME);
     }
 
+    // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
