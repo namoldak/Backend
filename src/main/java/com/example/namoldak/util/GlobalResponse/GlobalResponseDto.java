@@ -1,7 +1,6 @@
 package com.example.namoldak.util.GlobalResponse;
 
-import com.example.namoldak.util.GlobalResponse.code.ErrorCode;
-import com.example.namoldak.util.GlobalResponse.code.SuccessCode;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -13,15 +12,9 @@ public class GlobalResponseDto {
     private String statusCode;
     private String statusMsg;
 
-    public GlobalResponseDto(SuccessCode successCode){
-        this.httpStatus = successCode.getHttpStatus();
-        this.statusCode = successCode.getStatusCode();
-        this.statusMsg = successCode.getStatusMsg();
-    }
-
-    public GlobalResponseDto(ErrorCode errorCode){
-        this.httpStatus = errorCode.getHttpStatus();
-        this.statusCode = errorCode.getStatusCode();
-        this.statusMsg = errorCode.getStatusMsg();
+    public GlobalResponseDto(StatusCode statusCode){
+        this.httpStatus = statusCode.getHttpStatus();
+        this.statusCode = statusCode.getStatusCode();
+        this.statusMsg = statusCode.getStatusMsg();
     }
 }

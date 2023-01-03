@@ -1,6 +1,7 @@
 package com.example.namoldak.dto.ResponseDto;
 
-import com.example.namoldak.exception.StatusCode;
+
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

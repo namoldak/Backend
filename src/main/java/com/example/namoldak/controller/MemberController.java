@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.example.namoldak.util.GlobalResponse.code.SuccessCode.*;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 
 @RestController
@@ -26,27 +26,27 @@ public class MemberController {
     @PostMapping(value = "/auth/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequestDto) {
         memberService.signup(signupRequestDto);
-        return ResponseUtil.successResponse(SIGNUP_OK);
+        return ResponseUtil.response(SIGNUP_OK);
     }
 
     // 로그인
     @PostMapping(value = "/auth/login")
     public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto, HttpServletResponse response) {
-        return ResponseUtil.successResponse(memberService.login(signupRequestDto, response));
+        return ResponseUtil.response(memberService.login(signupRequestDto, response));
     }
 
     // 이메일 중복 확인
     @PostMapping("/auth/emailCheck")
     public ResponseEntity<?> idCheck(@RequestBody SignupRequestDto signupRequestDto) {
         memberService.emailCheck(signupRequestDto);
-        return ResponseUtil.successResponse(AVAILABLE_EMAIL);
+        return ResponseUtil.response(AVAILABLE_EMAIL);
     }
 
     // 닉네임 중복 확인
     @PostMapping("/auth/nicknameCheck")
     public ResponseEntity<?> nicknameCheck(@RequestBody SignupRequestDto signupRequestDto) {
         memberService.nicknameCheck(signupRequestDto);
-        return ResponseUtil.successResponse(AVAILABLE_NICKNAME);
+        return ResponseUtil.response(AVAILABLE_NICKNAME);
     }
 
     // 카카오 로그인
@@ -60,6 +60,6 @@ public class MemberController {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return ResponseUtil.successResponse(SIGNUP_OK);
+        return ResponseUtil.response(SIGNUP_OK);
     }
 }

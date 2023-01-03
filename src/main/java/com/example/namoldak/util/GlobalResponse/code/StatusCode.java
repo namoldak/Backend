@@ -1,17 +1,11 @@
 package com.example.namoldak.util.GlobalResponse.code;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-// 1. 기능 : 예외 메세지 커스텀
-// 2. 작성자 : 조소영
 @Getter
-public enum ErrorCode {
-
-    OK(HttpStatus.OK, "200", "응답이 정상 처리 되었습니다."),
-    LOGIN_OK(HttpStatus.OK, "200", "로그인 되셨습니다!"),
+public enum StatusCode {
 
     //400 BAD_REQUEST : 잘못된 요청
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "400", "요청이 올바르지 않습니다"),
@@ -51,13 +45,28 @@ public enum ErrorCode {
     // comment
     COMMENT_ERROR(HttpStatus.BAD_REQUEST,"140","댓글이 존재하지 않습니다."),
     SEARCH_POST_ERROR(HttpStatus.BAD_REQUEST,"141","검색 결과에 맞는 게시글이 존재하지 않습니다."),
-    INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다.");
+    INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
+
+
+    OK(HttpStatus.OK, "200", "응답이 정상 처리 되었습니다."),
+    LOGIN_OK(HttpStatus.OK, "200", "로그인 되셨습니다!"),
+    SIGNUP_OK(HttpStatus.OK, "200","회원가입에 성공했습니다."),
+    SIGNIN_OK(HttpStatus.OK,"200", "로그인에 성공했습니다."),
+    GET_OK(HttpStatus.OK,"200", "조회 성공했습니다."),
+    CREATE_OK(HttpStatus.OK,"200", "생성 성공했습니다."),
+    MODIFY_OK(HttpStatus.OK,"200", "수정 성공했습니다."),
+    DELETE_OK(HttpStatus.OK,"200", "삭제 성공했습니다."),
+    LIKE_CHECK(HttpStatus.OK,"200", "좋아요 성공했습니다."),
+    AVAILABLE_EMAIL(HttpStatus.OK,"200", "사용 가능한 이메일 입니다."),
+    AVAILABLE_NICKNAME(HttpStatus.OK,"200", "사용 가능한 닉네임 입니다."),
+    SEND_EMAIL(HttpStatus.OK,"200", "인증 메일이 발송되었습니다."),
+    REGISTER_OK(HttpStatus.OK,"200", "가입 완료 되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String statusCode;
     private final String statusMsg;
 
-    ErrorCode(HttpStatus httpStatus, String statusCode, String statusMsg) {
+    StatusCode(HttpStatus httpStatus, String statusCode, String statusMsg) {
         this.httpStatus = httpStatus;
         this.statusCode = statusCode;
         this.statusMsg = statusMsg;
