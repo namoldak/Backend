@@ -4,6 +4,7 @@ package com.example.namoldak.controller;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.service.GameRoomService;
+import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,9 @@ public class GameRoomController {
     // 게임룸 생성
     @PostMapping("/rooms")
     public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody GameRoomRequestDto gameRoomRequestDto){
-        return gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto);
+        return ResponseUtil.successResponse(gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
     }
+
 
     // 게임룸 전체조회 (페이징 처리)
     @GetMapping("/rooms") // ' /rooms?page=1 '
@@ -38,7 +40,7 @@ public class GameRoomController {
     // 게임룸 입장
     @PostMapping("/rooms/{roomId}")
     public ResponseEntity<?> enterGame(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return gameRoomService.enterGame(roomId, userDetails.getMember());
+        return ResponseUtil.successResponse(gameRoomService.enterGame(roomId, userDetails.getMember()));
     }
 }
 

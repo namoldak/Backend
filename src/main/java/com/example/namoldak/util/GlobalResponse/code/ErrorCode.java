@@ -1,12 +1,27 @@
-package com.example.namoldak.exception;
+package com.example.namoldak.util.GlobalResponse.code;
 
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+// 1. 기능 : 예외 메세지 커스텀
+// 2. 작성자 : 조소영
 @Getter
-public enum StatusCode {
+public enum ErrorCode {
+
     OK(HttpStatus.OK, "200", "응답이 정상 처리 되었습니다."),
     LOGIN_OK(HttpStatus.OK, "200", "로그인 되셨습니다!"),
+
+    //400 BAD_REQUEST : 잘못된 요청
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "400", "요청이 올바르지 않습니다"),
+    BAD_REQUEST_TOKEN(HttpStatus.BAD_REQUEST, "400","토큰이 유효하지 않습니다."),
+    EXIST_EMAIL(HttpStatus.BAD_REQUEST, "400","중복된 이메일이 존재합니다."),
+    EXIST_NICKNAME(HttpStatus.BAD_REQUEST, "400","중복된 닉네임이 존재합니다."),
+    NOTEXIST_EMAIL(HttpStatus.BAD_REQUEST, "400","존재하지 않는 이메일입니다."),
+    LOGIN_MATCH_FAIL(HttpStatus.BAD_REQUEST, "400","회원을 찾을 수 없습니다."),
+    INVALID_ID_PASSWORD(HttpStatus.BAD_REQUEST, "400","아이디나 비밀번호의 구성이 알맞지 않습니다"),
+    BAD_PASSWORD(HttpStatus.BAD_REQUEST, "400","비밀번호가 일치하지 않습니다"),
 
     LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "존재하지 않는 유저 정보입니다."),
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "비밀번호가 일치하지 않습니다."),
@@ -42,7 +57,7 @@ public enum StatusCode {
     private final String statusCode;
     private final String statusMsg;
 
-    StatusCode(HttpStatus httpStatus, String statusCode, String statusMsg) {
+    ErrorCode(HttpStatus httpStatus, String statusCode, String statusMsg) {
         this.httpStatus = httpStatus;
         this.statusCode = statusCode;
         this.statusMsg = statusMsg;
