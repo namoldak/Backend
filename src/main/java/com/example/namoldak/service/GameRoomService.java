@@ -7,10 +7,10 @@ import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
-import com.example.namoldak.exception.StatusCode;
 import com.example.namoldak.repository.GameRoomMemberRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +38,11 @@ public class GameRoomService {
 
     // 게임룸 전체 조회
     @Transactional
-    public List<GameRoomResponseDto> mainPage(Pageable pageable){
+    public List<GameRoomResponseDto> mainPage(Pageable pageable) {
 
         // DB에 저장된 모든 Room들을 리스트형으로 저장
         Page<GameRoom> rooms = gameRoomRepository.findAll(pageable);
+
         // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
         List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
 
@@ -51,34 +52,34 @@ public class GameRoomService {
             // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
             List<MemberResponseDto> memberList = new ArrayList<>();
             for (GameRoomMember gameRoomMember : gameRoomMemberList) {
-                    // GameRoomMember에 저장된 멤버 아이디로 DB 조회 후 데이터 저장
-                    Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
+                // GameRoomMember에 저장된 멤버 아이디로 DB 조회 후 데이터 저장
+                Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
 
-                    // MemberResponseDto에 빌더 방식으로 각각의 데이터 값 넣어주기
-                    MemberResponseDto memberResponseDto = MemberResponseDto.builder()
-                            .memberId(eachMember.get().getId())
-                            .email(eachMember.get().getEmail())
-                            .nickname(eachMember.get().getNickname())
-                            .build();
-                    // 완성된 Dto 리스트에 추가
-                    memberList.add(memberResponseDto);
-            }
-                // 그냥 Member가 아니라 GameRoomMember를 담아야 하기 때문에 GameRoomResponseDto로 다시 한번 감쌈
-                GameRoomResponseDto gameRoomResponseDto = GameRoomResponseDto.builder()
-                        .id(room.getGameRoomId())
-                        .roomName(room.getGameRoomName())
-                        .roomPassword(room.getGameRoomPassword())
-                        .member(memberList)
-                        .memberCnt(memberList.size())
-                        .owner(room.getOwner())
-                        .status(room.getStatus())
+                // MemberResponseDto에 빌더 방식으로 각각의 데이터 값 넣어주기
+                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                        .memberId(eachMember.get().getId())
+                        .email(eachMember.get().getEmail())
+                        .nickname(eachMember.get().getNickname())
                         .build();
+                // 완성된 Dto 리스트에 추가
+                memberList.add(memberResponseDto);
+            }
+            // 그냥 Member가 아니라 GameRoomMember를 담아야 하기 때문에 GameRoomResponseDto로 다시 한번 감쌈
+            GameRoomResponseDto gameRoomResponseDto = GameRoomResponseDto.builder()
+                    .id(room.getGameRoomId())
+                    .roomName(room.getGameRoomName())
+                    .roomPassword(room.getGameRoomPassword())
+                    .member(memberList)
+                    .memberCnt(memberList.size())
+                    .owner(room.getOwner())
+                    .status(room.getStatus())
+                    .build();
 
-                // memberList에 데이터가 있다면 gameRoomList에 gameRoomResponseDto 추가
-                // for문 끝날 때 까지 반복
-                if(!memberList.isEmpty()){
-                    gameRoomList.add(gameRoomResponseDto);
-                }
+            // memberList에 데이터가 있다면 gameRoomList에 gameRoomResponseDto 추가
+            // for문 끝날 때 까지 반복
+            if (!memberList.isEmpty()) {
+                gameRoomList.add(gameRoomResponseDto);
+            }
 //            }
         }
         return gameRoomList;
@@ -86,7 +87,7 @@ public class GameRoomService {
 
     // 게임룸 생성
     @Transactional
-    public ResponseEntity<?> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto){
+    public ResponseEntity<?> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
 
         // 빌더 활용해서 GameRoom 엔티티 데이터 채워주기
         GameRoom gameRoom = GameRoom.builder()
@@ -119,7 +120,7 @@ public class GameRoomService {
 
     // 게임룸 입장
     @Transactional
-    public ResponseEntity<?> enterGame(Long roomId, Member member){
+    public ResponseEntity<?> enterGame(Long roomId, Member member) {
 //        GameRoomResponseDto gameRoomResponseDto;
         // roomId로 DB에서 데이터 찾아와서 담음
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
@@ -160,5 +161,46 @@ public class GameRoomService {
         roomInfo.put("status", enterGameRoom.get().getStatus());
 
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
+    }
+
+    // 게임룸 키워드 조회
+    public List<GameRoomResponseDto> searchGame(Pageable pageable, String keyword) {
+
+        Page<GameRoom> rooms = gameRoomRepository.findByGameRoomNameContaining(pageable, keyword);
+
+        List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
+
+        for (GameRoom room : rooms) {
+            List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(room);
+            List<MemberResponseDto> memberList = new ArrayList<>();
+
+            for (GameRoomMember gameRoomMember : gameRoomMemberList) {
+
+                Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
+
+                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                        .memberId(eachMember.get().getId())
+                        .email(eachMember.get().getEmail())
+                        .nickname(eachMember.get().getNickname())
+                        .build();
+
+                memberList.add(memberResponseDto);
+            }
+
+            GameRoomResponseDto gameRoomResponseDto = GameRoomResponseDto.builder()
+                    .id(room.getGameRoomId())
+                    .roomName(room.getGameRoomName())
+                    .roomPassword(room.getGameRoomPassword())
+                    .member(memberList)
+                    .memberCnt(memberList.size())
+                    .owner(room.getOwner())
+                    .status(room.getStatus())
+                    .build();
+
+            if (!memberList.isEmpty()) {
+                gameRoomList.add(gameRoomResponseDto);
+            }
+        }
+        return gameRoomList;
     }
 }

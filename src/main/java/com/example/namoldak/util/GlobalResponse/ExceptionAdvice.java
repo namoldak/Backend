@@ -1,15 +1,13 @@
 package com.example.namoldak.util.GlobalResponse;
 
-import io.jsonwebtoken.security.SecurityException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-
-import static com.example.namoldak.util.GlobalResponse.code.ErrorCode.*;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.INVALID_ID_PASSWORD;
 
 
 // 1. 기능 : 전역에서 발생하는 예외를 핸들링
@@ -22,14 +20,14 @@ public class ExceptionAdvice {
     @ExceptionHandler(value= {CustomException.class})
     protected ResponseEntity<?> handleCustomException(CustomException e){
         log.error("====================== handleCustomException에서 처리한 에러 : {}", e.getMessage());
-        return ResponseUtil.errorResponse(e.getErrorCode());
+        return ResponseUtil.response(e.getStatusCode());
     }
 
     // 정규식 예외
     @ExceptionHandler(value= {MethodArgumentNotValidException.class})
     protected ResponseEntity<?> handleValidationException(MethodArgumentNotValidException e){
         log.error("====================== handleValidationException에서 처리한 에러 : {}", e.getMessage());
-        return ResponseUtil.errorResponse(INVALID_ID_PASSWORD);
+        return ResponseUtil.response(INVALID_ID_PASSWORD);
     }
 
 //    // 데이터 예외

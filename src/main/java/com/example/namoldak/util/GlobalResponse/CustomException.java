@@ -1,6 +1,6 @@
 package com.example.namoldak.util.GlobalResponse;
 
-import com.example.namoldak.util.GlobalResponse.code.ErrorCode;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CustomException extends RuntimeException {     //실행 예외 클래스를 상속받아서 Unchecked Exception으로 활용
-    private final ErrorCode errorCode;
+    private final StatusCode statusCode;
 }
