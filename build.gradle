@@ -33,6 +33,11 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+
+    // pub/sub
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+
     // Swagger
     implementation 'io.springfox:springfox-swagger2:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
