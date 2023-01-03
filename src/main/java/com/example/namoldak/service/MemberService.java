@@ -2,6 +2,8 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
+import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.dto.ResponseDto.ResponseDto;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +39,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void login(SignupRequestDto signupRequestDto, HttpServletResponse response) {
+    public MemberResponseDto login(SignupRequestDto signupRequestDto, HttpServletResponse response) {
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
 
@@ -50,6 +52,8 @@ public class MemberService {
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail()));
+
+        return new MemberResponseDto(member);
     }
 
     @Transactional(readOnly = true)
