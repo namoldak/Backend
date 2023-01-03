@@ -17,6 +17,8 @@ public class SignupRequestDto {
     @NotBlank(message = "이메일은 필수 입력 값입니다")
     private String email;
 
+//    @Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,15}",
+//            message = "비밀번호는 영문, 숫자, 특수기호가 적어도 1개 이상씩 포함된 8자 ~ 20자여야 합니다 합니다.")
     @NotBlank(message = "비밀번호는 필수 입력 값입니다")
     private String password;
 }

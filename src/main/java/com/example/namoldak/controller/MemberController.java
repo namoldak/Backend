@@ -1,5 +1,6 @@
 package com.example.namoldak.controller;
 
+import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.ResponseDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.service.KakaoService;
@@ -30,9 +31,8 @@ public class MemberController {
 
     // 로그인
     @PostMapping(value = "/auth/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody SignupRequestDto signupRequestDto, HttpServletResponse response) {
-        memberService.login(signupRequestDto, response);
-        return ResponseEntity.ok(new ResponseDto(HttpStatus.OK.value(), "로그인 성공"));
+    public MemberResponseDto login(@RequestBody SignupRequestDto signupRequestDto, HttpServletResponse response) {
+        return memberService.login(signupRequestDto, response);
     }
 
     // 이메일 중복 확인
