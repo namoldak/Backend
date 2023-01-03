@@ -48,8 +48,7 @@ public class GameRoomService {
             // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
             List<MemberResponseDto> memberList = new ArrayList<>();
             for (GameRoomMember gameRoomMember : gameRoomMemberList) {
-                // GameRoomMember 리스트의 길이 만큼 하나씩 늘려서 Member DB에서 찾아옴
-                for (int i = 0; i < gameRoomMemberList.size(); i++) {
+                    // GameRoomMember에 저장된 멤버 아이디로 DB 조회 후 데이터 저장
                     Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
 
                     // MemberResponseDto에 빌더 방식으로 각각의 데이터 값 넣어주기
@@ -77,7 +76,7 @@ public class GameRoomService {
                 if(!memberList.isEmpty()){
                     gameRoomList.add(gameRoomResponseDto);
                 }
-            }
+//            }
         }
         return gameRoomList;
     }
@@ -110,6 +109,50 @@ public class GameRoomService {
         roomInfo.put("gameRoomPassword", gameRoom.getGameRoomPassword());
         roomInfo.put("owner", gameRoom.getOwner());
         roomInfo.put("status", gameRoom.getStatus());
+
+        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<?> enterGame(Long roomId, Member member){
+//        GameRoomResponseDto gameRoomResponseDto;
+        // roomId로 DB에서 데이터 찾아와서 담음
+        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
+
+        // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
+        if (enterGameRoom.get().getStatus().equals("false")) {
+            // 뒤로 넘어가면 안 되니까 return으로 호다닥 끝내버림
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.ALREADY_PLAYING, null), HttpStatus.BAD_REQUEST);
+        }
+
+        // 입장하려는 게임방을 이용해서 GameRoomMember DB에서 유저 정보 전부 빼와서 리스트형에 저장 (입장 정원 확인 용도)
+        List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
+
+        // 만약 방에 4명이 넘어가면
+        if (gameRoomMemberList.size() > 4) {
+            // 입장 안 된다고 입구컷
+            return new ResponseEntity<>(new PrivateResponseBody(StatusCode.CANT_ENTER, null), HttpStatus.BAD_REQUEST);
+        }
+
+//        // 빌더 패턴으로 Entity에 데이터 넣기
+//        GameRoomMember gameRoomMember = GameRoomMember.builder()
+//                .gameRoom(enterGameRoom.get())
+//                .member(member)
+//                .gameRoomMemberId()
+//                .build();
+
+        GameRoomMember gameRoomMember = new GameRoomMember(enterGameRoom, member);
+
+        // DB에 데이터 저장
+        gameRoomMemberRepository.save(gameRoomMember);
+
+        // 해시맵으로 데이터 정리해서 보여주기
+        HashMap<String, String> roomInfo = new HashMap<>();
+
+        roomInfo.put("gameRoomName", enterGameRoom.get().getGameRoomName());
+        roomInfo.put("roomId", String.valueOf(enterGameRoom.get().getGameRoomId()));
+        roomInfo.put("owner", enterGameRoom.get().getOwner());
+        roomInfo.put("status", enterGameRoom.get().getStatus());
 
         return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
     }
