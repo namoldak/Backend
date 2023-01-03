@@ -29,5 +29,10 @@ public class GameRoomController {
     public List<GameRoomResponseDto> mainPage(@PathVariable int pageNum){
         return gameRoomService.mainPage(pageNum);
     }
+
+    @PostMapping("/rooms/{roomId}")
+    public ResponseEntity<?> enterGame(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return gameRoomService.enterGame(roomId, userDetails.getMember());
+    }
 }
 

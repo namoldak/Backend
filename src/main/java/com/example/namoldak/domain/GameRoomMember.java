@@ -2,15 +2,18 @@ package com.example.namoldak.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 public class GameRoomMember extends Timestamped{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -30,6 +33,11 @@ public class GameRoomMember extends Timestamped{
 
     public GameRoomMember(GameRoom gameRoom, Member member){
         this.gameRoom = gameRoom;
+        this.member = member;
+    }
+
+    public GameRoomMember(Optional <GameRoom> gameRoom, Member member){
+        this.gameRoom = gameRoom.get();
         this.member = member;
     }
 }
