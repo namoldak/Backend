@@ -8,6 +8,7 @@ import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -25,6 +26,7 @@ public class GameRoomController {
     private final GameRoomService gameRoomService;
 
     // 게임룸 생성
+//    @Cacheable
     @PostMapping("/rooms")
     public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody GameRoomRequestDto gameRoomRequestDto){
         return ResponseUtil.response(gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
