@@ -1,5 +1,6 @@
 package com.example.namoldak.service;
 
+import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.GameRoom;
 import com.example.namoldak.domain.GameRoomMember;
 import com.example.namoldak.domain.Member;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,8 @@ public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomMemberRepository gameRoomMemberRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomService chatRoomService;
+    private final SimpMessageSendingOperations messagingTemplate;
 
     // 게임룸 전체 조회
     @Transactional
@@ -105,6 +109,9 @@ public class GameRoomService {
         // GameRoomMember DB에 해당 데이터 저장
         gameRoomMemberRepository.save(gameRoomMember);
 
+        // 채팅방 생성
+        chatRoomService.createChatRoom(gameRoom.getGameRoomId().toString(), gameRoom.getGameRoomName());
+
         // data에 데이터를 담아주기 위해 HashMap 생성
         HashMap<String, String> roomInfo = new HashMap<>();
 
@@ -151,6 +158,22 @@ public class GameRoomService {
 
         // DB에 데이터 저장
         gameRoomMemberRepository.save(gameRoomMember);
+
+        HashMap<String, Object> contentSet = new HashMap<>();
+
+        GameMessage gameMessage = new GameMessage<>();
+        gameMessage.setRoomId(String.valueOf(roomId));
+        gameMessage.setSenderId(String.valueOf(member.getId()));
+        gameMessage.setSender(member.getNickname());
+
+        contentSet.put("owner", enterGameRoom.get().getOwner());
+        contentSet.put("memberCnt", gameRoomMemberList.size());
+        contentSet.put("enterComment", gameMessage.getRoomId() + "번 방에" + gameMessage.getSenderId() + "님이 입장하셨습니다.");
+
+        gameMessage.setContent(contentSet);
+        gameMessage.setType(GameMessage.MessageType.JOIN);
+
+        messagingTemplate.convertAndSend("/sub/gameroom/" + roomId, gameMessage);
 
         // 해시맵으로 데이터 정리해서 보여주기
         HashMap<String, String> roomInfo = new HashMap<>();
