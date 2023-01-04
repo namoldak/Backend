@@ -17,19 +17,23 @@ import java.util.Objects;
 public class StompHandler implements ChannelInterceptor {
 
     @Override
+    // preSend 메시지가 실제로 패널로 전송되기 전에 호출, 이 메서드가 null을 반환하면 전송 호출이 발생하지 않는다.
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+
         //메시지의 페이로드 및 헤더에서 인스턴스를 만듬
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);   // 이 메소드로 감싸면 STOMP 헤더에 직접 접근 가능 , STOMP 프레임 형식도 HTTP와 닮아있다.
         System.out.println("accessor = " + accessor);
 
         // 연결할때
         if (StompCommand.CONNECT == accessor.getCommand()) {
 
             // stomp의 헤더에서 accessToken과 refreshToken 을 뽑음
-            String accessToken = Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")).substring(7);
+            // requireNonNull : Objects 클래스에서 제공하는 널(Null) 체크를 위한 메소드
+
+            String accessToken = Objects.requireNonNull(accessor.getFirstNativeHeader("Authorization")).substring(7); // 토큰 가져오는데 앞에 Bearer과 공백을 제거하고
 
             System.out.println("accessToken = " + accessToken);
         }
-        return message;
+        return message; // 유효성 검증된 메세지가 반환
     }
 }
