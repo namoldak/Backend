@@ -23,8 +23,50 @@ public class ChatService {
         log.info(message.getSender());
         log.info(String.valueOf(message.getType()));
         log.info((String) message.getContent());
-        // Websocket에 발행된 메시지를 redis로 발행(publish)
+
+        ChatMessage exportMessage;
+
+        switch (message.getType()){
+            case ENTER:
+                exportMessage = ChatMessage.builder()
+                        .type(message.getType())
+                        .message("[공지] " + message.getSender() + "님이 입장하셨습니다.")
+                        .build();
+
+                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                break;
+
+            case ICE:
+                exportMessage = ChatMessage.builder()
+                        .type(message.getType())
+                        .ice(message.getIce())
+                        .build();
+
+                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                break;
+
+            case OFFER:
+                exportMessage = ChatMessage.builder()
+                        .type(message.getType())
+                        .offer(message.getOffer())
+                        .build();
+
+                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                break;
+
+            case ANSWER:
+                exportMessage = ChatMessage.builder()
+                        .type(message.getType())
+                        .answer(message.getAnswer())
+                        .build();
+
+                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                break;
+
+            default:
+                // Websocket에 발행된 메시지를 redis로 발행(publish)
 //        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
-        sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), message);
+                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), message);
+        }
     }
 }
