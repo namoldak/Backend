@@ -82,7 +82,7 @@ public class GameRearService {
         gameStartSetRepository.delete(gameStartSet);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().updateStatus("true");
+        enterGameRoom.get().setStatus("true");
     }
 
     // 정답
