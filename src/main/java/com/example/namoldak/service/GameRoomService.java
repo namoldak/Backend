@@ -8,9 +8,11 @@ import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
+import com.example.namoldak.repository.ChatRoomRepository;
 import com.example.namoldak.repository.GameRoomMemberRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class GameRoomService {
     private final MemberRepository memberRepository;
     private final ChatRoomService chatRoomService;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final ChatRoomRepository chatRoomRepository;
 
     // 게임룸 전체 조회
     @Transactional
@@ -225,5 +228,64 @@ public class GameRoomService {
             }
         }
         return gameRoomList;
+    }
+
+    @Transactional
+    public ResponseEntity<?> roomExit(Long RoomId, Member member) {
+        // 나가려고 하는 방 정보 DB에서 불러오기
+        GameRoom enterGameRoom = gameRoomRepository.findById(RoomId).orElseThrow(
+                () -> new CustomException(NOT_EXIST_ROOMS)
+        );
+        // 나가려고 하는 GameRoomMember를 member 객체로 DB에서 조회
+        GameRoomMember gameRoomMember = gameRoomMemberRepository.findByMember(member);
+        // 위에서 구한 GameRoomMemeber 객체로 DB 데이터 삭제
+        gameRoomMemberRepository.delete(gameRoomMember);
+        // 게임방에 남아있는 유저들 구하기
+        List<GameRoomMember> existGameRoomMember = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
+        // 남아있는 유저의 수가 0명이라면 게임방 DB에서 데이터 삭제
+        if (existGameRoomMember.size() == 0) {
+            gameRoomRepository.delete(enterGameRoom);
+        }
+        // 게임 채팅방도 삭제해줌
+        chatRoomRepository.deleteRoom(enterGameRoom.getGameRoomId().toString());
+
+        // 방을 나갈 경우의 알림 문구와 나간 이후의 방 인원 수를 저장하기 위한 해시맵
+        HashMap<String, Object> contentSet = new HashMap<>();
+
+        // 누가 나갔는지 알려줄 메세지 정보 세팅
+        GameMessage gameMessage = new GameMessage();
+        gameMessage.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
+        gameMessage.setSenderId(Long.toString(member.getId()));
+        gameMessage.setSender(member.getNickname());
+
+        contentSet.put("memberCnt", existGameRoomMember.size());
+        contentSet.put("alert", gameMessage.getSender() + " 님이 방을 나가셨습니다");
+
+        gameMessage.setContent(contentSet);
+        gameMessage.setType(GameMessage.MessageType.LEAVE);
+
+        // 해당 주소에 있는 사람들에게 게임 메세지 모두 발송
+        messagingTemplate.convertAndSend("/sub/gameroom/" + RoomId, gameMessage);
+
+        // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
+        if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomMember.isEmpty()){
+            // 남은 사람들의 수 만큼 랜덤으로 돌려서 나온 멤버 ID
+            Long nextOwnerId = existGameRoomMember.get((int) (Math.random() * existGameRoomMember.size())).getGameRoomMemberId();
+            // nextOwnerId로 GameRoomMember 정보 저장
+            GameRoomMember nextOwner = gameRoomMemberRepository.findById(nextOwnerId).orElseThrow(
+                    () -> new CustomException(LOGIN_MEMBER_ID_FAIL)
+            );
+            // 들어간 방에 Owner 업데이트
+            enterGameRoom.update(nextOwner.getMember().getNickname());
+            // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
+            GameMessage alertOwner = new GameMessage();
+            alertOwner.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
+            alertOwner.setSenderId(Long.toString(nextOwner.getMember().getId()));
+            alertOwner.setSender(nextOwner.getMember().getNickname());
+            alertOwner.setType(GameMessage.MessageType.NEWOWNER);
+
+            messagingTemplate.convertAndSend("/sub/gameroom" + RoomId, alertOwner);
+        }
+        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, "방을 나가셨습니다."), HttpStatus.OK);
     }
 }

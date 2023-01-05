@@ -34,5 +34,12 @@ public class GameRoom extends Timestamped{
     @Column(nullable = false)
     private String status;
 
+    public void update(String owner){
+        this.owner = owner;
+    }
+
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }
 

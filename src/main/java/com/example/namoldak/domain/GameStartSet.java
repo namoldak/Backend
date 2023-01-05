@@ -1,24 +1,34 @@
 package com.example.namoldak.domain;
 
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Builder
+@Entity
+@Setter
 public class GameStartSet {
-
-    private Long gameSetId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Long gameStartSetId;
+    @Column
     private String category;
+    @Column
     private String keyword;
+    @Column
     private Long roomId;
+    @Column
     private Integer round;
-    private Integer spotnum = 0;
+    @Column
+    private Integer spotNum;
+    @Column
     private String winner;
 
-    public Integer oneMoerRound(){
-        this.round++;
-        return this.round;
+
+    public void setWinner(String winner){
+        this.winner = winner;
     }
 }

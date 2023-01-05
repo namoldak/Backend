@@ -60,8 +60,8 @@ public class MemberService {
 
     // 이메일 중복 확인
     @Transactional(readOnly = true)
-    public boolean emailCheck(SignupRequestDto signupRequestDto){
-        String email = signupRequestDto.getEmail();
+    public boolean emailCheck(String email){
+//        String email = signupRequestDto.getEmail();
 
         //            throw new IllegalArgumentException("이미 있는 이메일임");
         return memberRepository.findByEmail(email).isPresent();
@@ -69,8 +69,8 @@ public class MemberService {
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
-    public boolean nicknameCheck(SignupRequestDto signupRequestDto){
-        String nickname = signupRequestDto.getNickname();
+    public boolean nicknameCheck(String nickname){
+//        String nickname = signupRequestDto.getNickname();
 
         //            throw new IllegalArgumentException("이미 있는 닉네임임");
         return memberRepository.findByNickname(nickname).isPresent();

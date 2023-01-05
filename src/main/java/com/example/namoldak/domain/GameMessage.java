@@ -9,17 +9,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GameMessage <T>{
+public class GameMessage<T> {
+
     private String roomId;
     private String senderId;
     private String sender;
     private T content;
     private GameMessage.MessageType type;
 
-    //TODO 어떻게 하누
     public enum MessageType {
-        JOIN, READY, SPOTLIGHT, LEAVE, START, DRAW, ENDGAME, UPDATE, SWITCHING,
-        CONTINUE, RESULT,DRAWANDENDGAME, LIER, NLIER, UNREADY, ALLREADY, LIAR, TRUER, COMPLETE, ALLCOMPLETE, WAIT, REWARD, VOTE, ONEMOREROUND,
-        NEWOWNER, VICTORY, RESET
+        OWNER, ENTER, RULE, READY, START, KEYWORD,
+        FAIL, SKIP, SUCCESS, WINNER, ENDGAME,
+        LEAVE, NEWOWNER
     }
 }
