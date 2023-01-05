@@ -38,15 +38,13 @@ public class MemberController {
     // 이메일 중복 확인
     @PostMapping("/auth/emailCheck")
     public ResponseEntity<?> idCheck(@RequestBody SignupRequestDto signupRequestDto) {
-        memberService.emailCheck(signupRequestDto);
-        return ResponseUtil.response(AVAILABLE_EMAIL);
+        return ResponseUtil.response(memberService.emailCheck(signupRequestDto));
     }
 
     // 닉네임 중복 확인
     @PostMapping("/auth/nicknameCheck")
     public ResponseEntity<?> nicknameCheck(@RequestBody SignupRequestDto signupRequestDto) {
-        memberService.nicknameCheck(signupRequestDto);
-        return ResponseUtil.response(AVAILABLE_NICKNAME);
+        return ResponseUtil.response(memberService.nicknameCheck(signupRequestDto));
     }
 
     // 카카오 로그인

@@ -60,21 +60,19 @@ public class MemberService {
 
     // 이메일 중복 확인
     @Transactional(readOnly = true)
-    public void emailCheck(SignupRequestDto signipRequesDto){
-        String email = signipRequesDto.getEmail();
+    public boolean emailCheck(SignupRequestDto signupRequestDto){
+        String email = signupRequestDto.getEmail();
 
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("이미 있는 이메일임");
-        }
+        //            throw new IllegalArgumentException("이미 있는 이메일임");
+        return memberRepository.findByEmail(email).isPresent();
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
-    public void nicknameCheck(SignupRequestDto signipRequesDto){
-        String nickname = signipRequesDto.getNickname();
+    public boolean nicknameCheck(SignupRequestDto signupRequestDto){
+        String nickname = signupRequestDto.getNickname();
 
-        if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new IllegalArgumentException("이미 있는 닉네임임");
-        }
+        //            throw new IllegalArgumentException("이미 있는 닉네임임");
+        return memberRepository.findByNickname(nickname).isPresent();
     }
 }
