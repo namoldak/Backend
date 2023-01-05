@@ -50,5 +50,11 @@ public class GameRoomController {
     public ResponseEntity<?> enterGame(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseUtil.response(gameRoomService.enterGame(roomId, userDetails.getMember()));
     }
+
+    // 게임룸 나가기
+    @DeleteMapping("room/{roomId}/exit")
+    public ResponseEntity<?> roomExit(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseUtil.response(gameRoomService.roomExit(roomId, userDetails.getMember()));
+    }
 }
 

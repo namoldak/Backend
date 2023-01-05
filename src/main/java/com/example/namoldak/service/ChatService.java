@@ -27,7 +27,7 @@ public class ChatService {
         ChatMessage exportMessage;
 
         switch (message.getType()){
-            case ENTER:
+            case "ENTER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
                         .message("[공지] " + message.getSender() + "님이 입장하셨습니다.")
@@ -36,7 +36,7 @@ public class ChatService {
                 sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
                 break;
 
-            case ICE:
+            case "ICE":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
                         .ice(message.getIce())
@@ -45,7 +45,7 @@ public class ChatService {
                 sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
                 break;
 
-            case OFFER:
+            case "OFFER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
                         .offer(message.getOffer())
@@ -54,7 +54,7 @@ public class ChatService {
                 sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
                 break;
 
-            case ANSWER:
+            case "ANSWER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
                         .answer(message.getAnswer())
