@@ -37,5 +37,9 @@ public class GameRoom extends Timestamped{
     public void update(String owner){
         this.owner = owner;
     }
+
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }
 

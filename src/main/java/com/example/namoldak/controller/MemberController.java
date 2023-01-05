@@ -37,14 +37,14 @@ public class MemberController {
 
     // 이메일 중복 확인
     @PostMapping("/auth/emailCheck")
-    public ResponseEntity<?> idCheck(@RequestBody SignupRequestDto signupRequestDto) {
-        return ResponseUtil.response(memberService.emailCheck(signupRequestDto));
+    public ResponseEntity<?> idCheck(@RequestParam ("email") String email) {
+        return ResponseUtil.response(memberService.emailCheck(email));
     }
 
     // 닉네임 중복 확인
     @PostMapping("/auth/nicknameCheck")
-    public ResponseEntity<?> nicknameCheck(@RequestBody SignupRequestDto signupRequestDto) {
-        return ResponseUtil.response(memberService.nicknameCheck(signupRequestDto));
+    public ResponseEntity<?> nicknameCheck(@RequestParam ("nickname") String nickname) {
+        return ResponseUtil.response(memberService.nicknameCheck(nickname));
     }
 
     // 카카오 로그인

@@ -27,4 +27,7 @@ public class GameStartSet {
     @Column
     private String winner;
 
+    public void updateWinner (String winner){
+        this.winner = winner;
+    }
 }

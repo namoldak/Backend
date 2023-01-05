@@ -14,8 +14,9 @@ import org.springframework.stereotype.Controller;
 public class GameRearController {
     private final GameRearService gameRearService;
 
-    @MessageMapping("/lier/game/{roomId}/isAnswer")
-    public void isAnswer(@DestinationVariable("roomId") Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails, AnswerDto answerDto){
-        gameRearService.isAnswer(roomId, userDetails.getMember(), answerDto);
+
+    @MessageMapping("/game/{roomId}/endgame")
+    public void endGame(@DestinationVariable("roomdId") Long roomId){
+        gameRearService.endGame(roomId);
     }
 }
