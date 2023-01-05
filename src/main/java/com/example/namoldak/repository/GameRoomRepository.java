@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
     Page<GameRoom> findAll(Pageable pageable); // 게임룸 전체 조회 페이징처리
     Page<GameRoom> findByGameRoomNameContaining(Pageable pageable, String keyword);
+    Optional<GameRoom> findByGameRoomId(Long gameRoomId);
 
 }

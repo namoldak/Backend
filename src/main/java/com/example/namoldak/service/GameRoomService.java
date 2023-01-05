@@ -276,7 +276,7 @@ public class GameRoomService {
                     () -> new CustomException(LOGIN_MEMBER_ID_FAIL)
             );
             // 들어간 방에 Owner 업데이트
-            enterGameRoom.update(nextOwner.getMember().getNickname());
+            enterGameRoom.setOwner(nextOwner.getMember().getNickname());
             // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
             GameMessage alertOwner = new GameMessage();
             alertOwner.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));

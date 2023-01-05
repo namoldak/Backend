@@ -19,6 +19,12 @@ public class GameRoomMember extends Timestamped{
     @Id
     private Long gameRoomMemberId;
 
+//    @Column
+//    private String keyword;
+
+//    @Column
+//    private String nickname;
+
     // 추가
     @JsonIgnore
     @JoinColumn(name="gameroomid")
