@@ -30,6 +30,7 @@ public class ChatService {
             case "ENTER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
+                        .sender(message.getSender())
                         .message("[공지] " + message.getSender() + "님이 입장하셨습니다.")
                         .build();
 
@@ -39,6 +40,7 @@ public class ChatService {
             case "ICE":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
+                        .sender(message.getSender())
                         .ice(message.getIce())
                         .build();
 
@@ -48,6 +50,7 @@ public class ChatService {
             case "OFFER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
+                        .sender(message.getSender())
                         .offer(message.getOffer())
                         .build();
 
@@ -57,6 +60,7 @@ public class ChatService {
             case "ANSWER":
                 exportMessage = ChatMessage.builder()
                         .type(message.getType())
+                        .sender(message.getSender())
                         .answer(message.getAnswer())
                         .build();
 
