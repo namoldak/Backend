@@ -38,14 +38,19 @@ public class GameRoomMember extends Timestamped{
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @Column(nullable = false)
+    private Long member_Id;
+
     public GameRoomMember(GameRoom gameRoom, Member member){
         this.gameRoom = gameRoom;
         this.member   = member;
+        this.member_Id = member.getId();
     }
 
     public GameRoomMember(Optional <GameRoom> gameRoom, Member member){
         this.gameRoom = gameRoom.get();
         this.member   = member;
+        this.member_Id = member.getId();
     }
 }
 
