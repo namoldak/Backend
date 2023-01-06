@@ -1,6 +1,5 @@
 package com.example.namoldak.config;
 
-import com.example.namoldak.domain.RedisSubscriber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
