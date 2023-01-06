@@ -45,6 +45,7 @@ public class GameRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final GameRearService gameRearService;
 
+
     // 게임룸 전체 조회
     @Transactional
     public List<GameRoomResponseDto> mainPage(Pageable pageable) {
@@ -133,7 +134,7 @@ public class GameRoomService {
     // 게임룸 입장
     @Transactional
     public ResponseEntity<?> enterGame(Long roomId, Member member) {
-//        GameRoomResponseDto gameRoomResponseDto;
+
         // roomId로 DB에서 데이터 찾아와서 담음
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
 

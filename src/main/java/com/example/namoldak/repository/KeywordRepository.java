@@ -4,12 +4,15 @@ import com.example.namoldak.domain.Keyword;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 
 import java.util.List;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
+    @Query(value = "select * from keyword k where k.category = :category order by rand() limit 4", nativeQuery = true)
+    List<Keyword> findTop4ByCategory(@Param("category") String category);
 
-//    @Query("select k from Keyword k where k.category = :category order by rand() limit 4")
-//    List<Keyword> findByCategory(@Param("category") String category);
-    List<Keyword> findByCategory(String category);
+    @Query(value = "select * from keyword k where k.category = :category order by rand() limit 3", nativeQuery = true)
+    List<Keyword> findTop3ByCategory(@Param("category") String category);
 }

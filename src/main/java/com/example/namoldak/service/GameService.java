@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.SPOTLIGHT_ERR;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_ENOUGH_MEMBER;
 
 // 기능 : 게임 진행 서비스
 @Slf4j
@@ -34,6 +35,7 @@ public class GameService {
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameStartSetRepository gameStartSetRepository;
     private final GameStartSetRepository2 gameStartSetRepository2;
+
 
     // 게임 시작
     @Transactional
@@ -53,23 +55,35 @@ public class GameService {
         List<GameRoomMember> gameRoomMembers = gameRoomMemberRepository.findByGameRoom(gameRoom);
 
         // 게임방의 상태를 start 상태로 업데이트
-        gameRoom.setStatus("start");
+        gameRoom.setStatus("false");
 
-        //TODO 멤버들에게 뿌려지게 될 키워드 전체 목록 불러오기 // 이 부분 쿼리 DSL로 수정 예정
-        Keyword keyword = new Keyword();
-        List<Keyword> keywordList = keywordRepository.findByCategory(keyword.getCategory());
+        // 멤버들에게 뿌려지게 될 키워드 전체 목록 불러오기
+        List<Keyword> keywordList1 = keywordRepository.findAll();
 
         // 랜덤으로 키워드 하나 뽑기
-//        Keyword keyword1 = keywordList.get((int) Math.random() * keywordList.size());
+        Keyword keyword1 = keywordList1.get((int) Math.random() * keywordList1.size());
 
-        // 뽑힌 키워드와 카테고리가 일치하는 다른 키워드들 조회 -> 어레이리스트에 담기
-//        List<Keyword> selectedKeywords = new ArrayList<>();
-//
-//        for (Keyword sameKeyword : keywordList) {
+        // 뽑힌 키워드와 카테고리가 일치하는 다른 키워드들 조회 -> selectedKeywords 에 담기
+//        List<Keyword> selectedKeywords = new ArrayList<>(); // 이 리스트의 카테고리는 일치한다.
+//        for (Keyword sameKeyword : keywordList1) {
 //            if (sameKeyword.getCategory().equals(keyword1.getCategory())) {
 //                selectedKeywords.add(sameKeyword);
 //            }
 //        }
+
+        // 위에서 랜덤으로 뽑은 키워드의 카테고리
+        String category = keyword1.getCategory();
+        // 같은 카테고리를 가진 키워드 리스트 만들기
+        List<Keyword> keywordList = new ArrayList<>();
+        if (gameRoomMembers.size() == 4) {
+            // 참여 멤버가 4명 이라면, 랜덤으로 키워드 4장이 담긴 리스트를 만들어 준다.
+            keywordList = keywordRepository.findTop4ByCategory(category);
+        } else if (gameRoomMembers.size() == 3) {
+            // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
+            keywordList = keywordRepository.findTop4ByCategory(category);
+        }else{
+            throw new CustomException(NOT_ENOUGH_MEMBER);
+        }
 
         HashMap<String, String> keywordToMember = new HashMap<>();
 
@@ -99,6 +113,8 @@ public class GameService {
                 .round(1)
                 .build();
 
+        // StartSet 저장
+        gameStartSetRepository.save(gameStartSet);
 
         // 웹소켓으로 전달드릴 content 내용
         HashMap<String, Object> startset = new HashMap<>();
