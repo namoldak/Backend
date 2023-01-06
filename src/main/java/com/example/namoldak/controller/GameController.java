@@ -8,6 +8,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,11 +28,14 @@ public class GameController {
         gameService.gameSkip(userDetails.getMember(), gameroomid);
     }
 
-    @MessageMapping("/pub/game/{gameroomid}/spotlight")
-    public void spotlight(
-            @DestinationVariable Long gameroomid) {
+//    @MessageMapping("/pub/game/{gameroomid}/spotlight")
+//    public void spotlight(
+//            @DestinationVariable Long gameroomid) {
+    @PostMapping("/pub/game/{gameRoomId}/spotlight")
+            public void spotlight(
+                    @PathVariable Long gameRoomId){
 
-        log.info("스포트라이트 - 게임방 아이디 : {}", gameroomid);
-        gameService.spotlight(gameroomid);
+        log.info("스포트라이트 - 게임방 아이디 : {}", gameRoomId);
+        gameService.spotlight(gameRoomId);
     }
 }

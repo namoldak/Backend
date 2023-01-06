@@ -7,13 +7,19 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+
 @Repository
 @RequiredArgsConstructor
 public class GameStartSetRepository2 {
 
     private static final String GAME_SET = "GAME_SET";
     private final RedisTemplate<String, Object> redisTemplate;
-    private final HashOperations<String, Long, GameStartSet2> opsHashGameSet = redisTemplate.opsForHash();
+    private HashOperations<String, Long, GameStartSet2> opsHashGameSet;
+
+    private void init() {
+        opsHashGameSet = redisTemplate.opsForHash();
+    }
 
     // 특정 게임셋을 불러와야함
     public GameStartSet2 findGameSetById(Long roomId) {
