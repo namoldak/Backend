@@ -10,6 +10,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 // 기능 : 게임 진행 관련 부가기능 컨트롤
 @Slf4j
@@ -18,15 +20,15 @@ import org.springframework.stereotype.Controller;
 public class GameRearController {
     private final GameRearService gameRearService;
 
-    @MessageMapping("/game/{roomId}/endgame")
-    public void endGame(@DestinationVariable("roomdId") Long roomId) {
+    @PostMapping("/game/{roomId}/endgame")
+    public void endGame(@PathVariable Long roomId) {
         gameRearService.endGame(roomId);
     }
 
     // 정답
-    @MessageMapping("/pub/game/{gameroomId}/answer")
+    @PostMapping("/pub/game/{gameroomId}/answer")
     public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                           @DestinationVariable Long gameroomid,
+                           @PathVariable Long gameroomid,
             AnswerDto answerDto) {
 
         log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameroomid, answerDto);

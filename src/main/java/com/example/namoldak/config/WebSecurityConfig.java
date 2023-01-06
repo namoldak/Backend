@@ -42,7 +42,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/**").permitAll()
+//                .antMatchers(HttpMethod.POST, "/**").permitAll()
 //                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
