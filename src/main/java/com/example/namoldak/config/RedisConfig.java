@@ -19,13 +19,14 @@ public class RedisConfig {
     @Bean
     public ChannelTopic channelTopic() {
         return new ChannelTopic("chatroom");
-    }
+    }   // 메세지를 주고받는 공간 ChatRoom = Channel
 
 
     /**
      * redis에 발행(publish)된 메시지 처리를 위한 리스너 설정
      */
     @Bean
+    //컨테이너는 Redis 채널로부터 메시지를 받는데 사용하며, 구독자들에게 메시지를 dispatch 하는 역할, 메세지 수신에 있어 관련 비즈니스 로직 작성 가능
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,
                                                               MessageListenerAdapter listenerAdapter,
                                                               ChannelTopic channelTopic) {
@@ -39,6 +40,7 @@ public class RedisConfig {
      * 실제 메시지를 처리하는 subscriber 설정 추가
      */
     @Bean
+    //pub sub 모델에서 subscriber 역할을 수행
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }

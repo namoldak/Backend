@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ChatService {
+
+    // Redis를 이용하는 방법에는 두가지가 있다 RedisTemplate, RedisRepository
     private final RedisTemplate<String, Object> redisTemplate;
     private final SimpMessageSendingOperations sendingOperations;
     private final ChannelTopic channelTopic;
