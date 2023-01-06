@@ -20,6 +20,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -30,7 +32,7 @@ public class KakaoService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
 
-    public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public List<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);                                  // 포스트맨 확인위해 주석처리 해둠.
 
@@ -47,7 +49,11 @@ public class KakaoService {
         //서버에서 바로 그냥 쿠키 객체를 만들어서 토큰에 직접 넣어서 반환하는 방법도 있음 (방법2)
         //몇번 방식을 쓸 것인지는 react 쪽과 협의 필요!
 
-        return createToken;
+        List<String> kakaoReturnValue = new ArrayList<>();
+        kakaoReturnValue.add(createToken);
+        kakaoReturnValue.add(kakaoUser.getNickname());
+
+        return kakaoReturnValue;
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
