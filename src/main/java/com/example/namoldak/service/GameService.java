@@ -3,10 +3,7 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.dto.ResponseDto.ResponseDto;
-import com.example.namoldak.repository.GameRoomMemberRepository;
-import com.example.namoldak.repository.GameRoomRepository;
-import com.example.namoldak.repository.KeywordRepository;
-import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +32,7 @@ public class GameService {
     private final KeywordRepository keywordRepository;
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final GameStartSetRepository gameStartSetRepository;
 
     // 게임 시작
     @Transactional
@@ -112,6 +110,8 @@ public class GameService {
                 .round(1)
                 .build();
 
+        // StartSet 저장
+        gameStartSetRepository.save(gameStartSet);
 
         // 웹소켓으로 전달드릴 content 내용
         HashMap<String, Object> startset = new HashMap<>();
