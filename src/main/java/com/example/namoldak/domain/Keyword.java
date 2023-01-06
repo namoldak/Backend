@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+// 기능 : 게임 카테고리와 키워드 Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

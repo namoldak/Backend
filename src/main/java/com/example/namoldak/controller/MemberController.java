@@ -17,7 +17,7 @@ import java.util.List;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
-
+// 기능 : 멤버 로그인, 회원가입 관련 컨트롤
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(produces = "application/json; charset=utf8")

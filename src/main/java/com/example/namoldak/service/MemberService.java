@@ -3,7 +3,6 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
-import com.example.namoldak.dto.ResponseDto.ResponseDto;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

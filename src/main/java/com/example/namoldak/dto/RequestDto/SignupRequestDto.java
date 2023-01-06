@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+// 기능 : 기본 폼 로그인 Request Dto
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

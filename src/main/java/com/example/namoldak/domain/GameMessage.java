@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 기능 : 채팅에 적용되는 관리자 메세지용 Dto
 @Getter
 @Setter
 @AllArgsConstructor
