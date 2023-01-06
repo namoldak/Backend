@@ -72,20 +72,20 @@ public class GameRearService {
         List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
 
         // 닉네임을 구하기 위해서 멤버 객체를 담을 리스트 선언
-        List<Optional<Member>> memberList = new ArrayList<>();
+        List<Member> memberList = new ArrayList<>();
 
         // for문으로 하나씩 빼서 DB 조회 후 List에 넣어주기
         for (GameRoomMember gameRoomMember : gameRoomMemberList) {
-            Optional<Member> member = memberRepository.findById(gameRoomMember.getMember().getId());
-            memberList.add(member);
+            Optional<Member> member = memberRepository.findById(gameRoomMember.getMember_Id());
+            memberList.add(member.get());
         }
 
         // member의 닉네임이 정답자와 같지 않을 경우 전부 Loser에 저장하고 같을 경우 Winner에 저장
-        for (Optional<Member> member : memberList) {
-            if (!member.get().getNickname().equals(gameStartSet.getWinner())) {
-                victoryDto.setLoser(member.get().getNickname());
+        for (Member member : memberList) {
+            if (member.getNickname() != (gameStartSet.getWinner())) {
+                victoryDto.setLoser(member.getNickname());
             } else {
-                victoryDto.setWinner(member.get().getNickname());
+                victoryDto.setWinner(member.getNickname());
             }
         }
 
