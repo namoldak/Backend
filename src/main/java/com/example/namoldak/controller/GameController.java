@@ -9,6 +9,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.Mapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 // 기능 : 게임 진행 관련 주요 서비스들을 컨트롤
 @Slf4j
@@ -19,8 +22,10 @@ public class GameController {
     private final GameService gameService;
 
     // 게임 시작
-    @MessageMapping("/pub/game/{gameRoomId}/start")
-    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
+//    @MessageMapping("/pub/game/{gameRoomId}/start")
+//    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
+    @PostMapping("/pub/game/{gameRoomId}/start")
+    public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         return gameService.gameStart(gameRoomId, userDetails.getMember());
     }
