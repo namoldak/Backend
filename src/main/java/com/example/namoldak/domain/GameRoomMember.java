@@ -39,12 +39,12 @@ public class GameRoomMember extends Timestamped{
 
     public GameRoomMember(GameRoom gameRoom, Member member){
         this.gameRoom = gameRoom;
-        this.member = member;
+        this.member   = member;
     }
 
     public GameRoomMember(Optional <GameRoom> gameRoom, Member member){
         this.gameRoom = gameRoom.get();
-        this.member = member;
+        this.member   = member;
     }
 }
 

@@ -34,7 +34,8 @@ public class MemberController {
 
     // 로그인
     @PostMapping(value = "/auth/login")
-    public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto,
+                                   HttpServletResponse response) {
         return ResponseUtil.response(memberService.login(signupRequestDto, response));
     }
 
@@ -52,7 +53,8 @@ public class MemberController {
 
     // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code,
+                                        HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
         List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
 

@@ -24,14 +24,11 @@ public class GameRearController {
 
     // 정답
     @MessageMapping("/pub/game/{gameroomId}/answer")
-    public void gameAnswer(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @DestinationVariable Long gameroomid,
+    public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                           @DestinationVariable Long gameroomid,
             AnswerDto answerDto) {
 
         log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameroomid, answerDto);
         gameRearService.gameAnswer(userDetails.getMember(), gameroomid, answerDto);
-
-
     }
 }
