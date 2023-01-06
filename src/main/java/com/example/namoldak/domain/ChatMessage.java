@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+// 기능 : 프론트부터 들어오는 Websocket 메세지와 서버로부터 프론트로 전달하는 Websocket 메세지 Dto
 @Getter
 @Setter
 @Builder

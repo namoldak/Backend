@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+// 기능 : Redis에 저장하는 챗룸
 @RequiredArgsConstructor
 @Repository
 public class ChatRoomRepository {

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+// 기능 : 게임 진행 서비스
 @Slf4j
 @RequiredArgsConstructor
 @Service

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
+// 기능 : 유저 정보 Entity
 @Entity
 @Table(name = "MEMBER")
 @Getter

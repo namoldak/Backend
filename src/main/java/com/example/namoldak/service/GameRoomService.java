@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
+// 기능 : 게임룸 서비스
 @Slf4j
 @RequiredArgsConstructor
 @Service

@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
+// 기능 : 게임 진행 관련 주요 서비스들을 컨트롤
 @Slf4j
 @RequiredArgsConstructor
 @Controller

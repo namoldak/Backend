@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+// 기능 : 게임진행 관련 Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

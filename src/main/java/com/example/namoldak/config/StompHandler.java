@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+// 기능 : Stomp로 메세지 보내기 전 들어오게 되는 핸들러
 @Slf4j
 @RequiredArgsConstructor
 @Component

@@ -9,6 +9,6 @@ public class ResponseDto {
 
     public ResponseDto(int statuscode, String message) {
         this.statuscode = statuscode;
-        this.message    = message;
+        this.message = message;
     }
 }
