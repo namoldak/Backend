@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+// 기능 : 게임룸 정보 Response Dto
 @Builder
 @Getter
 public class GameRoomResponseDto {

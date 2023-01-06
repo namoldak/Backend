@@ -17,6 +17,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
+// 기능 : JWT 유틸
 @Slf4j
 @Component
 @RequiredArgsConstructor

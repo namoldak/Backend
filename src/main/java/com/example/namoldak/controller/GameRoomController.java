@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+// 기능 : 게임룸 관련 CRUD 컨트롤
 @Slf4j
 @RequiredArgsConstructor
 @RestController

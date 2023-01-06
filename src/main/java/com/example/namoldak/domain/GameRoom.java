@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
+// 기능 : 게임룸 Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

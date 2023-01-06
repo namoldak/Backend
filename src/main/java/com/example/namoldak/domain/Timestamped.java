@@ -9,6 +9,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
+// 기능 : 생성 시간, 수정 시간
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

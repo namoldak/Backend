@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Optional;
 
+// 기능 : 게임룸과 유저를 다대다 연결하는 중간 Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

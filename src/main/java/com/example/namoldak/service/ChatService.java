@@ -8,23 +8,14 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+// 기능 : 시그널링 서버 역할 하는 서비스
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
-
-    // Redis를 이용하는 방법에는 두가지가 있다 RedisTemplate, RedisRepository
-    private final RedisTemplate<String, Object> redisTemplate;
     private final SimpMessageSendingOperations sendingOperations;
-    private final ChannelTopic channelTopic;
 
     public void meesage(ChatMessage message) {
-
-        log.info(message.getMessage());
-        log.info(message.getRoomId());
-        log.info(message.getSender());
-        log.info(String.valueOf(message.getType()));
-        log.info((String) message.getContent());
 
         ChatMessage exportMessage;
 
@@ -70,8 +61,6 @@ public class ChatService {
                 break;
 
             default:
-                // Websocket에 발행된 메시지를 redis로 발행(publish)
-//        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
                 sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), message);
         }
     }

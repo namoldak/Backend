@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// 기능 : 게임 진행 부가 기능 서비스
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -30,6 +31,7 @@ public class GameRearService {
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
 
+    // 게임 강제 종료
     @Transactional
     public void forcedEndGame(Long roomId) {
 
@@ -55,6 +57,7 @@ public class GameRearService {
         enterGameRoom.get().setStatus("true");
     }
 
+    // 게임 정상 종료
     @Transactional
     public void endGame(Long roomId) {
         // 승리자와 패배자를 list로 반환할 DTO 생성
