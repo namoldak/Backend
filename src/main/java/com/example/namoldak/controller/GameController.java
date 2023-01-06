@@ -41,7 +41,7 @@ public class GameController {
         gameService.gameSkip(userDetails.getMember(), gameRoomId);
     }
 
-//    @MessageMapping("/pub/game/{gameroomid}/spotlight")
+//    @MessageMapping("/pub/game/{gameRoomId}/spotlight")
 //    public void spotlight(
 //            @DestinationVariable Long gameRoomId) {
     @PostMapping("/pub/game/{gameRoomId}/spotlight")

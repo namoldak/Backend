@@ -80,7 +80,7 @@ public class GameService {
             keywordList = keywordRepository.findTop4ByCategory(category);
         } else if (gameRoomMembers.size() == 3) {
             // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
-            keywordList = keywordRepository.findTop4ByCategory(category);
+            keywordList = keywordRepository.findTop3ByCategory(category);
         }else{
             throw new CustomException(NOT_ENOUGH_MEMBER);
         }
@@ -138,18 +138,18 @@ public class GameService {
 
     // 건너뛰기
     @Transactional
-    public void gameSkip(Member member, Long gameroomid) {
+    public void gameSkip(Member member, Long gameRoomId) {
 
         // stomp로 메세지 전달
         GameMessage gameMessage = new GameMessage();
-        gameMessage.setRoomId(Long.toString(gameroomid)); // 현재 방 id
+        gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 방 id
         gameMessage.setSenderId(String.valueOf(member.getId())); // 로그인한 유저의 id
         gameMessage.setSender(member.getNickname()); // 로그인한 유저의 닉네임
         gameMessage.setContent(gameMessage.getSender() + "님이 건너뛰기를 선택하셨습니다.");
         gameMessage.setType(GameMessage.MessageType.SKIP);
 
         // 방 안의 구독자 모두가 메세지 받음
-        messagingTemplate.convertAndSend("/sub/gameroom/" + gameroomid, gameMessage);
+        messagingTemplate.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
     }
 
     public GameStartSet2 spotlight(Long gameRoomId){

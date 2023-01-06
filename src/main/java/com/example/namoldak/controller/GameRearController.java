@@ -28,12 +28,12 @@ public class GameRearController {
     }
 
     // 정답
-    @PostMapping("/pub/game/{gameroomId}/answer")
+    @PostMapping("/pub/game/{gameRoomId}/answer")
     public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                           @PathVariable Long gameroomId,
+                           @PathVariable Long gameRoomId,
             AnswerDto answerDto) {
 
-        log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameroomId, answerDto);
-        gameRearService.gameAnswer(userDetails.getMember(), gameroomId, answerDto);
+        log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameRoomId, answerDto);
+        gameRearService.gameAnswer(userDetails.getMember(), gameRoomId, answerDto);
     }
 }

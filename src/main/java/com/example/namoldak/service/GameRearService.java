@@ -107,13 +107,13 @@ public class GameRearService {
 
     // 정답
     @Transactional
-    public void gameAnswer(Member member, Long gameroomid, AnswerDto answerDto) {
+    public void gameAnswer(Member member, Long gameRoomId, AnswerDto answerDto) {
 
         // 모달창에 작성한 정답
         String answer = answerDto.getAnswer();
 
         // gameStartSet 불러오기
-        GameStartSet gameStartset = gameStartSetRepository.findByRoomId(gameroomid);
+        GameStartSet gameStartset = gameStartSetRepository.findByRoomId(gameRoomId);
 
         GameMessage gameMessage = new GameMessage();
 
@@ -124,23 +124,23 @@ public class GameRearService {
             gameStartset.setWinner(member.getNickname());
 
             // stomp로 메세지 전달
-            gameMessage.setRoomId(Long.toString(gameroomid));
+            gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSenderId(String.valueOf(member.getId()));
             gameMessage.setSender(member.getNickname());
             gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답입니다!");
             gameMessage.setType(GameMessage.MessageType.SUCCESS);
 
             // 방 안의 구독자 모두가 메세지 받음
-            sendingOperations.convertAndSend("/sub/gameroom/" + gameroomid, gameMessage);
+            sendingOperations.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
         } else {
             // stomp로 메세지 전달
-            gameMessage.setRoomId(Long.toString(gameroomid));
+            gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSenderId(String.valueOf(member.getId()));
             gameMessage.setSender(member.getNickname());
             gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답이 아닙니다.");
             gameMessage.setType(GameMessage.MessageType.FAIL);
 
-            sendingOperations.convertAndSend("/sub/gameroom/" + gameroomid, gameMessage);
+            sendingOperations.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
         }
     }
 }
