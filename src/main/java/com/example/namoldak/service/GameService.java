@@ -5,6 +5,7 @@ import com.example.namoldak.repository.GameRoomMemberRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.GameStartSetRepository2;
 import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,13 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.namoldak.domain.QGameRoom.gameRoom;
 import static com.example.namoldak.domain.QGameRoomMember.gameRoomMember;
 import static com.example.namoldak.domain.QMember.member;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.SPOTLIGHT_ERR;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,22 +59,24 @@ public class GameService {
         log.info("1 what");
         log.info(String.valueOf(gameRoomId));
 
-        Member member2 = jpaQueryFactory
-                .selectFrom(member)
-                .where(member.id.eq(6L))
-                .fetchOne();
-
-        System.out.println(member2.getEmail());
-
         // 게임룸 조회 (게임룸 상태를 조회하기 위한 조회)
-        GameRoom playRoom = jpaQueryFactory
-                .selectFrom(gameRoom)
-                .where(gameRoom.gameRoomName.eq("테스트방5"))
-                .fetchOne();
+//        GameRoom playRoom = jpaQueryFactory
+//                .selectFrom(gameRoom)
+//                .where(gameRoom.gameRoomName.eq("테스트방5"))
+//                .fetchOne();
+//
+//        em.flush();
+//        em.clear();
 
-        em.flush();
-        em.clear();
+        // 테스트로 여기서 방생 성 해보기
+        List<String> keywordList = new ArrayList<>();
+        keywordList.add("김연아");
+        keywordList.add("손흥민");
+        keywordList.add("세종대왕");
+        keywordList.add("이순신");
+        gameStartSetRepository2.saveGameSet(new GameStartSet2(gameRoomId, "인물", keywordList));
 
+        GameRoom playRoom = gameRoomRepository.findByGameRoomId(gameRoomId);
 
         log.info("2");
         // 해당 게임룸의 게임셋을 조회
@@ -87,21 +92,25 @@ public class GameService {
 
         log.info("4");
         // 유저들 정보 조회
-        List<GameRoomMember> memberListInGame = jpaQueryFactory
-                .selectFrom(gameRoomMember)
-                .where(gameRoomMember.gameRoom.gameRoomId.eq(gameRoomId))
-                .orderBy(gameRoomMember.createdAt.asc())
-                .fetch();
+//        List<GameRoomMember> memberListInGame = jpaQueryFactory
+//                .selectFrom(gameRoomMember)
+//                .where(gameRoomMember.gameRoom.gameRoomId.eq(gameRoomId))
+//                .orderBy(gameRoomMember.createdAt.asc())
+//                .fetch();
+        List<GameRoomMember> memberListInGame = gameRoomMemberRepository.findByGameRoom(playRoom);
 
         log.info("5");
         // 라운드 진행 중
         if(gameStartSet.getSpotnum() < memberListInGame.size()){
 
             // 현재 스포트라이트 받는 멤버
-            Member spotMember = jpaQueryFactory
-                    .selectFrom(member)
-                    .where(member.id.eq(memberListInGame.get(gameStartSet.getSpotnum()).getMember().getId()))
-                    .fetchOne();
+//            Member spotMember = jpaQueryFactory
+//                    .selectFrom(member)
+//                    .where(member.id.eq(memberListInGame.get(gameStartSet.getSpotnum()).getMember().getId()))
+//                    .fetchOne();
+            Member spotMember = memberRepository.findById(memberListInGame.get(gameStartSet.getSpotnum()).getMember().getId()).orElseThrow(
+                    ()-> new CustomException(SPOTLIGHT_ERR)
+            );
 
             log.info("6");
             // 메세지 알림
@@ -145,20 +154,5 @@ public class GameService {
         }
 
         return gameStartSet;
-    }
-
-    public String test(String nickname){
-        // 게임룸 조회 (게임룸 상태를 조회하기 위한 조회)
-
-        QMember qMember = member;
-
-        Member member3 = jpaQueryFactory
-                .selectFrom(member)
-                .where(
-                        member.nickname.eq(nickname)
-                )
-                .fetchOne();
-
-        return nickname;
     }
 }
