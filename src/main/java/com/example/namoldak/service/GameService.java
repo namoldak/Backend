@@ -55,7 +55,7 @@ public class GameService {
         gameRoom.setStatus("start");
 
         //TODO 멤버들에게 뿌려지게 될 키워드 전체 목록 불러오기
-        List<Keyword> keywordList = keywordRepository.findByCategory(keyword.getCategory());
+//        List<Keyword> keywordList = keywordRepository.findByCategory(keyword.getCategory());
 
         // 랜덤으로 키워드 하나 뽑기
 //        Keyword keyword1 = keywordList.get((int) Math.random() * keywordList.size());
@@ -82,38 +82,38 @@ public class GameService {
         }
 
         // 게임룸 멤버한테 키워드 배당
-        for (int i = 0; i < gameRoomMembers.size(); i++) {
-            keywordToMember.put(memberList.get(i).get().getNickname(), keywordList.get(i).getWord());
-        }
-
-        JSONObject keywordMember = new JSONObject(keywordToMember);
-
-        // GameStartSet에 해당 방의 카테고리와 멤버 각각의 키워드가 어떤 것인지 저장
-        GameStartSet gameStartSet = GameStartSet.builder()
-                .keyword(keywordMember.toString())
-                .category(keywordList.get(0).getCategory())
-                .roomId(gameRoomId)
-                .spotNum(0)
-                .round(1)
-                .build();
+//        for (int i = 0; i < gameRoomMembers.size(); i++) {
+//            keywordToMember.put(memberList.get(i).get().getNickname(), keywordList.get(i).getWord());
+//        }
+//
+//        JSONObject keywordMember = new JSONObject(keywordToMember);
+//
+//        // GameStartSet에 해당 방의 카테고리와 멤버 각각의 키워드가 어떤 것인지 저장
+//        GameStartSet gameStartSet = GameStartSet.builder()
+//                .keyword(keywordMember.toString())
+//                .category(keywordList.get(0).getCategory())
+//                .roomId(gameRoomId)
+//                .spotNum(0)
+//                .round(1)
+//                .build();
 
 
         // 웹소켓으로 전달드릴 content 내용
-        HashMap<String, Object> startset = new HashMap<>();
-        startset.put("category", gameStartSet.getCategory()); // 카테고리
-        startset.put("keyword", gameStartSet.getKeyword()); // 키워드
-        startset.put("memberlist", memberNicknameList); // 방에 존재하는 모든 유저들
-
-
-        GameMessage gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 게임방 id
-        gameMessage.setSenderId(""); // 준비된 유저의 id
-        gameMessage.setSender("주인님"); // 준비된 유저의 닉네임
-        gameMessage.setContent(startset); // 준비됐다는 내용
-        gameMessage.setType(GameMessage.MessageType.START); // 메세지 타입
+//        HashMap<String, Object> startset = new HashMap<>();
+//        startset.put("category", gameStartSet.getCategory()); // 카테고리
+//        startset.put("keyword", gameStartSet.getKeyword()); // 키워드
+//        startset.put("memberlist", memberNicknameList); // 방에 존재하는 모든 유저들
+//
+//
+//        GameMessage gameMessage = new GameMessage<>();
+//        gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 게임방 id
+//        gameMessage.setSenderId(""); // 준비된 유저의 id
+//        gameMessage.setSender("주인님"); // 준비된 유저의 닉네임
+//        gameMessage.setContent(startset); // 준비됐다는 내용
+//        gameMessage.setType(GameMessage.MessageType.START); // 메세지 타입
 
         // 게임 시작 알림을 방에 구독이 된 유저들에게 알려줌
-        messagingTemplate.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
+//        messagingTemplate.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
 
         return new ResponseEntity<>(new ResponseDto(200,"게임 시작"),HttpStatus.OK);
     }
