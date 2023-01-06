@@ -3,13 +3,12 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.RequestDto.AnswerDto;
 import com.example.namoldak.dto.ResponseDto.VictoryDto;
-import com.example.namoldak.repository.GameRoomMemberRepository;
-import com.example.namoldak.repository.GameRoomRepository;
-import com.example.namoldak.repository.GameStartSetRepository;
-import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.repository.*;
+
 import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.GameStartSet;
 import com.example.namoldak.domain.Member;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;

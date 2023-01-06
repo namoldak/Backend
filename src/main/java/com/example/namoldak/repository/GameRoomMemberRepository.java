@@ -13,4 +13,5 @@ public interface GameRoomMemberRepository extends JpaRepository<GameRoomMember, 
     List<GameRoomMember> findByGameRoom(GameRoom gameRoom);
     List<GameRoomMember> findByGameRoom(Optional<GameRoom> gameRoom);
     GameRoomMember findByMember(Member member);
+    List<GameRoomMember> findByGameRoomOrderByCreatedAt(GameRoom gameRoom);
 }

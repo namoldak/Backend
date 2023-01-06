@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.SPOTLIGHT_ERR;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_ENOUGH_MEMBER;
 
 // 기능 : 게임 진행 서비스
@@ -33,6 +34,8 @@ public class GameService {
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameStartSetRepository gameStartSetRepository;
+    private final GameStartSetRepository2 gameStartSetRepository2;
+
 
     // 게임 시작
     @Transactional
@@ -147,5 +150,140 @@ public class GameService {
 
         // 방 안의 구독자 모두가 메세지 받음
         messagingTemplate.convertAndSend("/sub/gameroom/" + gameroomid, gameMessage);
+    }
+
+    public GameStartSet2 spotlight(Long gameRoomId){
+
+        //TODO =============================================================================== test START
+
+        log.info("============================= 1 :" + gameRoomId.toString());
+        // 테스트로 여기서 방생 성 해보기
+        List<String> keywordList = new ArrayList<>();
+        keywordList.add("김연아");
+        keywordList.add("손흥민");
+        keywordList.add("세종대왕");
+        keywordList.add("이순신");
+
+        log.info("============================= 1-2");
+
+        GameStartSet2 gameStartSet2 = new GameStartSet2();
+        gameStartSet2.setRoomId(gameRoomId);
+        gameStartSet2.setSpotNum(0);
+        gameStartSet2.setCategory("인물");
+        gameStartSet2.setKeyword(keywordList);
+        gameStartSet2.setRound(0);
+
+        log.info(gameStartSet2.getRoomId().toString());
+
+        log.info("============================= 1-3");
+        gameStartSetRepository2.saveGameSet(gameStartSet2);
+
+        log.info("============================= 1-4");
+
+        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
+        log.info("Category : " + gameStartSet2.getCategory());
+        for(int i = 0; i < gameStartSet2.getKeyword().size(); i++){
+            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
+        }
+        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
+
+        log.info("============================= 1-5");
+
+        gameStartSet2.setCategory("음식");
+        keywordList.clear();
+        keywordList.add("푸퐛퐁커리" + gameRoomId.toString());
+        keywordList.add("정어리파이" + gameRoomId.toString());
+        keywordList.add("김밥" + gameRoomId.toString());
+        keywordList.add("떡볶이" + gameRoomId.toString());
+        gameStartSet2.setKeyword(keywordList);
+        gameStartSet2.setSpotNum(gameStartSet2.getSpotNum() +1 );
+        gameStartSetRepository2.saveGameSet(gameStartSet2);
+
+        log.info("============================= 1-6");
+
+        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
+        log.info("Category : " + gameStartSet2.getCategory());
+        for(int i = 0; i < gameStartSet2.getKeyword().size(); i++){
+            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
+        }
+        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
+
+        log.info("============================= 1-7");
+
+        GameStartSet2 gameStartSet21 = gameStartSetRepository2.findGameSetById(23L);
+
+        log.info("Room ID : " + gameStartSet21.getRoomId().toString());
+        log.info("Category : " + gameStartSet21.getCategory());
+        for(int i = 0; i < gameStartSet21.getKeyword().size(); i++){
+            log.info("키워드 : " + gameStartSet21.getKeyword().get(i).toString());
+        }
+        log.info("위치정보 : " + gameStartSet21.getSpotNum().toString());
+
+        log.info("============================= 1-8");
+
+        //TODO =============================================================================== test END
+
+        GameRoom playRoom = gameRoomRepository.findByGameRoomId(gameRoomId).get();
+
+        // 해당 게임룸의 게임셋을 조회
+        GameStartSet2 gameStartSet = gameStartSetRepository2.findGameSetById(gameRoomId);
+
+        // 게임이 진행이 불가한 상태라면 초기화 시켜야 함
+        if(playRoom.getStatus().equals("false")){ // false? true? 여튼 게임 진행이 아닌 상태
+            gameStartSet.setRound(0);
+            gameStartSet.setSpotNum(0);
+            gameStartSetRepository2.saveGameSet(gameStartSet);
+        }
+
+        // 유저들 정보 조회
+        List<GameRoomMember> memberListInGame = gameRoomMemberRepository.findByGameRoom(playRoom);
+
+        // 라운드 진행 중
+        if(gameStartSet.getSpotNum() < memberListInGame.size()){
+
+            // 현재 스포트라이트 받는 멤버
+            Member spotMember = memberRepository.findById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
+                    ()-> new CustomException(SPOTLIGHT_ERR)
+            );
+
+            // 메세지 알림
+            GameMessage gameMessage = new GameMessage();
+            gameMessage.setRoomId(Long.toString(gameRoomId));                   // 현재 게임룸 id
+            gameMessage.setSenderId(String.valueOf(spotMember.getId()));        // 스포트라이트 멤버 id
+            gameMessage.setSender(spotMember.getNickname());                    // 스포트라이트 멤버 닉네임
+            gameMessage.setContent(gameMessage.getSender() + "님이 차례입니다.");  // 메세지
+            gameMessage.setType(GameMessage.MessageType.SPOTLIGHT);
+
+            messagingTemplate.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
+
+            // 다음 차례로!
+            gameStartSet.setSpotNum(gameStartSet.getSpotNum() + 1);
+            gameStartSetRepository2.saveGameSet(gameStartSet);
+
+            log.info("위치정보 : " + gameStartSet21.getSpotNum().toString());
+
+
+        } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
+
+
+            if (gameStartSet.getRound() < 20) {
+                // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
+                gameStartSet.setRound(gameStartSet.getRound() + 1);
+                gameStartSet.setSpotNum(0);
+
+            } else if (gameStartSet.getRound() == 20) {
+                // 메세지 알림 = 여기 말할 이야기
+                GameMessage gameMessage = new GameMessage();
+                gameMessage.setRoomId(Long.toString(gameRoomId));               // 현재 게임룸 id
+                gameMessage.setSenderId("admin");
+                gameMessage.setSender("양계장 주인");
+                gameMessage.setContent("20라운드까지 정답자가 안나오다니!!!!!");
+                gameMessage.setType(GameMessage.MessageType.SKIP);
+
+                messagingTemplate.convertAndSend("/sub/gameroom/" + gameRoomId, gameMessage);
+
+            }
+        }
+        return gameStartSet;  //TODO 테스트용 반환
     }
 }

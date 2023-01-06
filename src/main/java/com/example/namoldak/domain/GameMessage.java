@@ -19,7 +19,7 @@ public class GameMessage<T> {
     private GameMessage.MessageType type;
 
     public enum MessageType {
-        JOIN, OWNER, ENTER, RULE, READY, START, KEYWORD,
+        JOIN, OWNER, ENTER, RULE, READY, START, KEYWORD, SPOTLIGHT,
         FAIL, SKIP, SUCCESS, WINNER, ENDGAME,
         LEAVE, NEWOWNER
     }

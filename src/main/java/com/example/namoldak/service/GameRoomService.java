@@ -180,7 +180,7 @@ public class GameRoomService {
         contentSet.put("enterComment", gameMessage.getRoomId() + "번 방에" + gameMessage.getSenderId() + "님이 입장하셨습니다.");
 
         gameMessage.setContent(contentSet);
-        gameMessage.setType(GameMessage.MessageType.JOIN);
+        gameMessage.setType(GameMessage.MessageType.ENTER);
 
         messagingTemplate.convertAndSend("/sub/gameroom/" + roomId, gameMessage);
 
