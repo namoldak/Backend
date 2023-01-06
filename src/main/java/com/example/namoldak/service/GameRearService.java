@@ -35,7 +35,30 @@ public class GameRearService {
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
+    public void forcedEndGame(Long roomId) {
 
+        // 현재 게임방 정보 불러오기
+        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
+
+        // 게임방의 셋팅 정보 불러오기
+        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId);
+
+        // 발송할 메세지 데이터 저장
+        GameMessage gameMessage = new GameMessage<>();
+        gameMessage.setRoomId(Long.toString(roomId));
+        gameMessage.setSenderId("");
+        gameMessage.setSender("");
+        gameMessage.setContent("게임 진행 가능한 최소 인원이 충족되지 못 하여 게임이 종료됩니다.");
+        gameMessage.setType(GameMessage.MessageType.ENDGAME);
+        sendingOperations.convertAndSend("/sub/gameroom" + roomId, gameMessage);
+
+        // DB에서 게임 셋팅 삭제
+        gameStartSetRepository.delete(gameStartSet);
+
+        // 현재 방 상태 정보를 true로 변경
+        enterGameRoom.get().setStatus("true");
+    }
 
     @Transactional
     public void endGame(Long roomId) {
