@@ -1,5 +1,7 @@
 package com.example.namoldak.util.jwt;
 
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,22 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
     public final JwtUtil jwtUtil;
 
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//
+//        String token = jwtUtil.resolveToken(request);
+//
+//        if(token != null) {
+//            if(!jwtUtil.validateToken(token)){
+//                jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
+//                return;
+//            }
+//            Claims info = jwtUtil.getUserInfoFromToken(token);
+//            setAuthentication(info.getSubject());
+//        }
+//        filterChain.doFilter(request, response);
+//    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -29,12 +47,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
-                jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
+                response.setStatus(StatusCode.INVALID_TOKEN.getHttpStatus().value());
+                response.setContentType("application/json; charset=UTF-8");
+                try {
+                    String json = new ObjectMapper().writeValueAsString(new GlobalResponseDto(StatusCode.INVALID_TOKEN));
+                    response.getWriter().write(json);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
                 return;
             }
+            // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
             Claims info = jwtUtil.getUserInfoFromToken(token);
             setAuthentication(info.getSubject());
         }
+        // 4. 다음 필터로 넘어간다
         filterChain.doFilter(request, response);
     }
 
