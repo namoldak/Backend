@@ -48,7 +48,7 @@ public class GameRoomService {
     @Transactional
     public List<GameRoomResponseDto> mainPage(Pageable pageable) {
 
-        // DB에 저장된 모든 Room들을 리스트형으로 저장
+        // DB에 저장된 모든 Room들을 리스트형으로 저장 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findAll(pageable);
 
         // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
@@ -195,28 +195,31 @@ public class GameRoomService {
 
     // 게임룸 키워드 조회
     public List<GameRoomResponseDto> searchGame(Pageable pageable, String keyword) {
-
+        // 게임룸 이름을 keyword(검색어)로 잡고 조회 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findByGameRoomNameContaining(pageable, keyword);
 
-        List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
+        if(rooms.isEmpty()){
+            throw new CustomException(NOT_EXIST_ROOMS);
+        }
 
+        List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
         for (GameRoom room : rooms) {
+            // 게임룸에 입장해 있는 멤버 조회
             List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(room);
             List<MemberResponseDto> memberList = new ArrayList<>();
-
             for (GameRoomMember gameRoomMember : gameRoomMemberList) {
 
                 Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
-
+                // 멤버로부터 필요한 정보인 id, email, nickname만 Dto에 담아주기
                 MemberResponseDto memberResponseDto = MemberResponseDto.builder()
                         .memberId(eachMember.get().getId())
                         .email(eachMember.get().getEmail())
                         .nickname(eachMember.get().getNickname())
                         .build();
-
+                // 담긴 정보 저장
                 memberList.add(memberResponseDto);
             }
-
+            // 게임룸에 필요한 정보를 Dto에 담아주기
             GameRoomResponseDto gameRoomResponseDto = GameRoomResponseDto.builder()
                     .id(room.getGameRoomId())
                     .roomName(room.getGameRoomName())
@@ -226,11 +229,12 @@ public class GameRoomService {
                     .owner(room.getOwner())
                     .status(room.getStatus())
                     .build();
-
+            // 방에 멤버가 1명 이상이라면, 담아줬던 데이터 저장하기
             if (!memberList.isEmpty()) {
                 gameRoomList.add(gameRoomResponseDto);
             }
         }
+        // 저장된 정보가 담긴 리스트를 반환
         return gameRoomList;
     }
 

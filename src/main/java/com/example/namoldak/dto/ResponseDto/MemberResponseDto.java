@@ -14,8 +14,8 @@ public class MemberResponseDto {
     private String nickname;
 
     public MemberResponseDto(Member member){
-        this.memberId = member.getId();
-        this.email = member.getEmail();
-        this.nickname = member.getNickname();
+        this.memberId  = member.getId();
+        this.email     = member.getEmail();
+        this.nickname  = member.getNickname();
     }
 }

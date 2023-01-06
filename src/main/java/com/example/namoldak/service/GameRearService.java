@@ -7,19 +7,14 @@ import com.example.namoldak.repository.GameRoomMemberRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.GameStartSetRepository;
 import com.example.namoldak.repository.MemberRepository;
-
 import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.GameStartSet;
 import com.example.namoldak.domain.Member;
-import com.example.namoldak.dto.RequestDto.AnswerDto;
-import com.example.namoldak.repository.GameStartSetRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,7 +8,6 @@ import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,7 +27,8 @@ public class GameRoomController {
     // 게임룸 생성
 //    @Cacheable
     @PostMapping("/rooms")
-    public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody GameRoomRequestDto gameRoomRequestDto){
+    public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                          @RequestBody GameRoomRequestDto gameRoomRequestDto){
         return ResponseUtil.response(gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
     }
 
@@ -41,19 +41,22 @@ public class GameRoomController {
 
     // 게임룸 키워드 조회
     @GetMapping("/rooms/search") // '/rooms/search?keyword=검색어'
-    public List<GameRoomResponseDto> searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable, String keyword){
+    public List<GameRoomResponseDto> searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable,
+                                                String keyword){
         return gameRoomService.searchGame(pageable, keyword);
     }
 
     // 게임룸 입장
     @PostMapping("/rooms/{roomId}")
-    public ResponseEntity<?> enterGame(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> enterGame(@PathVariable Long roomId,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseUtil.response(gameRoomService.enterGame(roomId, userDetails.getMember()));
     }
 
     // 게임룸 나가기
     @DeleteMapping("room/{roomId}/exit")
-    public ResponseEntity<?> roomExit(@PathVariable Long roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<?> roomExit(@PathVariable Long roomId,
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseUtil.response(gameRoomService.roomExit(roomId, userDetails.getMember()));
     }
 }

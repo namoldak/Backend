@@ -31,16 +31,16 @@ public class Member {
     private GameRoomMember gameRoomMember;
 
     public Member(String email, String nickname, String password) {
-        this.email = email;
+        this.email    = email;
         this.nickname = nickname;
         this.password = password;
     }
 
     public Member(String email, String password, Long kakaoId, String kakaoNickname){
-        this.email = email;
-        this.password = password;
-        this.kakaoId = kakaoId;
-        this.nickname = kakaoNickname;
+        this.email     = email;
+        this.password  = password;
+        this.kakaoId   = kakaoId;
+        this.nickname  = kakaoNickname;
     }
 
     public Member kakaoIdUpdate(Long kakaoId){
