@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 
+// 기능 :
 @Getter
 public class UserDetailsImpl implements UserDetails {
     private final Member member;

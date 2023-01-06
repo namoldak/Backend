@@ -1,11 +1,11 @@
 package com.example.namoldak.dto.ResponseDto;
 
-
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 기능 : ?
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +16,7 @@ public class PrivateResponseBody<T> {
 
     public PrivateResponseBody(StatusCode statusCode, T data){
         this.statusCode = statusCode.getStatusCode();
-        this.statusMsg = statusCode.getStatusMsg();
-        this.data = data;
+        this.statusMsg  = statusCode.getStatusMsg();
+        this.data       = data;
     }
 }

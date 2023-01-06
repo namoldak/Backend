@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.util.List;
 
+// 기능 : 게임룸 Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,11 +34,11 @@ public class GameRoom extends Timestamped{
     @Column(nullable = false)
     private String status;
 
-    public void update(String owner){
+    public void setOwner(String owner){
         this.owner = owner;
     }
 
-    public void updateStatus(String status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 }

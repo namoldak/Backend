@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 기능 : 채팅에 적용되는 관리자 메세지용 Dto
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class GameMessage<T> {
     private GameMessage.MessageType type;
 
     public enum MessageType {
-        OWNER, ENTER, RULE, READY, START, KEYWORD, SPOTLIGHT,
+        JOIN, OWNER, ENTER, RULE, READY, START, KEYWORD, SPOTLIGHT,
         FAIL, SKIP, SUCCESS, WINNER, ENDGAME,
         LEAVE, NEWOWNER
     }

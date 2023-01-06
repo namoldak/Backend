@@ -1,13 +1,16 @@
 package com.example.namoldak.dto.RequestDto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+// 기능 : 기본 폼 로그인 Request Dto
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class SignupRequestDto {
     @NotBlank(message = "닉네임은 필수 입력 값입니다")
     private String nickname;

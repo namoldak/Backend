@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+// 기능 : 챗룸 생성 서비스
 @RequiredArgsConstructor
 @Service
 public class ChatRoomService {

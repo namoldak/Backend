@@ -4,10 +4,13 @@ package com.example.namoldak.util.GlobalResponse.code;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+// 기능 : 응답용 메세지 커스텀
 @Getter
 public enum StatusCode {
 
-    //400 BAD_REQUEST : 잘못된 요청
+    //TODO ========================= 예외 응답 코드 ===============================
+
+    // 400 BAD_REQUEST : 잘못된 요청
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "400", "요청이 올바르지 않습니다"),
     BAD_REQUEST_TOKEN(HttpStatus.BAD_REQUEST, "400","토큰이 유효하지 않습니다."),
     EXIST_EMAIL(HttpStatus.BAD_REQUEST, "400","중복된 이메일이 존재합니다."),
@@ -16,7 +19,6 @@ public enum StatusCode {
     LOGIN_MATCH_FAIL(HttpStatus.BAD_REQUEST, "400","회원을 찾을 수 없습니다."),
     INVALID_ID_PASSWORD(HttpStatus.BAD_REQUEST, "400","아이디나 비밀번호의 구성이 알맞지 않습니다"),
     BAD_PASSWORD(HttpStatus.BAD_REQUEST, "400","비밀번호가 일치하지 않습니다"),
-
     LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "존재하지 않는 유저 정보입니다."),
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "비밀번호가 일치하지 않습니다."),
     LOGIN_WRONG_SIGNATURE_JWT_TOKEN(HttpStatus.BAD_REQUEST, "112", "잘못된 JWT 서명입니다."),
@@ -48,6 +50,8 @@ public enum StatusCode {
     SEARCH_POST_ERROR(HttpStatus.BAD_REQUEST,"141","검색 결과에 맞는 게시글이 존재하지 않습니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
 
+
+    //TODO ========================= 성공 응답 코드 ===============================
 
     OK(HttpStatus.OK, "200", "응답이 정상 처리 되었습니다."),
     LOGIN_OK(HttpStatus.OK, "200", "로그인 되셨습니다!"),

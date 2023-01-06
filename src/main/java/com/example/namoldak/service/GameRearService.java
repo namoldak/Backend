@@ -15,11 +15,11 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// 기능 : 게임 진행 부가 기능 서비스
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -30,8 +30,33 @@ public class GameRearService {
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
 
+    // 게임 강제 종료
+    @Transactional
+    public void forcedEndGame(Long roomId) {
 
+        // 현재 게임방 정보 불러오기
+        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
 
+        // 게임방의 셋팅 정보 불러오기
+        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId);
+
+        // 발송할 메세지 데이터 저장
+        GameMessage gameMessage = new GameMessage<>();
+        gameMessage.setRoomId(Long.toString(roomId));
+        gameMessage.setSenderId("");
+        gameMessage.setSender("");
+        gameMessage.setContent("게임 진행 가능한 최소 인원이 충족되지 못 하여 게임이 종료됩니다.");
+        gameMessage.setType(GameMessage.MessageType.ENDGAME);
+        sendingOperations.convertAndSend("/sub/gameroom" + roomId, gameMessage);
+
+        // DB에서 게임 셋팅 삭제
+        gameStartSetRepository.delete(gameStartSet);
+
+        // 현재 방 상태 정보를 true로 변경
+        enterGameRoom.get().setStatus("true");
+    }
+
+    // 게임 정상 종료
     @Transactional
     public void endGame(Long roomId) {
         // 승리자와 패배자를 list로 반환할 DTO 생성
@@ -77,7 +102,7 @@ public class GameRearService {
         gameStartSetRepository.delete(gameStartSet);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().updateStatus("true");
+        enterGameRoom.get().setStatus("true");
     }
 
     // 정답

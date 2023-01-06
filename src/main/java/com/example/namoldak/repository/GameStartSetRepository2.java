@@ -17,6 +17,7 @@ public class GameStartSetRepository2 {
     private final RedisTemplate<String, Object> redisTemplate;
     private HashOperations<String, Long, GameStartSet2> opsHashGameSet;
 
+    @PostConstruct
     private void init() {
         opsHashGameSet = redisTemplate.opsForHash();
     }

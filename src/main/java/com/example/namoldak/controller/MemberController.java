@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.List;
+
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
-
+// 기능 : 멤버 로그인, 회원가입 관련 컨트롤
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(produces = "application/json; charset=utf8")
 public class MemberController {
     private final MemberService memberService;
     private final KakaoService kakaoService;
@@ -31,7 +34,8 @@ public class MemberController {
 
     // 로그인
     @PostMapping(value = "/auth/login")
-    public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto,
+                                   HttpServletResponse response) {
         return ResponseUtil.response(memberService.login(signupRequestDto, response));
     }
 
@@ -49,15 +53,15 @@ public class MemberController {
 
     // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code,
+                                        HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
-        String createToken = kakaoService.kakaoLogin(code, response);
+        List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
 
         // Cookie 생성 및 직접 브라우저에 Set
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));  //앞부분이 키값, 뒷부분이 value값
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값
         cookie.setPath("/");
         response.addCookie(cookie);
-
-        return ResponseUtil.response(SIGNUP_OK);
+        return ResponseUtil.response(kakaoReturnValue.get(1));
     }
 }

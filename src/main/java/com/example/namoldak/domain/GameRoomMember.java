@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Optional;
 
+// 기능 : 게임룸과 유저를 다대다 연결하는 중간 Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +19,12 @@ public class GameRoomMember extends Timestamped{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long gameRoomMemberId;
+
+//    @Column
+//    private String keyword;
+
+//    @Column
+//    private String nickname;
 
     // 추가
     @JsonIgnore
@@ -33,12 +40,12 @@ public class GameRoomMember extends Timestamped{
 
     public GameRoomMember(GameRoom gameRoom, Member member){
         this.gameRoom = gameRoom;
-        this.member = member;
+        this.member   = member;
     }
 
     public GameRoomMember(Optional <GameRoom> gameRoom, Member member){
         this.gameRoom = gameRoom.get();
-        this.member = member;
+        this.member   = member;
     }
 }
 

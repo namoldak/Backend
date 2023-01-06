@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+// 기능 : Redis에 저장되는 챗룸 객체
 @Getter
 @Setter
 public class ChatRoom implements Serializable {
@@ -15,8 +16,8 @@ public class ChatRoom implements Serializable {
 
     public static ChatRoom create(String name, String roomId) {
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.roomId = roomId;
-        chatRoom.name = name;
+        chatRoom.roomId   = roomId;
+        chatRoom.name     = name;
         return chatRoom;
     }
 }

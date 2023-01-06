@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+// 기능 : 로그인한 유저 정보 Response Dto
 @AllArgsConstructor
 @Builder
 @Getter
@@ -14,8 +15,8 @@ public class MemberResponseDto {
     private String nickname;
 
     public MemberResponseDto(Member member){
-        this.memberId = member.getId();
-        this.email = member.getEmail();
-        this.nickname = member.getNickname();
+        this.memberId  = member.getId();
+        this.email     = member.getEmail();
+        this.nickname  = member.getNickname();
     }
 }
