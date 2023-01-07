@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 // 기능 : 게임 진행 관련 부가기능 컨트롤
@@ -27,7 +28,7 @@ public class GameRearController {
     @PostMapping("/pub/game/{gameRoomId}/answer")
     public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
                            @PathVariable Long gameRoomId,
-            AnswerDto answerDto) {
+                           @RequestBody AnswerDto answerDto) {
 
         log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameRoomId, answerDto);
         gameRearService.gameAnswer(userDetails.getMember(), gameRoomId, answerDto);
