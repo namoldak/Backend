@@ -2,7 +2,6 @@ package com.example.namoldak.dto.ResponseDto;
 
 import lombok.Builder;
 import lombok.Getter;
-
 import java.util.List;
 
 // 기능 : 게임룸 정보 Response Dto

@@ -25,7 +25,6 @@ public class GameRoomController {
     private final GameRoomService gameRoomService;
 
     // 게임룸 생성
-//    @Cacheable
     @PostMapping("/rooms")
     public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @RequestBody GameRoomRequestDto gameRoomRequestDto){
@@ -54,7 +53,7 @@ public class GameRoomController {
     }
 
     // 게임룸 나가기
-    @DeleteMapping("room/{roomId}/exit")
+    @DeleteMapping("/rooms/{roomId}/exit")
     public ResponseEntity<?> roomExit(@PathVariable Long roomId,
                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseUtil.response(gameRoomService.roomExit(roomId, userDetails.getMember()));

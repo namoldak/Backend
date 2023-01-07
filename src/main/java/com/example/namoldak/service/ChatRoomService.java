@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
 
-    public ResponseEntity<PrivateResponseBody> createChatRoom(String roomId, String name) {
+    public ResponseEntity<PrivateResponseBody> createChatRoom(String roomId, String name){
 
         ChatRoom chatRoom = ChatRoom.create(name, roomId);
         return new ResponseEntity<>(new PrivateResponseBody

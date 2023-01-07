@@ -3,7 +3,7 @@ package com.example.namoldak.dto.RequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// 기능 :  kakao ???
+// 기능 :  kakao 유저 정보를 받는 Dto
 @Getter
 @NoArgsConstructor
 public class KakaoUserInfoDto {

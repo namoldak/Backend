@@ -1,6 +1,5 @@
 package com.example.namoldak.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -24,12 +23,8 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
+    @Column
     private Long kakaoId;
-
-//    @JsonIgnore
-//    @JoinColumn(name="gameroommember_id")
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private GameRoomMember gameRoomMember;
 
     public Member(String email, String nickname, String password) {
         this.email    = email;

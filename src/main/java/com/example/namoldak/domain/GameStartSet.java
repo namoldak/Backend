@@ -1,7 +1,6 @@
 package com.example.namoldak.domain;
 
 import lombok.*;
-
 import javax.persistence.*;
 
 // 기능 : 게임진행 관련 Entity
@@ -10,7 +9,6 @@ import javax.persistence.*;
 @Getter
 @Builder
 @Entity
-@Setter
 public class GameStartSet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

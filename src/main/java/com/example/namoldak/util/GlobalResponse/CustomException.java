@@ -4,8 +4,7 @@ import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-// 1. 기능 : 실행 예외에 ErrorCode필드 추가해 커스텀
-// 2. 작성자 : 조소영
+// 기능 : 실행 예외에 ErrorCode필드 추가해 커스텀
 @Getter
 @AllArgsConstructor
 public class CustomException extends RuntimeException {     //실행 예외 클래스를 상속받아서 Unchecked Exception으로 활용

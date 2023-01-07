@@ -11,7 +11,7 @@ public class GlobalResponseDto {
     private String statusCode;
     private String statusMsg;
 
-    public GlobalResponseDto(StatusCode statusCode){
+    public GlobalResponseDto(StatusCode statusCode) {
         this.httpStatus = statusCode.getHttpStatus();
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();

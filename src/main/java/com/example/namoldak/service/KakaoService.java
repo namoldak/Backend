@@ -18,14 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-// 1. 기능 : OAuth.2.0 카카오 로그인
-// 2. 작성자 : 차이진
+// 기능 : OAuth.2.0 카카오 로그인
 @Slf4j
 @Service
 @RequiredArgsConstructor

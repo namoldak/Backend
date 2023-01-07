@@ -9,12 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.List;
-
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 // 기능 : 멤버 로그인, 회원가입 관련 컨트롤

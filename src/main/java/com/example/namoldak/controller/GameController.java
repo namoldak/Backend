@@ -29,7 +29,7 @@ public class GameController {
     @PostMapping("/pub/game/{gameRoomId}/start")
     public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return gameService.gameStart(gameRoomId, userDetails.getMember());
+        return ResponseUtil.response(gameService.gameStart(gameRoomId, userDetails.getMember()));
     }
 
     // 건너뛰기
@@ -41,6 +41,7 @@ public class GameController {
         gameService.gameSkip(userDetails.getMember(), gameRoomId);
     }
 
+    // 발언권 부여
 //    @MessageMapping("/pub/game/{gameRoomId}/spotlight")
 //    public void spotlight(
 //            @DestinationVariable Long gameRoomId) {

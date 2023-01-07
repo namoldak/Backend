@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// 기능 : ?
+// 기능 : 데이터 및 상태 코드, 메세지 반환
 @Getter
 @Setter
 @NoArgsConstructor
