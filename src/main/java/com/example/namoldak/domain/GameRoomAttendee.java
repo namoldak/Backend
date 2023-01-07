@@ -15,7 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Entity
 @Builder
-public class GameRoomMember extends Timestamped{
+public class GameRoomAttendee extends Timestamped{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long gameRoomMemberId;
@@ -29,28 +29,37 @@ public class GameRoomMember extends Timestamped{
     // 추가
     @JsonIgnore
     @JoinColumn(name="gameroomid")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private GameRoom gameRoom;
 
-    //TODO 왜 이렇게 했나요?
     @JsonIgnore
     @JoinColumn(name="memberid")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Column(nullable = false)
     private Long member_Id;
 
-    public GameRoomMember(GameRoom gameRoom, Member member){
+    @Column(nullable = false)
+    private Long gameRoom_Id;
+
+    @Column(nullable = false)
+    private String memberNickname;
+
+    public GameRoomAttendee(GameRoom gameRoom, Member member){
         this.gameRoom = gameRoom;
         this.member   = member;
         this.member_Id = member.getId();
+        this.gameRoom_Id = gameRoom.getGameRoomId();
+        this.memberNickname = member.getNickname();
     }
 
-    public GameRoomMember(Optional <GameRoom> gameRoom, Member member){
+    public GameRoomAttendee(Optional <GameRoom> gameRoom, Member member){
         this.gameRoom = gameRoom.get();
         this.member   = member;
         this.member_Id = member.getId();
+        this.gameRoom_Id = gameRoom.get().getGameRoomId();
+        this.memberNickname = member.getNickname();
     }
 }
 

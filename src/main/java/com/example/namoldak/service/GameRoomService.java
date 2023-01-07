@@ -2,14 +2,14 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.GameRoom;
-import com.example.namoldak.domain.GameRoomMember;
+import com.example.namoldak.domain.GameRoomAttendee;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.ChatRoomRepository;
-import com.example.namoldak.repository.GameRoomMemberRepository;
+import com.example.namoldak.repository.GameRoomAttendeeRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -38,7 +38,7 @@ public class GameRoomService {
     // 의존성 주입
     private final JwtUtil jwtUtil;
     private final GameRoomRepository gameRoomRepository;
-    private final GameRoomMemberRepository gameRoomMemberRepository;
+    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final MemberRepository memberRepository;
     private final ChatRoomService chatRoomService;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -58,12 +58,12 @@ public class GameRoomService {
 
         for (GameRoom room : rooms) {
             // 모든 Room들이 모여있는 rooms에서 하나씩 추출 -> Room 객체 활용해서 GameRoomMember DB에서 찾은 후 리스트에 저장
-            List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(room);
+            List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(room);
             // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
             List<MemberResponseDto> memberList = new ArrayList<>();
-            for (GameRoomMember gameRoomMember : gameRoomMemberList) {
+            for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
                 // GameRoomMember에 저장된 멤버 아이디로 DB 조회 후 데이터 저장
-                Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
+                Optional<Member> eachMember = memberRepository.findById(gameRoomAttendee.getMember().getId());
 
                 // MemberResponseDto에 빌더 방식으로 각각의 데이터 값 넣어주기
                 MemberResponseDto memberResponseDto = MemberResponseDto.builder()
@@ -111,9 +111,9 @@ public class GameRoomService {
         gameRoomRepository.save(gameRoom);
 
         // 생성자로 gameRoom, member 데이터를 담은 GameRoomMember 객체 완성
-        GameRoomMember gameRoomMember = new GameRoomMember(gameRoom, member);
+        GameRoomAttendee gameRoomAttendee = new GameRoomAttendee(gameRoom, member);
         // GameRoomMember DB에 해당 데이터 저장
-        gameRoomMemberRepository.save(gameRoomMember);
+        gameRoomAttendeeRepository.save(gameRoomAttendee);
 
         // 채팅방 생성
         chatRoomService.createChatRoom(gameRoom.getGameRoomId().toString(), gameRoom.getGameRoomName());
@@ -145,28 +145,28 @@ public class GameRoomService {
         }
 
         // 입장하려는 게임방을 이용해서 GameRoomMember DB에서 유저 정보 전부 빼와서 리스트형에 저장 (입장 정원 확인 용도)
-        List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
+        List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
 
         // 만약 방에 4명이 넘어가면
-        if (gameRoomMemberList.size() > 3) {
+        if (gameRoomAttendeeList.size() > 3) {
             // 입장 안 된다고 입구컷
             return new ResponseEntity<>(new PrivateResponseBody(StatusCode.CANT_ENTER, "정원이 다 차있닭!!"), HttpStatus.BAD_REQUEST);
         }
 
         // for문으로 리스트에서 gameRoomMember 하나씩 빼주기
-        for (GameRoomMember gameRoomMember : gameRoomMemberList) {
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
             // gameRoomMember에서 얻은 유저 아이디로 Member 객체 저장
-            Optional<Member> member1 = memberRepository.findById(gameRoomMember.getMember().getId());
+            Optional<Member> member1 = memberRepository.findById(gameRoomAttendee.getMember().getId());
             // 현재 들어가려는 유저의 ID와 게임에 들어가있는 멤버의 ID가 똑같으면 입구컷 해버림
             if (member.getId().equals(member1.get().getId())){
                 return new ResponseEntity<>(new PrivateResponseBody(StatusCode.MEMBER_DUPLICATED, "이미 입장해있닭!!"), HttpStatus.BAD_REQUEST);
             }
         }
 
-        GameRoomMember gameRoomMember = new GameRoomMember(enterGameRoom, member);
+        GameRoomAttendee gameRoomAttendee = new GameRoomAttendee(enterGameRoom, member);
 
         // DB에 데이터 저장
-        gameRoomMemberRepository.save(gameRoomMember);
+        gameRoomAttendeeRepository.save(gameRoomAttendee);
 
         HashMap<String, Object> contentSet = new HashMap<>();
 
@@ -176,7 +176,7 @@ public class GameRoomService {
         gameMessage.setSender(member.getNickname());
 
         contentSet.put("owner", enterGameRoom.get().getOwner());
-        contentSet.put("memberCnt", gameRoomMemberList.size());
+        contentSet.put("memberCnt", gameRoomAttendeeList.size());
         contentSet.put("enterComment", gameMessage.getRoomId() + "번 방에" + gameMessage.getSenderId() + "님이 입장하셨습니다.");
 
         gameMessage.setContent(contentSet);
@@ -207,11 +207,11 @@ public class GameRoomService {
         List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
         for (GameRoom room : rooms) {
             // 게임룸에 입장해 있는 멤버 조회
-            List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(room);
+            List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(room);
             List<MemberResponseDto> memberList = new ArrayList<>();
-            for (GameRoomMember gameRoomMember : gameRoomMemberList) {
+            for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
 
-                Optional<Member> eachMember = memberRepository.findById(gameRoomMember.getMember().getId());
+                Optional<Member> eachMember = memberRepository.findById(gameRoomAttendee.getMember().getId());
                 // 멤버로부터 필요한 정보인 id, email, nickname만 Dto에 담아주기
                 MemberResponseDto memberResponseDto = MemberResponseDto.builder()
                         .memberId(eachMember.get().getId())
@@ -248,16 +248,16 @@ public class GameRoomService {
         );
 
         // 나가려고 하는 GameRoomMember를 member 객체로 DB에서 조회
-        GameRoomMember gameRoomMember = gameRoomMemberRepository.findByMember(member);
+        GameRoomAttendee gameRoomAttendee = gameRoomAttendeeRepository.findByMember(member);
 
         // 위에서 구한 GameRoomMemeber 객체로 DB 데이터 삭제
-        gameRoomMemberRepository.delete(gameRoomMember);
+        gameRoomAttendeeRepository.delete(gameRoomAttendee);
 
         // 게임방에 남아있는 유저들 구하기
-        List<GameRoomMember> existGameRoomMember = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
+        List<GameRoomAttendee> existGameRoomAttendee = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
 
         // 남아있는 유저의 수가 0명이라면 게임방 DB에서 데이터 삭제
-        if (existGameRoomMember.size() == 0) {
+        if (existGameRoomAttendee.size() == 0) {
             gameRoomRepository.delete(enterGameRoom);
         }
 
@@ -266,7 +266,7 @@ public class GameRoomService {
 
         // 게임이 시작 중인 상태에서 3명 아래로 떨어졌을 경우에
         if (enterGameRoom.getStatus().equals("false")){
-            if (existGameRoomMember.size() < 3) {
+            if (existGameRoomAttendee.size() < 3) {
                 // 게임을 끝내버림
                 gameRearService.forcedEndGame(RoomId);
             }
@@ -281,7 +281,7 @@ public class GameRoomService {
         gameMessage.setSenderId(Long.toString(member.getId()));
         gameMessage.setSender(member.getNickname());
 
-        contentSet.put("memberCnt", existGameRoomMember.size());
+        contentSet.put("memberCnt", existGameRoomAttendee.size());
         contentSet.put("alert", gameMessage.getSender() + " 님이 방을 나가셨습니다");
 
         gameMessage.setContent(contentSet);
@@ -291,11 +291,11 @@ public class GameRoomService {
         messagingTemplate.convertAndSend("/sub/gameroom/" + RoomId, gameMessage);
 
         // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
-        if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomMember.isEmpty()){
+        if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomAttendee.isEmpty()){
             // 남은 사람들의 수 만큼 랜덤으로 돌려서 나온 멤버 ID
-            Long nextOwnerId = existGameRoomMember.get((int) (Math.random() * existGameRoomMember.size())).getGameRoomMemberId();
+            Long nextOwnerId = existGameRoomAttendee.get((int) (Math.random() * existGameRoomAttendee.size())).getGameRoomMemberId();
             // nextOwnerId로 GameRoomMember 정보 저장
-            GameRoomMember nextOwner = gameRoomMemberRepository.findById(nextOwnerId).orElseThrow(
+            GameRoomAttendee nextOwner = gameRoomAttendeeRepository.findById(nextOwnerId).orElseThrow(
                     () -> new CustomException(LOGIN_MEMBER_ID_FAIL)
             );
             // 들어간 방에 Owner 업데이트

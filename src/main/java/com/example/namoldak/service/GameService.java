@@ -29,7 +29,7 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_ENOUG
 public class GameService {
 
     private final GameRoomRepository gameRoomRepository;
-    private final GameRoomMemberRepository gameRoomMemberRepository;
+    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final KeywordRepository keywordRepository;
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -52,7 +52,7 @@ public class GameService {
         }
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
-        List<GameRoomMember> gameRoomMembers = gameRoomMemberRepository.findByGameRoom(gameRoom);
+        List<GameRoomAttendee> gameRoomAttendees = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
 
         // 게임방의 상태를 start 상태로 업데이트
         gameRoom.setStatus("false");
@@ -75,10 +75,10 @@ public class GameService {
         String category = keyword1.getCategory();
         // 같은 카테고리를 가진 키워드 리스트 만들기
         List<Keyword> keywordList = new ArrayList<>();
-        if (gameRoomMembers.size() == 4) {
+        if (gameRoomAttendees.size() == 4) {
             // 참여 멤버가 4명 이라면, 랜덤으로 키워드 4장이 담긴 리스트를 만들어 준다.
             keywordList = keywordRepository.findTop4ByCategory(category);
-        } else if (gameRoomMembers.size() == 3) {
+        } else if (gameRoomAttendees.size() == 3) {
             // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
             keywordList = keywordRepository.findTop3ByCategory(category);
         }else{
@@ -91,14 +91,14 @@ public class GameService {
         // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트
         // 닉네임만 필요하기에 닉네임만 담음
         List<String> memberNicknameList = new ArrayList<>();
-        for (GameRoomMember gameRoomMember : gameRoomMembers) {
-            Optional<Member> member1 = memberRepository.findById(gameRoomMember.getMember().getId());
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendees) {
+            Optional<Member> member1 = memberRepository.findById(gameRoomAttendee.getMember().getId());
             memberList.add(member1);
             memberNicknameList.add(member1.get().getNickname());
         }
 
         //게임룸 멤버한테 키워드 배당
-        for (int i = 0; i < gameRoomMembers.size(); i++) {
+        for (int i = 0; i < gameRoomAttendees.size(); i++) {
             keywordToMember.put(memberList.get(i).get().getNickname(), keywordList.get(i).getWord());
         }
 
@@ -236,7 +236,7 @@ public class GameService {
         }
 
         // 유저들 정보 조회
-        List<GameRoomMember> memberListInGame = gameRoomMemberRepository.findByGameRoom(playRoom);
+        List<GameRoomAttendee> memberListInGame = gameRoomAttendeeRepository.findByGameRoom(playRoom);
 
         // 라운드 진행 중
         if(gameStartSet.getSpotNum() < memberListInGame.size()){
