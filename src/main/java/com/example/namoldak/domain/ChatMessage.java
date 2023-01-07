@@ -15,13 +15,12 @@ public class ChatMessage <T>{
         TALK, ENTER, OFFER, ICE, ANSWER
     }
 
-//    private MessageType type; // 메시지 타입
-    private String type;
-    private String roomId; // 방번호
-    private String sender; // 메시지 보낸사람
-    private T content;
-    private String message; // 메시지
+    private String type;         // 메세지 타입
+    private String roomId;       // 방번호
+    private String sender;       // 메시지 보낸사람
+    private String message;      // 메시지
 
+    // 시그널링 타입
     private String offer;
     private String ice;
     private String candidate;

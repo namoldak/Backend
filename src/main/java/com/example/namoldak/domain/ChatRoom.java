@@ -2,7 +2,6 @@ package com.example.namoldak.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.io.Serializable;
 
 // 기능 : Redis에 저장되는 챗룸 객체

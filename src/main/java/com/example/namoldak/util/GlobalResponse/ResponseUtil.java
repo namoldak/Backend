@@ -13,7 +13,7 @@ public class ResponseUtil {
         if (statusCode.getStatusCode().equals("200")) {
             // 성공응답
             return new ResponseEntity<>(new GlobalResponseDto(statusCode), HttpStatus.OK);
-        }else{
+        } else {
             // 예외응답
             return new ResponseEntity<>(new GlobalResponseDto(statusCode), statusCode.getHttpStatus());
         }

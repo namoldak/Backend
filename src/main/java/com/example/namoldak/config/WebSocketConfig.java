@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/sub");  // 구독한 것에 대한 경로
-        config.setApplicationDestinationPrefixes("/pub");   //
+        config.setApplicationDestinationPrefixes("/pub");
     }
 
     // 프론트에서 웹소켓 사용시 Stomp 엔드포인트로 연결 (첫 연결)

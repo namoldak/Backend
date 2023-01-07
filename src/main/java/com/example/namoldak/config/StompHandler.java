@@ -6,7 +6,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 
 // 기능 : Stomp로 메세지 보내기 전 들어오게 되는 핸들러

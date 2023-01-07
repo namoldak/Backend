@@ -4,13 +4,8 @@ import com.example.namoldak.dto.RequestDto.AnswerDto;
 import com.example.namoldak.service.GameRearService;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameRearController {
     private final GameRearService gameRearService;
 
-    @PostMapping("/pub/game/{roomId}/endgame")
+    // 게임 끝내기
+    @PostMapping("/pub/game/{roomId}/endGame")
     public void endGame(@PathVariable Long roomId) {
         gameRearService.endGame(roomId);
     }

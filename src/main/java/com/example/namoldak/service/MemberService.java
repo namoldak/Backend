@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.servlet.http.HttpServletResponse;
 
 @RequiredArgsConstructor
@@ -27,11 +26,11 @@ public class MemberService {
         String nickname = signupRequestDto.getNickname();
 
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("이미 있는 이메일임");
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new IllegalArgumentException("이미 있는 닉네임임");
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
         Member member = new Member(email, nickname, password);
@@ -45,11 +44,11 @@ public class MemberService {
         String password = signupRequestDto.getPassword();
 
         Member member = memberRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("유저를 찾을 수 없음")
+                () -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")
         );
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 다르잖슴");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail()));
@@ -60,18 +59,12 @@ public class MemberService {
     // 이메일 중복 확인
     @Transactional(readOnly = true)
     public boolean emailCheck(String email){
-//        String email = signupRequestDto.getEmail();
-
-        //            throw new IllegalArgumentException("이미 있는 이메일임");
         return memberRepository.findByEmail(email).isPresent();
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
-//        String nickname = signupRequestDto.getNickname();
-
-        //            throw new IllegalArgumentException("이미 있는 닉네임임");
         return memberRepository.findByNickname(nickname).isPresent();
     }
 }

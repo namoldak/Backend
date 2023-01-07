@@ -3,7 +3,6 @@ package com.example.namoldak.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 // 기능 : 게임 카테고리와 키워드 Entity
@@ -21,5 +20,4 @@ public class Keyword {
 
     @Column(nullable = false)
     private String word;
-
 }
