@@ -7,7 +7,6 @@ import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +29,11 @@ public class GameService {
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameStartSetRepository gameStartSetRepository;
-    private final GameStartSetRepository2 gameStartSetRepository2;
 
 
     // 게임 시작
     @Transactional
-    public PrivateResponseBody gameStart(Long gameRoomId, Member member){
+    public PrivateResponseBody gameStart(Long gameRoomId, Member member) {
 
         // 현재 입장한 게임방의 정보를 가져옴
         GameRoom gameRoom = gameRoomRepository.findByGameRoomId(gameRoomId).orElseThrow(
@@ -88,27 +86,29 @@ public class GameService {
 
         //게임룸 멤버한테 키워드 배당
         for (int i = 0; i < gameRoomAttendees.size(); i++) {
-            keywordToMember.put(memberList.get(i).get().getNickname(), keywordList.get(i).getWord());
+            keywordToMember.put(memberNicknameList.get(i), keywordList.get(i).getWord());
         }
 
-        JSONObject keywordMember = new JSONObject(keywordToMember);
-
-        // GameStartSet에 해당 방의 카테고리와 멤버 각각의 키워드가 어떤 것인지 저장
-        GameStartSet gameStartSet = GameStartSet.builder()
-                .keyword(keywordMember.toString())
-                .category(keywordList.get(0).getCategory())
-                .roomId(gameRoomId)
-                .spotNum(0)
-                .round(1)
-                .build();
+        GameStartSet gameStartSet = new GameStartSet();
+        gameStartSet.setRoomId(gameRoomId);
+        gameStartSet.setSpotNum(0);
+        gameStartSet.setCategory(category);
+        gameStartSet.setKeywordToMember(keywordToMember);
+        gameStartSet.setRound(0);
 
         // StartSet 저장
-        gameStartSetRepository.save(gameStartSet);
+        gameStartSetRepository.saveGameSet(gameStartSet);
+
+        GameStartSet gameStartSet21 = gameStartSetRepository.findGameSetById(gameRoomId);
+        log.info("카테고리 : " + gameStartSet21.getCategory());
+        for (String memberNick : memberNicknameList) {
+            log.info("키워드 : " + keywordToMember.get(memberNick));
+        }
 
         // 웹소켓으로 전달드릴 content 내용
         HashMap<String, Object> startSet = new HashMap<>();
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
-        startSet.put("keyword", gameStartSet.getKeyword()); // 키워드
+        startSet.put("keyword", gameStartSet.getKeywordToMember()); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
 
 
@@ -122,7 +122,7 @@ public class GameService {
         // 게임 시작 알림을 방에 구독이 된 유저들에게 알려줌
         messagingTemplate.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
 
-        return new PrivateResponseBody(StatusCode.OK, null);
+        return new PrivateResponseBody(StatusCode.OK, "게임시작 !");
     }
 
     // 건너뛰기
@@ -141,98 +141,98 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
     }
 
-    public GameStartSet2 spotlight(Long gameRoomId){
+    public GameStartSet spotlight(Long gameRoomId) {
 
-        //TODO =============================================================================== test START
-
-        log.info("============================= 1 :" + gameRoomId.toString());
-        // 테스트로 여기서 방생 성 해보기
-        List<String> keywordList = new ArrayList<>();
-        keywordList.add("김연아");
-        keywordList.add("손흥민");
-        keywordList.add("세종대왕");
-        keywordList.add("이순신");
-
-        log.info("============================= 1-2");
-
-        GameStartSet2 gameStartSet2 = new GameStartSet2();
-        gameStartSet2.setRoomId(gameRoomId);
-        gameStartSet2.setSpotNum(0);
-        gameStartSet2.setCategory("인물");
-        gameStartSet2.setKeyword(keywordList);
-        gameStartSet2.setRound(0);
-
-        log.info(gameStartSet2.getRoomId().toString());
-
-        log.info("============================= 1-3");
-        gameStartSetRepository2.saveGameSet(gameStartSet2);
-
-        log.info("============================= 1-4");
-
-        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
-        log.info("Category : " + gameStartSet2.getCategory());
-        for(int i = 0; i < gameStartSet2.getKeyword().size(); i++){
-            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
-        }
-        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
-
-        log.info("============================= 1-5");
-
-        gameStartSet2.setCategory("음식");
-        keywordList.clear();
-        keywordList.add("푸퐛퐁커리" + gameRoomId.toString());
-        keywordList.add("정어리파이" + gameRoomId.toString());
-        keywordList.add("김밥" + gameRoomId.toString());
-        keywordList.add("떡볶이" + gameRoomId.toString());
-        gameStartSet2.setKeyword(keywordList);
-        gameStartSet2.setSpotNum(gameStartSet2.getSpotNum() +1 );
-        gameStartSetRepository2.saveGameSet(gameStartSet2);
-
-        log.info("============================= 1-6");
-
-        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
-        log.info("Category : " + gameStartSet2.getCategory());
-        for(int i = 0; i < gameStartSet2.getKeyword().size(); i++){
-            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
-        }
-        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
-
-        log.info("============================= 1-7");
-
-        GameStartSet2 gameStartSet21 = gameStartSetRepository2.findGameSetById(23L);
-
-        log.info("Room ID : " + gameStartSet21.getRoomId().toString());
-        log.info("Category : " + gameStartSet21.getCategory());
-        for(int i = 0; i < gameStartSet21.getKeyword().size(); i++){
-            log.info("키워드 : " + gameStartSet21.getKeyword().get(i).toString());
-        }
-        log.info("위치정보 : " + gameStartSet21.getSpotNum().toString());
-
-        log.info("============================= 1-8");
-
-        //TODO =============================================================================== test END
+//        //TODO =============================================================================== test START
+//
+//        log.info("============================= 1 :" + gameRoomId.toString());
+//        // 테스트로 여기서 방생 성 해보기
+//        List<String> keywordList = new ArrayList<>();
+//        keywordList.add("김연아");
+//        keywordList.add("손흥민");
+//        keywordList.add("세종대왕");
+//        keywordList.add("이순신");
+//
+//        log.info("============================= 1-2");
+//
+//        GameStartSet2 gameStartSet2 = new GameStartSet2();
+//        gameStartSet2.setRoomId(gameRoomId);
+//        gameStartSet2.setSpotNum(0);
+//        gameStartSet2.setCategory("인물");
+////        gameStartSet2.setKeywordToMember();
+//        gameStartSet2.setRound(0);
+//
+//        log.info(gameStartSet2.getRoomId().toString());
+//
+//        log.info("============================= 1-3");
+//        gameStartSetRepository2.saveGameSet(gameStartSet2);
+//
+//        log.info("============================= 1-4");
+//
+//        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
+//        log.info("Category : " + gameStartSet2.getCategory());
+//        for (int i = 0; i < gameStartSet2.getKeyword().size(); i++) {
+//            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
+//        }
+//        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
+//
+//        log.info("============================= 1-5");
+//
+//        gameStartSet2.setCategory("음식");
+//        keywordList.clear();
+//        keywordList.add("푸퐛퐁커리" + gameRoomId.toString());
+//        keywordList.add("정어리파이" + gameRoomId.toString());
+//        keywordList.add("김밥" + gameRoomId.toString());
+//        keywordList.add("떡볶이" + gameRoomId.toString());
+//        gameStartSet2.setKeyword(keywordList);
+//        gameStartSet2.setSpotNum(gameStartSet2.getSpotNum() + 1);
+//        gameStartSetRepository2.saveGameSet(gameStartSet2);
+//
+//        log.info("============================= 1-6");
+//
+//        log.info("Room ID : " + gameStartSet2.getRoomId().toString());
+//        log.info("Category : " + gameStartSet2.getCategory());
+//        for (int i = 0; i < gameStartSet2.getKeyword().size(); i++) {
+//            log.info("키워드 : " + gameStartSet2.getKeyword().get(i).toString());
+//        }
+//        log.info("위치정보 : " + gameStartSet2.getSpotNum().toString());
+//
+//        log.info("============================= 1-7");
+//
+//        GameStartSet2 gameStartSet21 = gameStartSetRepository2.findGameSetById(23L);
+//
+//        log.info("Room ID : " + gameStartSet21.getRoomId().toString());
+//        log.info("Category : " + gameStartSet21.getCategory());
+//        for (int i = 0; i < gameStartSet21.getKeyword().size(); i++) {
+//            log.info("키워드 : " + gameStartSet21.getKeyword().get(i).toString());
+//        }
+//        log.info("위치정보 : " + gameStartSet21.getSpotNum().toString());
+//
+//        log.info("============================= 1-8");
+//
+//        //TODO =============================================================================== test END
 
         GameRoom playRoom = gameRoomRepository.findByGameRoomId(gameRoomId).get();
 
         // 해당 게임룸의 게임셋을 조회
-        GameStartSet2 gameStartSet = gameStartSetRepository2.findGameSetById(gameRoomId);
+        GameStartSet gameStartSet = gameStartSetRepository.findGameSetById(gameRoomId);
 
         // 게임이 진행이 불가한 상태라면 초기화 시켜야 함
-        if(playRoom.getStatus().equals("true")){ // false : 게임이 진행 중, true : 게임 시작 전
+        if (playRoom.getStatus().equals("true")) { // false : 게임이 진행 중, true : 게임 시작 전
             gameStartSet.setRound(0);
             gameStartSet.setSpotNum(0);
-            gameStartSetRepository2.saveGameSet(gameStartSet);
+            gameStartSetRepository.saveGameSet(gameStartSet);
         }
 
         // 유저들 정보 조회
         List<GameRoomAttendee> memberListInGame = gameRoomAttendeeRepository.findByGameRoom(playRoom);
 
         // 라운드 진행 중
-        if(gameStartSet.getSpotNum() < memberListInGame.size()){
+        if (gameStartSet.getSpotNum() < memberListInGame.size()) {
 
             // 현재 스포트라이트 받는 멤버
             Member spotMember = memberRepository.findById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
-                    ()-> new CustomException(SPOTLIGHT_ERR)
+                    () -> new CustomException(SPOTLIGHT_ERR)
             );
 
             // 메세지 알림
@@ -247,9 +247,7 @@ public class GameService {
 
             // 다음 차례로!
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() + 1);
-            gameStartSetRepository2.saveGameSet(gameStartSet);
-
-            log.info("위치정보 : " + gameStartSet21.getSpotNum().toString());
+            gameStartSetRepository.saveGameSet(gameStartSet);
 
 
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {

@@ -5,7 +5,6 @@ import com.example.namoldak.dto.RequestDto.AnswerDto;
 import com.example.namoldak.dto.ResponseDto.VictoryDto;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.domain.GameMessage;
-import com.example.namoldak.domain.GameStartSet;
 import com.example.namoldak.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +20,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class GameRearService{
-    private final GameStartSetRepository gameStartSetRepository;
     private final SimpMessageSendingOperations sendingOperations;
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
+    private final GameStartSetRepository gameStartSetRepository;
 
     // 게임 강제 종료
     @Transactional
@@ -33,9 +32,6 @@ public class GameRearService{
 
         // 현재 게임방 정보 불러오기
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
-
-        // 게임방의 셋팅 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId);
 
         // 발송할 메세지 데이터 저장
         GameMessage gameMessage = new GameMessage<>();
@@ -46,8 +42,8 @@ public class GameRearService{
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
         sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
 
-        // DB에서 게임 셋팅 삭제
-        gameStartSetRepository.delete(gameStartSet);
+        // Redis DB에서 게임 셋팅 삭제
+        gameStartSetRepository.deleteGameSet(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -60,7 +56,7 @@ public class GameRearService{
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId);
+        GameStartSet gameStartSet = gameStartSetRepository.findGameSetById(roomId);
 
         // 현재 게임룸 데이터 불러오기
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
@@ -79,7 +75,7 @@ public class GameRearService{
 
         // member의 닉네임이 정답자와 같지 않을 경우 전부 Loser에 저장하고 같을 경우 Winner에 저장
         for (Member member : memberList){
-            if (member.getNickname() != (gameStartSet.getWinner())){
+            if (!member.getNickname().equals(gameStartSet.getWinner())){
                 victoryDto.setLoser(member.getNickname());
             } else {
                 victoryDto.setWinner(member.getNickname());
@@ -96,7 +92,8 @@ public class GameRearService{
         sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
-        gameStartSetRepository.delete(gameStartSet);
+//        gameStartSetRepository.delete(gameStartSet);
+        gameStartSetRepository.deleteGameSet(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -110,15 +107,16 @@ public class GameRearService{
         String answer = answerDto.getAnswer();
 
         // gameStartSet 불러오기
-        GameStartSet gameStartset = gameStartSetRepository.findByRoomId(gameRoomId);
+        GameStartSet gameStartSet = gameStartSetRepository.findGameSetById(gameRoomId);
 
         GameMessage gameMessage = new GameMessage();
 
         // 정답을 맞추면 게임 끝
-        if (gameStartset.getKeyword().equals(answerDto.getAnswer())){
+        if (gameStartSet.getKeywordToMember().get(member.getNickname()).equals(answer)){
 
             // 정답자
-            gameStartset.setWinner(member.getNickname());
+            gameStartSet.setWinner(member.getNickname());
+            gameStartSetRepository.saveGameSet(gameStartSet);
 
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));

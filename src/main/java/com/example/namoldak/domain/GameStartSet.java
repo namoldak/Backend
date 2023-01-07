@@ -1,33 +1,23 @@
 package com.example.namoldak.domain;
 
-import lombok.*;
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-// 기능 : 게임진행 관련 Entity
-@NoArgsConstructor
-@AllArgsConstructor
+import java.io.Serializable;
+import java.util.HashMap;
+
+// 기능 : Redis에 게임 진행상황 저장
 @Getter
-@Builder
-@Entity
-public class GameStartSet {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long gameStartSetId;
-    @Column
+@Setter
+public class GameStartSet implements Serializable {
+
+    private static final long serialVersionUID = 6494678977089006639L;
     private String category;
-    @Column
-    private String keyword;
-    @Column
+    private HashMap<String, String> keywordToMember;
     private Long roomId;
-    @Column
     private Integer round;
-    @Column
-    private Integer spotNum;
-    @Column
+    private Integer spotNum = 0;
     private String winner;
 
-
-    public void setWinner(String winner){
-        this.winner = winner;
-    }
 }
+
