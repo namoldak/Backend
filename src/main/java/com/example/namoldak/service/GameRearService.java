@@ -26,7 +26,7 @@ import java.util.Optional;
 public class GameRearService {
     private final GameStartSetRepository gameStartSetRepository;
     private final SimpMessageSendingOperations sendingOperations;
-    private final GameRoomMemberRepository gameRoomMemberRepository;
+    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
 
@@ -69,14 +69,14 @@ public class GameRearService {
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
 
         // 불러온 게임룸으로 들어간 GameRoomMember들 구하기
-        List<GameRoomMember> gameRoomMemberList = gameRoomMemberRepository.findByGameRoom(enterGameRoom);
+        List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
 
         // 닉네임을 구하기 위해서 멤버 객체를 담을 리스트 선언
         List<Member> memberList = new ArrayList<>();
 
         // for문으로 하나씩 빼서 DB 조회 후 List에 넣어주기
-        for (GameRoomMember gameRoomMember : gameRoomMemberList) {
-            Optional<Member> member = memberRepository.findById(gameRoomMember.getMember_Id());
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
+            Optional<Member> member = memberRepository.findById(gameRoomAttendee.getMember_Id());
             memberList.add(member.get());
         }
 

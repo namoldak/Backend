@@ -26,10 +26,10 @@ public class Member {
 
     private Long kakaoId;
 
-    @JsonIgnore
-    @JoinColumn(name="gameroommember_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private GameRoomMember gameRoomMember;
+//    @JsonIgnore
+//    @JoinColumn(name="gameroommember_id")
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private GameRoomMember gameRoomMember;
 
     public Member(String email, String nickname, String password) {
         this.email    = email;
