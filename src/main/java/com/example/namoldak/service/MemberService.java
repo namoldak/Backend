@@ -1,6 +1,7 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
+import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -68,5 +69,13 @@ public class MemberService {
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
         return memberRepository.findByNickname(nickname).isPresent();
+    }
+
+    public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
+        if (!member.getPassword().equals(deleteMemberRequestDto.getPassword())){
+            memberRepository.delete(member);
+        } else {
+            throw new CustomException(StatusCode.BAD_PASSWORD);
+        }
     }
 }

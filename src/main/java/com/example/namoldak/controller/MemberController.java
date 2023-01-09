@@ -1,13 +1,16 @@
 package com.example.namoldak.controller;
 
+import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.service.KakaoService;
 import com.example.namoldak.service.MemberService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.jwt.JwtUtil;
+import com.example.namoldak.util.security.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -60,5 +63,13 @@ public class MemberController {
         cookie.setPath("/");
         response.addCookie(cookie);
         return ResponseUtil.response(kakaoReturnValue.get(1));
+    }
+
+    // 회원탈퇴
+    @DeleteMapping("/auth/deleteMember")
+    public ResponseEntity<?> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                          @RequestBody DeleteMemberRequestDto deleteMemberRequestDto){
+        memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
+        return ResponseUtil.response(DELETE_MEMBER_OK);
     }
 }
