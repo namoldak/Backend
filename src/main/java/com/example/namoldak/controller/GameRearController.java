@@ -20,8 +20,8 @@ public class GameRearController {
 
     // 게임 끝내기
     @PostMapping("/pub/game/{gameRoomId}/endGame")
-    public void endGame(@PathVariable Long roomId) {
-        gameRearService.endGame(roomId);
+    public void endGame(@PathVariable Long gameRoomId) {
+        gameRearService.endGame(gameRoomId);
     }
 
     // 정답
