@@ -1,5 +1,6 @@
 package com.example.namoldak.domain;
 
+import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -42,5 +43,9 @@ public class Member {
     public Member kakaoIdUpdate(Long kakaoId){
         this.kakaoId = kakaoId;
         return this;
+    }
+
+    public void update(SignupRequestDto signupRequestDto) {
+        this.nickname = signupRequestDto.getNickname();
     }
 }

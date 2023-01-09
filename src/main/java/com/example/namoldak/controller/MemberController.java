@@ -72,4 +72,11 @@ public class MemberController {
         memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
         return ResponseUtil.response(DELETE_MEMBER_OK);
     }
+
+    // 닉네임 변경
+    @PutMapping("/auth/changeNickname")
+    public ResponseEntity<?> changeNickname(@RequestBody SignupRequestDto signupRequestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseUtil.response(memberService.changeNickname(signupRequestDto, userDetails.getMember()));
+    }
 }
