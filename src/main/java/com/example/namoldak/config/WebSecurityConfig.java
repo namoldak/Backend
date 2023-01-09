@@ -1,22 +1,39 @@
 package com.example.namoldak.config;
 
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtAuthFilter;
 import com.example.namoldak.util.jwt.JwtUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.ACCESS_DENIED;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.INVALID_TOKEN;
 
 // 기능 : Spring Security 사용에 필요한 설정
 @Configuration
@@ -49,6 +66,13 @@ public class WebSecurityConfig {
                         UsernamePasswordAuthenticationFilter.class);
         http.cors();
 
+        // Spring Security에서 발생하는 예외를 커스텀 핸들링
+        http.exceptionHandling()
+                // 인증부분  (여기서만 사용하기 때문에 익명함수 람다식 이용)
+                .authenticationEntryPoint((request, response, authException) -> {
+                    securityExceptionResponse(response, INVALID_TOKEN);
+                });
+
         return http.build();
     }
 
@@ -69,4 +93,13 @@ public class WebSecurityConfig {
         return source;
     }
 
+    // 예외 응답처리 메소드
+    public void securityExceptionResponse(HttpServletResponse response, StatusCode statusCode) throws IOException {
+        response.setStatus(statusCode.getHttpStatus().value());
+        response.setHeader("content-type", "application/json; charset=UTF-8");
+        String json = new ObjectMapper().writeValueAsString(new GlobalResponseDto(statusCode));
+        response.getWriter().write(json);
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
 }

@@ -20,8 +20,13 @@ public class ResponseUtil {
     }
 
     // 성공 응답 (Data) - 메세지 없이 오로지 결과값만 반환
-    public static <T> ResponseEntity<?> response(T Data) {
-        return new ResponseEntity<>(Data, HttpStatus.OK);
+    public static <T> ResponseEntity<?> response(T data) {
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    // 성공 메세지와 응답 (Data)
+    public static <T> ResponseEntity<?> response(StatusCode statusCode, T data) {
+        return new ResponseEntity<>(new GlobalResponseDto(statusCode, data), statusCode.getHttpStatus());
     }
 
 }

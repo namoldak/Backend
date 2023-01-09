@@ -57,7 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setStatus(statusCode);
         response.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(new IllegalArgumentException("오류"));
+            String json = new ObjectMapper().writeValueAsString(new GlobalResponseDto<>(StatusCode.INVALID_TOKEN));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

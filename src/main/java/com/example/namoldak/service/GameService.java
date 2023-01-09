@@ -33,7 +33,7 @@ public class GameService {
 
     // 게임 시작
     @Transactional
-    public PrivateResponseBody gameStart(Long gameRoomId, Member member) {
+    public void gameStart(Long gameRoomId, Member member) {
 
         // 현재 입장한 게임방의 정보를 가져옴
         GameRoom gameRoom = gameRoomRepository.findByGameRoomId(gameRoomId).orElseThrow(
@@ -42,7 +42,7 @@ public class GameService {
 
         // 게임 시작은 방장만이 할 수 있음
         if (!member.getNickname().equals(gameRoom.getOwner())) {
-            return new PrivateResponseBody(StatusCode.UNAUTHORIZE, null);
+            throw new CustomException(StatusCode.UNAUTHORIZE);
         }
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
@@ -121,8 +121,6 @@ public class GameService {
 
         // 게임 시작 알림을 방에 구독이 된 유저들에게 알려줌
         messagingTemplate.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
-
-        return new PrivateResponseBody(StatusCode.OK, "게임시작 !");
     }
 
     // 건너뛰기

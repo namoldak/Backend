@@ -7,19 +7,15 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
-import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.ChatRoomRepository;
 import com.example.namoldak.repository.GameRoomAttendeeRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
-import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +42,7 @@ public class GameRoomService {
 
     // 게임룸 전체 조회
     @Transactional
-    public List<GameRoomResponseDto> mainPage(Pageable pageable){
+    public List<GameRoomResponseDto> mainPage(Pageable pageable) {
 
         // DB에 저장된 모든 Room들을 리스트형으로 저장 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findAll(pageable);
@@ -94,7 +90,7 @@ public class GameRoomService {
 
     // 게임룸 생성
     @Transactional
-    public ResponseEntity<?> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto){
+    public HashMap<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
 
         // 빌더 활용해서 GameRoom 엔티티 데이터 채워주기
         GameRoom gameRoom = GameRoom.builder()
@@ -126,12 +122,13 @@ public class GameRoomService {
         roomInfo.put("owner", gameRoom.getOwner());
         roomInfo.put("status", gameRoom.getStatus());
 
-        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
+//        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
+        return roomInfo;
     }
 
     // 게임룸 입장
     @Transactional
-    public PrivateResponseBody enterGame(Long roomId, Member member){
+    public HashMap<String, String>  enterGame(Long roomId, Member member) {
 
         // roomId로 DB에서 데이터 찾아와서 담음
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
@@ -139,7 +136,8 @@ public class GameRoomService {
         // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
         if (enterGameRoom.get().getStatus().equals("false")){
             // 뒤로 넘어가면 안 되니까 return으로 호다닥 끝내버림
-            return new PrivateResponseBody(StatusCode.ALREADY_PLAYING, "게임이 시작해서 못 들어간닭!!");
+//            return new PrivateResponseBody(StatusCode.ALREADY_PLAYING, "게임이 시작해서 못 들어간닭!!");
+            throw new CustomException(ALREADY_PLAYING);
         }
 
         // 입장하려는 게임방을 이용해서 GameRoomMember DB에서 유저 정보 전부 빼와서 리스트형에 저장 (입장 정원 확인 용도)
@@ -148,7 +146,8 @@ public class GameRoomService {
         // 만약 방에 4명이 넘어가면
         if (gameRoomAttendeeList.size() > 3){
             // 입장 안 된다고 입구컷
-            return new PrivateResponseBody(StatusCode.CANT_ENTER, "정원이 다 차있닭!!");
+//            return new PrivateResponseBody(StatusCode.CANT_ENTER, "정원이 다 차있닭!!");
+            throw new CustomException(CANT_ENTER);
         }
 
         // for문으로 리스트에서 gameRoomMember 하나씩 빼주기
@@ -157,7 +156,8 @@ public class GameRoomService {
             Optional<Member> member1 = memberRepository.findById(gameRoomAttendee.getMember().getId());
             // 현재 들어가려는 유저의 ID와 게임에 들어가있는 멤버의 ID가 똑같으면 입구컷 해버림
             if (member.getId().equals(member1.get().getId())){
-                return new PrivateResponseBody(StatusCode.MEMBER_DUPLICATED, "이미 입장해있닭!!");
+//                return new PrivateResponseBody(StatusCode.MEMBER_DUPLICATED, "이미 입장해있닭!!");
+                throw new CustomException(MEMBER_DUPLICATED);
             }
         }
 
@@ -190,11 +190,12 @@ public class GameRoomService {
         roomInfo.put("owner", enterGameRoom.get().getOwner());
         roomInfo.put("status", enterGameRoom.get().getStatus());
 
-        return new PrivateResponseBody<>(StatusCode.OK, roomInfo);
+//        return new PrivateResponseBody<>(StatusCode.OK, roomInfo);
+        return roomInfo;
     }
 
     // 게임룸 키워드 조회
-    public List<GameRoomResponseDto> searchGame(Pageable pageable, String keyword){
+    public List<GameRoomResponseDto> searchGame(Pageable pageable, String keyword) {
         // 게임룸 이름을 keyword(검색어)로 잡고 조회 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findByGameRoomNameContaining(pageable, keyword);
 
@@ -240,7 +241,7 @@ public class GameRoomService {
     }
 
     @Transactional
-    public PrivateResponseBody roomExit(Long RoomId, Member member){
+    public void roomExit(Long RoomId, Member member) {
         // 나가려고 하는 방 정보 DB에서 불러오기
         GameRoom enterGameRoom = gameRoomRepository.findById(RoomId).orElseThrow(
                 () -> new CustomException(NOT_EXIST_ROOMS)
@@ -308,6 +309,5 @@ public class GameRoomService {
 
             messagingTemplate.convertAndSend("/sub/gameRoom" + RoomId, alertOwner);
         }
-        return new PrivateResponseBody<>(StatusCode.OK, "방을 나가셨습니닭!");
     }
 }
