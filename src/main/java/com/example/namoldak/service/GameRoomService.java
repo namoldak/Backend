@@ -12,6 +12,7 @@ import com.example.namoldak.repository.GameRoomAttendeeRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -91,6 +92,11 @@ public class GameRoomService {
     // 게임룸 생성
     @Transactional
     public HashMap<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
+
+        // 현재 계정이 이미 방장으로 설정된 방이 있다면 예외 처리
+        if (gameRoomRepository.findByOwner(member.getNickname()).isPresent()) {
+            throw new CustomException(StatusCode.MEMBER_DUPLICATED);
+        }
 
         // 빌더 활용해서 GameRoom 엔티티 데이터 채워주기
         GameRoom gameRoom = GameRoom.builder()
