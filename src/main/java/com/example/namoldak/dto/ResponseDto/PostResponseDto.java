@@ -20,8 +20,8 @@ public class PostResponseDto {
     private String content;                                                // 게시글 내용
     private String nickname;                                               // 작성자 닉네임
     private int cmtCnt;                                                    // 댓글 갯수
-    private LocalDateTime createdAt;                                       // 작성 시간
-    private LocalDateTime modifiedAt;                                      // 수정 시간
+//    private LocalDateTime createdAt;                                       // 작성 시간
+//    private LocalDateTime modifiedAt;                                      // 수정 시간
 
     public PostResponseDto(Post post){
         this.id           =     post.getId();
@@ -29,7 +29,7 @@ public class PostResponseDto {
         this.content      =     post.getContent();
         this.cmtCnt       =     post.getCommentList().size();
         this.nickname     =     post.getMember().getNickname();
-        this.createdAt    =     post.getCreatedAt();
-        this.modifiedAt   =     post.getModifiedAt();
+//        this.createdAt    =     post.getCreatedAt();
+//        this.modifiedAt   =     post.getModifiedAt();
     }
 }

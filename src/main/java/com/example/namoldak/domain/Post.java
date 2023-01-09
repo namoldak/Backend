@@ -18,7 +18,7 @@ public class Post extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;                                                          // 고유 ID
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;                                                    // Member 와 연관 관계 설정
     @Column
     private String title;                                                     // 포스트 타이틀
@@ -28,6 +28,7 @@ public class Post extends Timestamped {
     private String nickname;                                                  // 작성자 닉네임
     @Column
     private String category;                                                  // 카테고리
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정
     private List<Comment> commentList = new ArrayList<>();                    // 댓글 리스트
 

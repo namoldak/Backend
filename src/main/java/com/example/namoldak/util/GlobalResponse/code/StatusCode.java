@@ -49,10 +49,11 @@ public enum StatusCode {
     SPOTLIGHT_ERR(HttpStatus.BAD_REQUEST,"133","스포트라이트 처리에서 예외가 발생했습니다."),
 
     // comment
-    COMMENT_ERROR(HttpStatus.BAD_REQUEST,"140","댓글이 존재하지 않습니다."),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"404","댓글이 존재하지 않습니다."),
     SEARCH_POST_ERROR(HttpStatus.BAD_REQUEST,"141","검색 결과에 맞는 게시글이 존재하지 않습니다."),
     ACCESS_DENIED(HttpStatus.NOT_ACCEPTABLE, "403", "접근이 불가능합니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 게시글이 없습니다."),
 
 
     //TODO ========================= 성공 응답 코드 ===============================
@@ -75,7 +76,7 @@ public enum StatusCode {
     ENTER_OK(HttpStatus.OK,"200", "방에 입장하셨습니닭!"),
     DELETE_MEMBER_OK(HttpStatus.OK,"200", "회원 탈퇴 성공했습니다."),
     GAME_START(HttpStatus.OK,"200", "게임 시작!");
-    
+
 
     private final HttpStatus httpStatus;
     private final String statusCode;
