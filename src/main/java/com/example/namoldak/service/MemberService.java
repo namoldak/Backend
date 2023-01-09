@@ -4,6 +4,7 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
@@ -76,6 +77,20 @@ public class MemberService {
             memberRepository.delete(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
+        }
+    }
+
+    // 닉네임 변경
+    @Transactional
+    public PrivateResponseBody changeNickname(SignupRequestDto signupRequestDto, Member member) {
+        Member member1 = memberRepository.findById(member.getId()).orElseThrow(
+                ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
+        );
+        if(member.getId().equals(member1.getId())){
+            member1.update(signupRequestDto);
+            return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");
+        }else {
+            throw new CustomException(StatusCode.CANT_ENTER);
         }
     }
 }

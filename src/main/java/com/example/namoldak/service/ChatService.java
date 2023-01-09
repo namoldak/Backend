@@ -25,7 +25,7 @@ public class ChatService{
                         .message("[공지] " + message.getSender() + "님이 입장하셨습니다.")
                         .build();
 
-                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
                 break;
 
             case "ICE":
@@ -35,7 +35,7 @@ public class ChatService{
                         .ice(message.getIce())
                         .build();
 
-                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
                 break;
 
             case "OFFER":
@@ -45,7 +45,7 @@ public class ChatService{
                         .offer(message.getOffer())
                         .build();
 
-                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
                 break;
 
             case "ANSWER":
@@ -55,11 +55,11 @@ public class ChatService{
                         .answer(message.getAnswer())
                         .build();
 
-                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), exportMessage);
+                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
                 break;
 
             default:
-                sendingOperations.convertAndSend("/sub/gameroom/" + message.getRoomId(), message);
+                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), message);
         }
     }
 }
