@@ -13,13 +13,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.Mapping;
-
+import org.springframework.web.bind.annotation.RestController;
 
 // 기능 : 게임 진행 관련 주요 서비스들을 컨트롤
 @Slf4j
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class GameController {
 
     private final GameService gameService;
@@ -29,15 +28,15 @@ public class GameController {
 //    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
     @PostMapping("/pub/game/{gameRoomId}/start")
     public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
-                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         gameService.gameStart(gameRoomId, userDetails.getMember());
         return ResponseUtil.response(StatusCode.GAME_START);
     }
 
     // 건너뛰기
-    @MessageMapping("/pub/game/{gameRoomId}/skip")
+    @PostMapping("/pub/game/{gameRoomId}/skip")
     public void gameSkip(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                         @DestinationVariable Long gameRoomId) {
+                         @PathVariable Long gameRoomId) {
 
         log.info("건너뛰기 - 게임 메세지 : {}, 게임방 아이디 : {}", userDetails.getMember(), gameRoomId);
         gameService.gameSkip(userDetails.getMember(), gameRoomId);
@@ -49,7 +48,7 @@ public class GameController {
 //            @DestinationVariable Long gameRoomId) {
     @PostMapping("/pub/game/{gameRoomId}/spotlight")
     public ResponseEntity<?>  spotlight(
-            @PathVariable Long gameRoomId){
+            @PathVariable Long gameRoomId) {
 
         log.info("스포트라이트 - 게임방 아이디 : {}", gameRoomId);
         return ResponseUtil.response(gameService.spotlight(gameRoomId));

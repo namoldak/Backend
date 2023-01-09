@@ -68,7 +68,7 @@ public class MemberController {
     // 회원탈퇴
     @DeleteMapping("/auth/deleteMember")
     public ResponseEntity<?> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                          @RequestBody DeleteMemberRequestDto deleteMemberRequestDto){
+                                          @RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
         memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
         return ResponseUtil.response(DELETE_MEMBER_OK);
     }

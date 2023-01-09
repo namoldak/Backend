@@ -16,7 +16,7 @@ public class RedisConfig {
 
     // Redis 연결
     @Bean
-    public RedisConnectionFactory redisConnectionFactory(){
+    public RedisConnectionFactory redisConnectionFactory() {
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory();
         return lettuceConnectionFactory;
     }

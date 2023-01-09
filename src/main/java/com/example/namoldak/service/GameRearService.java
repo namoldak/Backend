@@ -121,7 +121,7 @@ public class GameRearService{
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSenderId(String.valueOf(member.getId()));
-            gameMessage.setSender(member.getNickname());
+            gameMessage.setSender("양계장 주인");
             gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답입니닭!");
             gameMessage.setType(GameMessage.MessageType.SUCCESS);
 
@@ -131,7 +131,7 @@ public class GameRearService{
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSenderId(String.valueOf(member.getId()));
-            gameMessage.setSender(member.getNickname());
+            gameMessage.setSender("양계장 주인");
             gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!");
             gameMessage.setType(GameMessage.MessageType.FAIL);
 

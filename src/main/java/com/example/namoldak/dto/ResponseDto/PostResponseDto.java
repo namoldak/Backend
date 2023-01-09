@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 // 기능 : 포스트 관련 반환값을 닮을 Dto
 @Getter
 @Setter

@@ -1,7 +1,6 @@
 package com.example.namoldak.dto.ResponseDto;
 
 import com.example.namoldak.domain.Comment;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

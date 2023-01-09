@@ -2,7 +2,6 @@ package com.example.namoldak.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.HashMap;
 

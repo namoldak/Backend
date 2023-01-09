@@ -1,7 +1,6 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.*;
-import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;

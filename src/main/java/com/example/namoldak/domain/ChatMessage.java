@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChatMessage <T>{
+public class ChatMessage <T> {
     public enum MessageType {
         TALK, ENTER, OFFER, ICE, ANSWER
     }
