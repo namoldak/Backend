@@ -1,0 +1,46 @@
+package com.example.namoldak.domain;
+
+import com.example.namoldak.dto.RequestDto.PostRequestDto;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+// 기능 : 포스트 정보 Entity
+public class Post extends Timestamped {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;                                                          // 고유 ID
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Member member;                                                    // Member 와 연관 관계 설정
+    @Column
+    private String title;                                                     // 포스트 타이틀
+    @Column
+    private String content;                                                   // 포스트 내용
+    @Column
+    private String nickname;                                                  // 작성자 닉네임
+    @Column
+    private String category;                                                  // 카테고리
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정
+    private List<Comment> commentList = new ArrayList<>();                    // 댓글 리스트
+
+    public Post(PostRequestDto postRequestDto, Member member) {
+        this.member = member;
+        this.title = postRequestDto.getTitle();
+        this.content = postRequestDto.getContent();
+        this.nickname = member.getNickname();
+        this.category = postRequestDto.getCategory();
+    }
+
+    public void update(PostRequestDto postRequestDto) {
+        this.title = postRequestDto.getTitle();
+        this.content = postRequestDto.getContent();
+    }
+}

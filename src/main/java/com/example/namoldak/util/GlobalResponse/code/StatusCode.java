@@ -20,6 +20,7 @@ public enum StatusCode {
     INVALID_ID_PASSWORD(HttpStatus.BAD_REQUEST, "400","아이디나 비밀번호의 구성이 알맞지 않습니다"),
     BAD_PASSWORD(HttpStatus.BAD_REQUEST, "400","비밀번호가 일치하지 않습니다"),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "403","로그인 후 사용이 가능합니다"),
+    NO_AUTH_MEMBER(HttpStatus.BAD_REQUEST, "403","작성자 정보와 일치하지 않습니다."),
     LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "존재하지 않는 유저 정보입니다."),
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "비밀번호가 일치하지 않습니다."),
     LOGIN_WRONG_SIGNATURE_JWT_TOKEN(HttpStatus.BAD_REQUEST, "112", "잘못된 JWT 서명입니다."),
