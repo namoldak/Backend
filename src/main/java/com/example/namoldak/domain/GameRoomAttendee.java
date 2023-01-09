@@ -24,7 +24,7 @@ public class GameRoomAttendee extends Timestamped{
     private GameRoom gameRoom;
 
     @JoinColumn(name="memberid")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Column(nullable = false)
