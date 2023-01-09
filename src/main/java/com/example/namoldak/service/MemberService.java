@@ -73,7 +73,7 @@ public class MemberService {
     }
 
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
-        if (!member.getPassword().equals(deleteMemberRequestDto.getPassword())){
+        if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
             memberRepository.delete(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
