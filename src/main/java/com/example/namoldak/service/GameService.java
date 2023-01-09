@@ -254,6 +254,7 @@ public class GameService {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() + 1);
                 gameStartSet.setSpotNum(0);
+                gameStartSetRepository.saveGameSet(gameStartSet);
 
             } else if (gameStartSet.getRound() == 20) {
                 // 메세지 알림 = 여기 말할 이야기
