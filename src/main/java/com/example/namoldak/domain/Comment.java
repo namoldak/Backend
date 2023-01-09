@@ -16,7 +16,7 @@ public class Comment extends Timestamped {
     @Column(nullable = false)
     private String nickname;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_Id", nullable = false)
     private Member member;
 
