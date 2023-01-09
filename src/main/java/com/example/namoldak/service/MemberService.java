@@ -3,6 +3,8 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,11 @@ public class MemberService {
         String nickname = signupRequestDto.getNickname();
 
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 
         Member member = new Member(email, nickname, password);
@@ -44,11 +46,11 @@ public class MemberService {
         String password = signupRequestDto.getPassword();
 
         Member member = memberRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")
+                () -> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
         );
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(StatusCode.BAD_PASSWORD);
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail()));

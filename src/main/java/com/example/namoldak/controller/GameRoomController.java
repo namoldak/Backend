@@ -5,6 +5,7 @@ import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.service.GameRoomService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class GameRoomController {
     @PostMapping("/rooms")
     public ResponseEntity<?> makeGameRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @RequestBody GameRoomRequestDto gameRoomRequestDto){
-        return ResponseUtil.response(gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
+        return ResponseUtil.response(StatusCode.CREATE_ROOM, gameRoomService.makeGameRoom(userDetails.getMember(), gameRoomRequestDto));
     }
 
 
@@ -49,14 +50,15 @@ public class GameRoomController {
     @PostMapping("/rooms/{roomId}")
     public ResponseEntity<?> enterGame(@PathVariable Long roomId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseUtil.response(gameRoomService.enterGame(roomId, userDetails.getMember()));
+        return ResponseUtil.response(StatusCode.ENTER_OK, gameRoomService.enterGame(roomId, userDetails.getMember()));
     }
 
     // 게임룸 나가기
     @DeleteMapping("/rooms/{roomId}/exit")
     public ResponseEntity<?> roomExit(@PathVariable Long roomId,
                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseUtil.response(gameRoomService.roomExit(roomId, userDetails.getMember()));
+        gameRoomService.roomExit(roomId, userDetails.getMember());
+        return ResponseUtil.response(StatusCode.EXIT_SUCCESS);
     }
 }
 

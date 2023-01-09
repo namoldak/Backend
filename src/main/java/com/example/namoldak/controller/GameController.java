@@ -2,6 +2,7 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.service.GameService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ public class GameController {
     @PostMapping("/pub/game/{gameRoomId}/start")
     public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseUtil.response(gameService.gameStart(gameRoomId, userDetails.getMember()));
+        gameService.gameStart(gameRoomId, userDetails.getMember());
+        return ResponseUtil.response(StatusCode.GAME_START);
     }
 
     // 건너뛰기
