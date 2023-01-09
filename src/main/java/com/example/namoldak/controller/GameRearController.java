@@ -19,7 +19,7 @@ public class GameRearController {
     private final GameRearService gameRearService;
 
     // 게임 끝내기
-    @PostMapping("/pub/game/{roomId}/endGame")
+    @PostMapping("/pub/game/{gameRoomId}/endGame")
     public void endGame(@PathVariable Long roomId) {
         gameRearService.endGame(roomId);
     }

@@ -42,7 +42,8 @@ public class PostController {
 
     // 게시글 삭제
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> deletePost(@PathVariable Long id,
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         postService.deletePost(id, userDetails.getMember());
         return ResponseUtil.response(postService.deletePost(id, userDetails.getMember()));
     }
