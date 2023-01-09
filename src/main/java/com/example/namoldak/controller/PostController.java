@@ -10,12 +10,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
 // 포스트 관련 CRUD 컨트롤러
 @RequiredArgsConstructor
-@RestController
+@Controller
 public class PostController {
     private final PostService postService;
 
@@ -27,9 +28,16 @@ public class PostController {
     }
 
     // 게시글 전체 불러오기
-    @GetMapping("posts/all")
-    public ResponseEntity<?> getAllPost(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    @GetMapping("/posts/all")
+    public ResponseEntity<?> getAllPost(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseUtil.response(postService.getAllPost(pageable));
+    }
+
+    // 게시글 카테고리별 불러오기
+    @GetMapping("/posts/category") //posts/category?category=자유게시판
+    public ResponseEntity<?> getCategoryPost(@PageableDefault(page = 0, size = 10) Pageable pageable,
+                                             @RequestParam(required = false) String category) {
+        return ResponseUtil.response(postService.getCategoryPost(pageable, category));
     }
 
     // 게시글 수정
