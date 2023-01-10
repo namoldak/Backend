@@ -1,6 +1,5 @@
 package com.example.namoldak.dto.ResponseDto;
 
-import com.example.namoldak.domain.Post;
 import lombok.Getter;
 
 import java.util.List;

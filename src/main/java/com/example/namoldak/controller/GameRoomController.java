@@ -33,8 +33,8 @@ public class GameRoomController {
 
     // 게임룸 전체조회 (페이징 처리)
     @GetMapping("/rooms") // '/rooms?page=1'
-    public List<GameRoomResponseDto> mainPage(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable) {
-        return gameRoomService.mainPage(pageable);
+    public ResponseEntity<?> mainPage(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseUtil.response(gameRoomService.mainPage(pageable));
     }
 
     // 게임룸 키워드 조회
