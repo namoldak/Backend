@@ -247,7 +247,6 @@ public class GameService {
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() + 1);
             gameStartSetRepository.saveGameSet(gameStartSet);
 
-
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
 

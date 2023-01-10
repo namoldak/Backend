@@ -2,20 +2,25 @@ package com.example.namoldak.repository;
 
 import com.example.namoldak.domain.ChatRoom;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-// 기능 : Redis에 저장하는 챗룸
+// 기능 : Redis안에 저장되는 챗룸 레포로 key값은 Room ID, value값은 해당 챗룸의 모든 참가자들의 name과 session이 저장된 객체
 @RequiredArgsConstructor
 @Repository
+@Slf4j
 public class ChatRoomRepository {
     private static final String CHAT_ROOMS = "CHAT_ROOM";
     private final RedisTemplate<String, Object> redisTemplate;
-    private HashOperations<String, String, ChatRoom> opsHashChatRoom;
+    private HashOperations<String, Long, ChatRoom> opsHashChatRoom;
 
     @PostConstruct
     private void init() {
@@ -28,12 +33,13 @@ public class ChatRoomRepository {
     }
 
     // 특정 채팅방 조회
-    public ChatRoom findRoomById(String id) {
+    public ChatRoom findRoomById(Long id) {
         return opsHashChatRoom.get(CHAT_ROOMS, id);
     }
 
     // 채팅룸 생성
-    public ChatRoom saveRoom(ChatRoom chatRoom){
+    public ChatRoom saveChatRoom(ChatRoom chatRoom){
+        log.info("======================== 채팅방 생성 4 : " + chatRoom.getRoomId());
         opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
         return chatRoom;
     }
