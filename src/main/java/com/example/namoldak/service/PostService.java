@@ -4,16 +4,14 @@ import com.example.namoldak.domain.Comment;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
-import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
-import com.example.namoldak.dto.ResponseDto.PostResponseDto;
-import com.example.namoldak.dto.ResponseDto.PostResponseListDto;
-import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
+import com.example.namoldak.dto.ResponseDto.*;
+import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 // 기능 : 포스트 CRUD 서비스
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+
 
     // 포스트 생성
     @Transactional
@@ -58,13 +59,32 @@ public class PostService {
         List<Post> posts = postRepository.findAllByCategory(category);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
-        for(Post post : postList) {
+        for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
 
         int totalPage = posts.size();
 //        Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
         return new PostResponseListDto(totalPage, postResponseDtoList);
+    }
+
+    // 포스트 상세 조회
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getOnePost(Long id) {
+        List<PostResponseDto> result = new ArrayList<>();
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new CustomException(StatusCode.POST_ERROR)
+        );
+
+//        List<Comment> comments = commentRepository.findByPost(post);
+        List<Comment> comments = commentRepository.findByPost(post);
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+        for (Comment comment : comments) {
+            commentResponseDtoList.add(new CommentResponseDto(comment));
+        }
+
+        result.add(new PostResponseDto(post, commentResponseDtoList));
+        return result;
     }
 
     // 포스트 수정
@@ -81,6 +101,7 @@ public class PostService {
         }
     }
 
+    // 포스트 삭제
     @Transactional
     public PrivateResponseBody deletePost(Long id, Member member) {
         Post post = postRepository.findById(id).orElseThrow(

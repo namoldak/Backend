@@ -40,6 +40,12 @@ public class PostController {
         return ResponseUtil.response(postService.getCategoryPost(pageable, category));
     }
 
+    // 게시글 상세 조회
+    @GetMapping("/posts/{id}")
+    public ResponseEntity<?> getOnePost(@PathVariable Long id) {
+        return ResponseUtil.response(postService.getOnePost(id));
+    }
+
     // 게시글 수정
     @PutMapping("/posts/{id}")
     public ResponseEntity<?> updatePost(@PathVariable Long id,
