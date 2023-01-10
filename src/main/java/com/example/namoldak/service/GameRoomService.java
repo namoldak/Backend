@@ -6,6 +6,7 @@ import com.example.namoldak.domain.GameRoomAttendee;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
+import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.repository.ChatRoomRepository;
 import com.example.namoldak.repository.GameRoomAttendeeRepository;
@@ -43,10 +44,13 @@ public class GameRoomService {
 
     // 게임룸 전체 조회
     @Transactional
-    public List<GameRoomResponseDto> mainPage(Pageable pageable) {
+    public GameRoomResponseListDto mainPage(Pageable pageable) {
 
         // DB에 저장된 모든 Room들을 리스트형으로 저장 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findAll(pageable);
+
+        // DB에 저장된 모든 Room들을 리스트로 가져와
+        List<GameRoom> roomList = gameRoomRepository.findAll();
 
         // 필요한 키값들을 반환하기 위해서 미리 Dto 리스트 선언
         List<GameRoomResponseDto> gameRoomList = new ArrayList<>();
@@ -86,7 +90,8 @@ public class GameRoomService {
                 gameRoomList.add(gameRoomResponseDto);
             }
         }
-        return gameRoomList;
+        int totalPage = roomList.size();
+        return new GameRoomResponseListDto(totalPage, gameRoomList);
     }
 
     // 게임룸 생성

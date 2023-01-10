@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 // 기능 : 포스트 관련 반환값을 닮을 Dto
 @Getter
 @Setter
@@ -20,8 +17,9 @@ public class PostResponseDto {
     private String content;                                                // 게시글 내용
     private String nickname;                                               // 작성자 닉네임
     private int cmtCnt;                                                    // 댓글 갯수
-//    private LocalDateTime createdAt;                                       // 작성 시간
-//    private LocalDateTime modifiedAt;                                      // 수정 시간
+    private String category;                                               // 카테고리
+//    private LocalDateTime createdAt;                                     // 작성 시간
+//    private LocalDateTime modifiedAt;                                    // 수정 시간
 
     public PostResponseDto(Post post){
         this.id           =     post.getId();
@@ -29,6 +27,7 @@ public class PostResponseDto {
         this.content      =     post.getContent();
         this.cmtCnt       =     post.getCommentList().size();
         this.nickname     =     post.getMember().getNickname();
+        this.category     =     post.getCategory();
 //        this.createdAt    =     post.getCreatedAt();
 //        this.modifiedAt   =     post.getModifiedAt();
     }

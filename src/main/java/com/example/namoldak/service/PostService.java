@@ -6,6 +6,7 @@ import com.example.namoldak.domain.Post;
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
 import com.example.namoldak.dto.ResponseDto.PostResponseDto;
+import com.example.namoldak.dto.ResponseDto.PostResponseListDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,15 +39,32 @@ public class PostService {
 
     // 포스트 전체 조회
     @Transactional
-    public Page<PostResponseDto> getAllPost(Pageable pageable) {
+    public PostResponseListDto getAllPost(Pageable pageable) {
         Page<Post> postList = postRepository.findAll(pageable);
+        List<Post> posts = postRepository.findAll();
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
-        final Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
-        return page;
+        int totalPage = posts.size();
+//        final Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
+        return new PostResponseListDto(totalPage, postResponseDtoList);
+    }
+
+    // 카테고리별 포스트 조회
+    public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
+        Page<Post> postList = postRepository.findAllByCategoryOrderByCreatedAtDesc(pageable, category);
+        List<Post> posts = postRepository.findAllByCategory(category);
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+
+        for(Post post : postList) {
+            postResponseDtoList.add(new PostResponseDto(post));
+        }
+
+        int totalPage = posts.size();
+//        Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
+        return new PostResponseListDto(totalPage, postResponseDtoList);
     }
 
     // 포스트 수정
@@ -76,5 +93,4 @@ public class PostService {
         }
         return new PrivateResponseBody<>(StatusCode.OK, "포스트 삭제가 완료되었습니다.");
     }
-
 }

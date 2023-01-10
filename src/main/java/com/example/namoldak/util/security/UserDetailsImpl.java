@@ -4,7 +4,6 @@ import com.example.namoldak.domain.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.ArrayList;
 import java.util.Collection;
 
 // 기능 : 유저 디테일 구현체
