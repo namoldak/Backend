@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Builder
@@ -20,9 +22,10 @@ public class WebSocketResponseMessage {
     private String type;
     private String data;
     private Long roomId;
-    private List<JSONObject> allUsers;
-    //    private Map<String, WebSocketSession> allUsers;
+    private List<String> allUsers;
+    private String receiver;
     private Object offer;
+    private Object answer;
     private Object candidate;
     private Object sdp;
 //    public WebSocketMessage(){

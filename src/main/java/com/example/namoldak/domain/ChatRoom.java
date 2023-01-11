@@ -1,5 +1,8 @@
 package com.example.namoldak.domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
@@ -12,11 +15,12 @@ import java.util.Objects;
 // 기능 : Redis에 저장되는 챗룸 안 참가자들 session ID 정보 객체
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ChatRoom implements Serializable {
     // redis에 저장되는 객체들은 Serialize 가능해야함
     private static final long serialVersionUID = 6494678977089006639L;
     private Long roomId;
-    private Map<String, WebSocketSession> clients = new HashMap<>();
+    private HashMap<String, String> clients = new HashMap<>();
 
     public ChatRoom(Long id) {
         this.roomId = id;

@@ -54,6 +54,8 @@ public enum StatusCode {
     ACCESS_DENIED(HttpStatus.NOT_ACCEPTABLE, "403", "접근이 불가능합니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 게시글이 없습니다."),
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸 정보가 없습니다."),
+    IN_CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸에 해당 유저 정보가 없습니다."),
 
 
     //TODO ========================= 성공 응답 코드 ===============================

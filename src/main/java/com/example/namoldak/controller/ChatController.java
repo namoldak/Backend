@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,8 @@ public class ChatController {
     }
 
     @GetMapping("/test/chatRoom/{roomId}")
-    public Map<String, WebSocketSession> showChatRoom(@PathVariable Long roomId) throws JSONException {
-        Map<String, WebSocketSession> objDatas = chatRoomService.findChatRoomById(roomId).getClients();
+    public HashMap<String, String> showChatRoom(@PathVariable Long roomId) throws JSONException {
+        HashMap<String, String> objDatas = chatRoomService.findChatRoomById(roomId).getClients();
         return objDatas;
     }
 }

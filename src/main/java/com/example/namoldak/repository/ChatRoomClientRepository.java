@@ -29,8 +29,8 @@ public class ChatRoomClientRepository {
     }
 
     // Client 정보 저장 Key값은 session Id, value값은 chatRoom 객체
-    public ChatRoom saveClient(String sessionId, ChatRoom chatRoom){
-        opsHashChatRoomClient.put(CHAT_ROOM_CLIENT, sessionId, chatRoom);
+    public ChatRoom saveClient(String session, ChatRoom chatRoom){
+        opsHashChatRoomClient.put(CHAT_ROOM_CLIENT, session, chatRoom);
         return chatRoom;
     }
     // 채팅룸 삭제

@@ -15,51 +15,15 @@ public class ChatService{
 
     public void meesage(ChatMessage message){
 
+        log.info("수빈님의 채팅을 보여줘!!!!!!!!!!!!!!!");
+
         ChatMessage exportMessage;
+        exportMessage = ChatMessage.builder()
+                .type(message.getType())
+                .sender(message.getSender())
+                .message(message.getMessage())
+                .build();
 
-        switch (message.getType()){
-            case "ENTER":
-                exportMessage = ChatMessage.builder()
-                        .type(message.getType())
-                        .sender(message.getSender())
-                        .message("[공지] " + message.getSender() + "님이 입장하셨습니다.")
-                        .build();
-
-                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
-                break;
-
-            case "ICE":
-                exportMessage = ChatMessage.builder()
-                        .type(message.getType())
-                        .sender(message.getSender())
-                        .ice(message.getIce())
-                        .build();
-
-                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
-                break;
-
-            case "OFFER":
-                exportMessage = ChatMessage.builder()
-                        .type(message.getType())
-                        .sender(message.getSender())
-                        .offer(message.getOffer())
-                        .build();
-
-                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
-                break;
-
-            case "ANSWER":
-                exportMessage = ChatMessage.builder()
-                        .type(message.getType())
-                        .sender(message.getSender())
-                        .answer(message.getAnswer())
-                        .build();
-
-                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
-                break;
-
-            default:
-                sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), message);
-        }
+        sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
     }
 }
