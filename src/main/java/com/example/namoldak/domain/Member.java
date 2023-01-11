@@ -27,6 +27,23 @@ public class Member {
     @Column
     private Long kakaoId;
 
+    @Column
+    private Long winNum = 0L;
+
+    @Column
+    private Long loseNum = 0L;
+
+    @Column
+    private Long totalGameNum = 0L;
+    @Column
+    private Long enterGameNum = 0L;
+
+    @Column
+    private Long soloExitNum = 0L;
+
+    @Column
+    private Long makeRoomNum = 0L;
+
     public Member(String email, String nickname, String password) {
         this.email    = email;
         this.nickname = nickname;
@@ -47,5 +64,29 @@ public class Member {
 
     public void update(SignupRequestDto signupRequestDto) {
         this.nickname = signupRequestDto.getNickname();
+    }
+
+    public void updateWinNum(Long num) {
+        this.winNum += num;
+    }
+
+    public void updateLoseNum(Long num) {
+        this.loseNum += num;
+    }
+
+    public void updateTotalGame(Long num) {
+        this.totalGameNum += num;
+    }
+
+    public void updateSoloExit(Long num) {
+        this.soloExitNum += num;
+    }
+
+    public void updateMakeRoom(Long num) {
+        this.makeRoomNum += num;
+    }
+
+    public void updateEnterGame(Long num) {
+        this.enterGameNum += num;
     }
 }
