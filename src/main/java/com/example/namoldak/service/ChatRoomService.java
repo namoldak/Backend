@@ -2,21 +2,23 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.ChatRoom;
 import com.example.namoldak.repository.ChatRoomRepository;
-import com.example.namoldak.util.GlobalResponse.ResponseUtil;
-import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 // 기능 : 챗룸 생성 서비스
-@RequiredArgsConstructor
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
 
-    public ResponseEntity<?> createChatRoom(String roomId, String name){
+    public ChatRoom createChatRoom(Long roomId) {
+        ChatRoom chatRoom = new ChatRoom(roomId);
+        return chatRoomRepository.saveChatRoom(chatRoom);
+    }
 
-        ChatRoom chatRoom = ChatRoom.create(name, roomId);
-        return ResponseUtil.response(StatusCode.OK, chatRoomRepository.saveRoom(chatRoom));
+    public ChatRoom findChatRoomById(final Long id) {
+        return chatRoomRepository.findRoomById(id);
     }
 }

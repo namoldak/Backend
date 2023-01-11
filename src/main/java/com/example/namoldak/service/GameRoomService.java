@@ -125,7 +125,8 @@ public class GameRoomService {
         gameRoomAttendeeRepository.save(gameRoomAttendee);
 
         // 채팅방 생성
-        chatRoomService.createChatRoom(gameRoom.getGameRoomId().toString(), gameRoom.getGameRoomName());
+        log.info("======================== 채팅방 생성 1 : " + gameRoom.getGameRoomId());
+        chatRoomService.createChatRoom(gameRoom.getGameRoomId());
 
         // data에 데이터를 담아주기 위해 HashMap 생성
         HashMap<String, String> roomInfo = new HashMap<>();

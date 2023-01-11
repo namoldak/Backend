@@ -4,15 +4,16 @@ import com.example.namoldak.domain.ChatMessage;
 import com.example.namoldak.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 // 기능 : 채팅 컨트롤러
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class ChatController {
 
     private final ChatService chatService;
 
+    // stomp 채팅용 요청 URL
     @MessageMapping("/chat/message")
     public void message(ChatMessage message) {
         chatService.meesage(message);
