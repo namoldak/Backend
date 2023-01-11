@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+// 기능 : 프론트에 응답하는 시그널링용 Message
 @Builder
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -28,24 +29,6 @@ public class WebSocketResponseMessage {
     private Object answer;
     private Object candidate;
     private Object sdp;
-//    public WebSocketMessage(){
-//
-//    }
-//    public WebSocketMessage(String sender,
-//                            String type,
-//                            String data,
-//                            List<JSONObject> allUsers,
-//                            Object offer,
-//                            Object candidate,
-//                            Object sdp) {
-//        this.sender = sender;
-//        this.type = type;
-//        this.data = data;
-//        this.allUsers = allUsers;
-//        this.offer = offer;
-//        this.candidate = candidate;
-//        this.sdp = sdp;
-//    }
 
     public void setFrom(String from) {
         this.sender = from;
@@ -68,33 +51,4 @@ public class WebSocketResponseMessage {
     public void setSdp(Object sdp) {
         this.sdp = sdp;
     }
-
-//    @Override
-//    public boolean equals(final Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        final WebSocketMessage message = (WebSocketMessage) o;
-//        return Objects.equals(getSender(), message.getSender()) &&
-//                Objects.equals(getType(), message.getType()) &&
-//                Objects.equals(getData(), message.getData()) &&
-//                Objects.equals(getCandidate(), message.getCandidate()) &&
-//                Objects.equals(getSdp(), message.getSdp());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//
-//        return Objects.hash(getSender(), getType(), getData(), getCandidate(), getSdp());
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return "WebSocketMessage{" +
-//                "from='" + sender + '\'' +
-//                ", type='" + type + '\'' +
-//                ", data='" + data + '\'' +
-//                ", candidate=" + candidate +
-//                ", sdp=" + sdp +
-//                '}';
-//    }
 }

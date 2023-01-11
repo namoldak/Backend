@@ -15,7 +15,6 @@ import java.util.Objects;
 // 기능 : Redis에 저장되는 챗룸 안 참가자들 session ID 정보 객체
 @Getter
 @Setter
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ChatRoom implements Serializable {
     // redis에 저장되는 객체들은 Serialize 가능해야함
     private static final long serialVersionUID = 6494678977089006639L;
