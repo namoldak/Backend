@@ -103,6 +103,10 @@ public class GameRoomService {
             throw new CustomException(StatusCode.MEMBER_DUPLICATED);
         }
 
+        // 게임방 만든 횟수 추가
+        member.updateMakeRoom(1L);
+        memberRepository.save(member);
+
         // 빌더 활용해서 GameRoom 엔티티 데이터 채워주기
         GameRoom gameRoom = GameRoom.builder()
                 .gameRoomName(gameRoomRequestDto.getGameRoomName())
@@ -140,7 +144,7 @@ public class GameRoomService {
 
     // 게임룸 입장
     @Transactional
-    public HashMap<String, String>  enterGame(Long roomId, Member member) {
+    public HashMap<String, String> enterGame(Long roomId, Member member) {
 
         // roomId로 DB에서 데이터 찾아와서 담음
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
@@ -161,6 +165,10 @@ public class GameRoomService {
 //            return new PrivateResponseBody(StatusCode.CANT_ENTER, "정원이 다 차있닭!!");
             throw new CustomException(CANT_ENTER);
         }
+
+        // 멤버가 방에 입장한 횟수 1개 증가
+        member.updateEnterGame(1L);
+        memberRepository.save(member);
 
         // for문으로 리스트에서 gameRoomMember 하나씩 빼주기
         for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList){
@@ -270,6 +278,9 @@ public class GameRoomService {
 
         // 남아있는 유저의 수가 0명이라면 게임방 DB에서 데이터 삭제
         if (existGameRoomAttendee.size() == 0) {
+            // 혼자 있을 때 방에서 나간 횟수 증가
+            member.updateSoloExit(1L);
+            memberRepository.save(member);
             gameRoomRepository.delete(enterGameRoom);
         }
 

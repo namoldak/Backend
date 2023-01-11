@@ -70,6 +70,9 @@ public class GameRearService{
         // for문으로 하나씩 빼서 DB 조회 후 List에 넣어주기
         for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList){
             Optional<Member> member = memberRepository.findById(gameRoomAttendee.getMember().getId());
+            // 멤버 총 게임 횟수 증가
+            member.get().updateTotalGame(1L);
+            memberRepository.save(member.get());
             memberList.add(member.get());
         }
 
@@ -77,8 +80,14 @@ public class GameRearService{
         for (Member member : memberList){
             if (!member.getNickname().equals(gameStartSet.getWinner())){
                 victoryDto.setLoser(member.getNickname());
+                // 멤버 패배 기록 추가
+                member.updateLoseNum(1L);
+                memberRepository.save(member);
             } else {
                 victoryDto.setWinner(member.getNickname());
+                // 멤버 승리 기록 추가
+                member.updateWinNum(1L);
+                memberRepository.save(member);
             }
         }
 
