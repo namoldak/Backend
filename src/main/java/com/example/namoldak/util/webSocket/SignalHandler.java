@@ -35,6 +35,7 @@ public class SignalHandler extends TextWebSocketHandler {
     private static final String MSG_TYPE_ANSWER = "answer";
     private static final String MSG_TYPE_CANDIDATE = "candidate";
     private static final String MSG_TYPE_LEAVE = "leave";
+    private static final String MSG_TYPE_EXIT = "exit";
 
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
@@ -42,7 +43,6 @@ public class SignalHandler extends TextWebSocketHandler {
 
         // 끊어진 세션이 어느방에 있었는지 조회
         Long roomId = roomIdToSession.get(session);
-
         // session 삭제
         removeSession(session, roomId);
     }
@@ -150,12 +150,51 @@ public class SignalHandler extends TextWebSocketHandler {
                     break;
 
                 case MSG_TYPE_LEAVE:
-
-                    log.info("======================================== LEAVE");
                     // session 삭제
                     removeSession(session,roomId);
-
                     break;
+
+                case MSG_TYPE_EXIT:
+                    log.info("=================================== EXIT : ");
+                    log.info("=================================== sessionId : " + session.getId());
+
+                    log.info("=================================== roomId : " + roomId);
+                    Map<String, WebSocketSession> eClientList = clientsInRoom.get(roomId);
+                    log.info("=================================== eClientList 개수 : " + eClientList.size());
+
+                    String removeKey = "";
+                    for(Map.Entry<String, WebSocketSession> oneClient : eClientList.entrySet()){
+                        log.info("=================================== 제거 이전 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+                        if(oneClient.getKey().equals(session.getId())){
+                            removeKey = oneClient.getKey();
+                        }
+                    }
+                    eClientList.remove(removeKey);
+
+                    for(Map.Entry<String, WebSocketSession> oneClient : eClientList.entrySet()){
+                        log.info("=================================== 저장될 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+                    }
+
+                    clientsInRoom.put(roomId, eClientList);
+
+                    Map<String, WebSocketSession> eClientList2 = clientsInRoom.get(roomId);
+                    for(Map.Entry<String, WebSocketSession> oneClient : eClientList2.entrySet()){
+                        log.info("=================================== 제거 이후 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+                    }
+
+                    log.info("=================================== 세션이 포함된 방 : " + roomIdToSession.get(session).toString());
+                    roomIdToSession.remove(session);
+                    log.info("========================== LEAVE 3");
+
+                    for(Map.Entry<String, WebSocketSession> oneClient : eClientList2.entrySet()){
+                        log.info("============== " + oneClient.getKey() + "에게 전달");
+                        sendMessage(oneClient.getValue(),
+                                new WebSocketResponseMessage().builder()
+                                        .type(message.getType())
+                                        .sender(session.getId())
+                                        .receiver(oneClient.getKey())
+                                        .build());
+                    }
 
                 default:
                     log.info("======================================== DEFAULT");
@@ -180,25 +219,50 @@ public class SignalHandler extends TextWebSocketHandler {
         }
 
         // 접속을 끊은 세션에 대해 2가지 데이터에서 삭제
-        public void removeSession(WebSocketSession session, Long roomId){
+        public void removeSession(WebSocketSession session, Long roomId) {
 
+            log.info("=================================== LEAVE : ");
             // 1) 방 참가자들 세션 정보들 사이에서 삭제
+            // 방안 참가자들 세션 정보들 조회
+            Map<String, WebSocketSession> eClientList = clientsInRoom.get(roomId);
+            log.info("=================================== eClientList 개수 : " + eClientList.size());
 
-            Map<String, WebSocketSession> clientList = clientsInRoom.get(roomId);
             // 끊어진 세션을 맵에서 찾아 제거
-            for (Map.Entry<String, WebSocketSession> entry : clientList.entrySet()) {
-                if (entry.getValue() == session) {
-                    log.info("============== DELETE : " + entry.getKey() + ", SessionID : " + entry.getValue());
-                    clientList.remove(entry.getKey());
-                } else {
-                    throw new CustomException(IN_CHAT_ROOM_NOT_FOUND);
+            String removeKey = "";
+            for(Map.Entry<String, WebSocketSession> oneClient : eClientList.entrySet()){
+                log.info("=================================== 제거 이전 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+                if(oneClient.getKey().equals(session.getId())){
+                    removeKey = oneClient.getKey();
                 }
             }
-            // 끊어진 세션을 제외한 나머지 세션들을 다시 저장
-            clientsInRoom.put(roomId, clientList);
+            eClientList.remove(removeKey);
+            for(Map.Entry<String, WebSocketSession> oneClient : eClientList.entrySet()){
+                log.info("=================================== 저장될 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+            }
 
+            // 끊어진 세션을 제외한 나머지 세션들을 다시 저장
+            clientsInRoom.put(roomId, eClientList);
+
+            Map<String, WebSocketSession> eClientList2 = clientsInRoom.get(roomId);
+            for(Map.Entry<String, WebSocketSession> oneClient : eClientList2.entrySet()){
+                log.info("=================================== 제거 이후 onClient : " + oneClient.getKey() + " sessionId : " + oneClient.getValue());
+            }
+
+            log.info("=================================== 세션이 포함된 방 : " + roomIdToSession.get(session).toString());
             // 2) 별도 해당 참가자 세션 정보도 삭제
             roomIdToSession.remove(session);
+            log.info("========================== LEAVE 3");
+
+            // 본인 제외 모두에게 전달
+            for(Map.Entry<String, WebSocketSession> oneClient : eClientList2.entrySet()){
+                log.info("============== " + oneClient.getKey() + "에게 전달");
+                sendMessage(oneClient.getValue(),
+                        new WebSocketResponseMessage().builder()
+                                .type("leave")
+                                .sender(session.getId())
+                                .receiver(oneClient.getKey())
+                                .build());
+            }
         }
 }
 
