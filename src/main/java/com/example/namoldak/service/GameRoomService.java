@@ -94,10 +94,10 @@ public class GameRoomService {
     @Transactional
     public HashMap<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
 
-        // 현재 계정이 이미 방장으로 설정된 방이 있다면 예외 처리
-        if (gameRoomRepository.findByOwner(member.getNickname()).isPresent()) {
-            throw new CustomException(StatusCode.MEMBER_DUPLICATED);
-        }
+//        // 현재 계정이 이미 방장으로 설정된 방이 있다면 예외 처리
+//        if (gameRoomRepository.findByOwner(member.getNickname()).isPresent()) {
+//            throw new CustomException(StatusCode.MEMBER_DUPLICATED);
+//        }
 
         // 게임방 만든 횟수 추가
         member.updateMakeRoom(1L);

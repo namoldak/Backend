@@ -1,6 +1,7 @@
 package com.example.namoldak.repository;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // 기능 : 웹소켓에 필요한 세션 정보를 저장, 관리 (싱글톤)
+@Slf4j
 @Component
 @NoArgsConstructor
 public class SessionRepository {
@@ -58,6 +60,7 @@ public class SessionRepository {
                 removeKey = oneClient.getKey();
             }
         }
+        log.info("========== 지워질 session id : " + removeKey);
         clientList.remove(removeKey);
 
         // 끊어진 세션을 제외한 나머지 세션들을 다시 저장
