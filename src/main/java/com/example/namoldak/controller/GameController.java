@@ -34,9 +34,9 @@ public class GameController {
     }
 
     // 건너뛰기
-    @PostMapping("/pub/game/{gameRoomId}/skip")
+    @MessageMapping("/pub/game/{gameRoomId}/skip")
     public void gameSkip(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                         @PathVariable Long gameRoomId) {
+                         @DestinationVariable Long gameRoomId) {
 
         log.info("건너뛰기 - 게임 메세지 : {}, 게임방 아이디 : {}", userDetails.getMember(), gameRoomId);
         gameService.gameSkip(userDetails.getMember(), gameRoomId);
