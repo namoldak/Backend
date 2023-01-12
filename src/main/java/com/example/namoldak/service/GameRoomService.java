@@ -326,4 +326,21 @@ public class GameRoomService {
             messagingTemplate.convertAndSend("/sub/gameRoom" + roomId, alertOwner);
         }
     }
+
+    public HashMap<String, String> ownerInfo(Long roomId) {
+        // 전달받은 roomId로 DB 조회 후 저장
+        Optional<GameRoom> enterRoom = gameRoomRepository.findById(roomId);
+        // 방에서 방장의 닉네임을 저장
+        String ownerNickname = enterRoom.get().getOwner();
+        // 닉네임을 통해서 유저 객체를 불러온 후에 ID를 저장
+        Optional<Member> member = memberRepository.findByNickname(ownerNickname);
+        String ownerId = member.get().getId().toString();
+
+        // 데이터를 전달할 해시맵 생성 후 넣어주기
+        HashMap<String, String> ownerInfo = new HashMap<>();
+        ownerInfo.put("ownerId", ownerId);
+        ownerInfo.put("ownerNickname", ownerNickname);
+
+        return ownerInfo;
+    }
 }
