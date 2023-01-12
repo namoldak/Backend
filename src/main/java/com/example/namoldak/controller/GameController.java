@@ -24,10 +24,10 @@ public class GameController {
     private final GameService gameService;
 
     // 게임 시작
-//    @MessageMapping("/pub/game/{gameRoomId}/start")
-//    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
-    @PostMapping("/pub/game/{gameRoomId}/start")
-    public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
+    @MessageMapping("/pub/game/{gameRoomId}/start")
+    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
+//    @PostMapping("/pub/game/{gameRoomId}/start")
+//    public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         gameService.gameStart(gameRoomId, userDetails.getMember());
         return ResponseUtil.response(StatusCode.GAME_START);
@@ -43,12 +43,12 @@ public class GameController {
     }
 
     // 발언권 부여
-//    @MessageMapping("/pub/game/{gameRoomId}/spotlight")
-//    public void spotlight(
-//            @DestinationVariable Long gameRoomId) {
-    @PostMapping("/pub/game/{gameRoomId}/spotlight")
-    public ResponseEntity<?>  spotlight(
-            @PathVariable Long gameRoomId) {
+    @MessageMapping("/pub/game/{gameRoomId}/spotlight")
+    public ResponseEntity<?> spotlight(
+            @DestinationVariable Long gameRoomId) {
+//    @PostMapping("/pub/game/{gameRoomId}/spotlight")
+//    public ResponseEntity<?>  spotlight(
+//            @PathVariable Long gameRoomId) {
 
         log.info("스포트라이트 - 게임방 아이디 : {}", gameRoomId);
         return ResponseUtil.response(gameService.spotlight(gameRoomId));

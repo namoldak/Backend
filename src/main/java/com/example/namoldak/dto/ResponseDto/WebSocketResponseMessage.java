@@ -1,4 +1,4 @@
-package com.example.namoldak.domain;
+package com.example.namoldak.dto.ResponseDto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
