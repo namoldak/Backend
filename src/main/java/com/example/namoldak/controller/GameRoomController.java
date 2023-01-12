@@ -15,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 
 // 기능 : 게임룸 관련 CRUD 컨트롤
@@ -58,6 +60,12 @@ public class GameRoomController {
                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         gameRoomService.roomExit(roomId, userDetails.getMember());
         return ResponseUtil.response(StatusCode.EXIT_SUCCESS);
+    }
+
+    // 게임룸 방장 조회하기
+    @GetMapping("/rooms/{roomId}/ownerInfo")
+    public ResponseEntity<?> ownerInfo(@PathVariable Long roomId) {
+        return ResponseUtil.response(gameRoomService.ownerInfo(roomId));
     }
 }
 
