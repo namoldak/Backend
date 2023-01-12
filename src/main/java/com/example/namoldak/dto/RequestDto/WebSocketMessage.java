@@ -1,4 +1,4 @@
-package com.example.namoldak.domain;
+package com.example.namoldak.dto.RequestDto;
 
 import lombok.Getter;
 
