@@ -90,7 +90,7 @@ public class MemberService {
             member1.update(signupRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");
         }else {
-            throw new CustomException(StatusCode.CANT_ENTER);
+            throw new CustomException(StatusCode.LOGIN_MATCH_FAIL);
         }
     }
 }

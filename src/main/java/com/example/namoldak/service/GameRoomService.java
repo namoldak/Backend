@@ -86,7 +86,7 @@ public class GameRoomService {
                 gameRoomList.add(gameRoomResponseDto);
             }
         }
-        int totalPage = roomList.size();
+        int totalPage = rooms.getTotalPages();
         return new GameRoomResponseListDto(totalPage, gameRoomList);
     }
 
@@ -207,7 +207,7 @@ public class GameRoomService {
     }
 
     // 게임룸 키워드 조회
-    public List<GameRoomResponseDto> searchGame(Pageable pageable, String keyword) {
+    public GameRoomResponseListDto searchGame(Pageable pageable, String keyword) {
         // 게임룸 이름을 keyword(검색어)로 잡고 조회 + 페이징 처리
         Page<GameRoom> rooms = gameRoomRepository.findByGameRoomNameContaining(pageable, keyword);
 
@@ -249,7 +249,8 @@ public class GameRoomService {
             }
         }
         // 저장된 정보가 담긴 리스트를 반환
-        return gameRoomList;
+        int totalPage = rooms.getTotalPages();
+        return new GameRoomResponseListDto(totalPage, gameRoomList);
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
+import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.service.GameRoomService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -39,8 +40,8 @@ public class GameRoomController {
 
     // 게임룸 키워드 조회
     @GetMapping("/rooms/search") // '/rooms/search?keyword=검색어'
-    public List<GameRoomResponseDto> searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable,
-                                                String keyword) {
+    public GameRoomResponseListDto searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable,
+                                              String keyword) {
         return gameRoomService.searchGame(pageable, keyword);
     }
 
