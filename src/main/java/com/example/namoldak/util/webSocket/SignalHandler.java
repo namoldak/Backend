@@ -1,6 +1,6 @@
 package com.example.namoldak.util.webSocket;
 
-import com.example.namoldak.domain.ChatRoom;
+import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.dto.RequestDto.WebSocketMessage;
 import com.example.namoldak.dto.ResponseDto.WebSocketResponseMessage;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -24,24 +24,20 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.CHAT_ROOM
 public class SignalHandler extends TextWebSocketHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final SessionRepository sessionRepositoryRepo = SessionRepository.getInstance();  // 세션 데이터 저장소
     private final ObjectMapper objectMapper = new ObjectMapper();
-    // 세션 저장 1) clientsInRoom : 게임방 Id를 key 값으로 그 방안 참가자의 session Id들과 session 객체들을 저장
-    private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
-    // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
-    private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
     private static final String MSG_TYPE_JOIN_ROOM = "join_room";
     private static final String MSG_TYPE_OFFER = "offer";
     private static final String MSG_TYPE_ANSWER = "answer";
     private static final String MSG_TYPE_CANDIDATE = "candidate";
     private static final String MSG_TYPE_LEAVE = "leave";
-    private static final String MSG_TYPE_EXIT = "exit";
 
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
         // 웹소켓 연결이 끊어지면 실행되는 메소드
 
         // 끊어진 세션이 어느방에 있었는지 조회
-        Long roomId = roomIdToSession.get(session);
+        Long roomId = sessionRepositoryRepo.getRoomId(session);
         // session 삭제
         removeSession(session, roomId);
     }
@@ -64,33 +60,28 @@ public class SignalHandler extends TextWebSocketHandler {
             log.info("============== message.getType : " + message.getType());
             log.info("============== message.getRoomId : " + roomId.toString());
 
-            ChatRoom chatRoom;
             switch (message.getType()) {
                 // 처음 입장
                 case MSG_TYPE_JOIN_ROOM:
-                    Map<String, WebSocketSession> clientList = new HashMap<>();
 
-                    // 해당 챗룸이 존재하면
-                    if (clientsInRoom.containsKey(roomId)) {
-                        // 해당 챗룸을 조회
-                        clientList = clientsInRoom.get(roomId);
 
-                        // 세션 저장 1) : 게임방 Id를 key 값으로 그 방안 참가자의 session Id들과 session 객체들을 "수정"해서 저장
-                        clientsInRoom.get(roomId).put(session.getId(), session);
+                    if (sessionRepositoryRepo.hasRoom(roomId)) {
+                        // 해당 챗룸이 존재하면
+                        // 세션 저장 1) : 게임방 안의 session List에 새로운 Client session정보를 저장
+                        sessionRepositoryRepo.addClient(roomId, session);
 
                     } else {
-                        // 세션 저장 1) : 게임방 Id를 key 값으로 그 방안 참가자의 session Id들과 session 객체들을 "새로" 저장
-                        Map<String, WebSocketSession> newClient = new HashMap<>();
-                        newClient.put(session.getId(), session);
-                        clientsInRoom.put(roomId, newClient);
+                        // 해당 챗룸이 존재하지 않으면
+                        // 세션 저장 1) : 새로운 게임방 정보와 새로운 Client session정보를 저장
+                        sessionRepositoryRepo.addClientInNewRoom(roomId, session);
                     }
 
                     // 세션 저장 2) : 이 세션이 어느 방에 들어가 있는지 저장
-                    roomIdToSession.put(session, roomId);
+                    sessionRepositoryRepo.saveRoomIdToSession(session, roomId);
 
                     // 방안 참가자 중 자신을 제외한 나머지 사람들의 Session ID를 List로 저장
                     List<String> exportClientList = new ArrayList<>();
-                    for (Map.Entry<String, WebSocketSession> entry : clientsInRoom.get(roomId).entrySet()) {
+                    for (Map.Entry<String, WebSocketSession> entry : sessionRepositoryRepo.getClientList(roomId).entrySet()) {
                         if (entry.getValue() != session) {
                             exportClientList.add(entry.getKey());
                         }
@@ -113,11 +104,11 @@ public class SignalHandler extends TextWebSocketHandler {
                 case MSG_TYPE_ANSWER:
                 case MSG_TYPE_CANDIDATE:
 
-                    if (clientsInRoom.containsKey(roomId)) {
-                        Map<String, WebSocketSession> sClientList = clientsInRoom.get(roomId);
+                    if (sessionRepositoryRepo.hasRoom(roomId)) {
+                        Map<String, WebSocketSession> clientList = sessionRepositoryRepo.getClientList(roomId);
 
-                        if (sClientList.containsKey(message.getReceiver())) {
-                            WebSocketSession ws = sClientList.get(message.getReceiver());
+                        if (clientList.containsKey(message.getReceiver())) {
+                            WebSocketSession ws = clientList.get(message.getReceiver());
                             sendMessage(ws,
                                     new WebSocketResponseMessage().builder()
                                             .type(message.getType())
@@ -164,27 +155,14 @@ public class SignalHandler extends TextWebSocketHandler {
         public void removeSession(WebSocketSession session, Long roomId) {
 
             // 1) 방 참가자들 세션 정보들 사이에서 삭제
-            // 방안 참가자들 세션 정보들 조회
-            Map<String, WebSocketSession> eClientList = clientsInRoom.get(roomId);
-
-            // 끊어진 세션을 맵에서 찾아 제거
-            String removeKey = "";
-            for(Map.Entry<String, WebSocketSession> oneClient : eClientList.entrySet()){
-                if(oneClient.getKey().equals(session.getId())){
-                    removeKey = oneClient.getKey();
-                }
-            }
-            eClientList.remove(removeKey);
-
-            // 끊어진 세션을 제외한 나머지 세션들을 다시 저장
-            clientsInRoom.put(roomId, eClientList);
+            sessionRepositoryRepo.deleteClient(roomId, session);
 
             // 2) 별도 해당 참가자 세션 정보도 삭제
-            roomIdToSession.remove(session);
+            sessionRepositoryRepo.deleteRoomIdToSession(session);
 
             // 본인 제외 모두에게 전달
-            Map<String, WebSocketSession> eClientList2 = clientsInRoom.get(roomId);
-            for(Map.Entry<String, WebSocketSession> oneClient : eClientList2.entrySet()){
+            Map<String, WebSocketSession> clientList = sessionRepositoryRepo.getClientList(roomId);
+            for(Map.Entry<String, WebSocketSession> oneClient : clientList.entrySet()){
                 sendMessage(oneClient.getValue(),
                         new WebSocketResponseMessage().builder()
                                 .type("leave")

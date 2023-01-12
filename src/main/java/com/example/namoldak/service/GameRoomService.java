@@ -1,17 +1,14 @@
 package com.example.namoldak.service;
 
-import com.example.namoldak.domain.GameMessage;
-import com.example.namoldak.domain.GameRoom;
-import com.example.namoldak.domain.GameRoomAttendee;
-import com.example.namoldak.domain.Member;
+import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
-import com.example.namoldak.repository.ChatRoomRepository;
 import com.example.namoldak.repository.GameRoomAttendeeRepository;
 import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
+import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +33,9 @@ public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final MemberRepository memberRepository;
-    private final ChatRoomService chatRoomService;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final ChatRoomRepository chatRoomRepository;
     private final GameRearService gameRearService;
+    private final SessionRepository sessionRepositoryRepo = SessionRepository.getInstance();
 
 
     // 게임룸 전체 조회
@@ -123,10 +119,6 @@ public class GameRoomService {
 
         // GameRoomMember DB에 해당 데이터 저장
         gameRoomAttendeeRepository.save(gameRoomAttendee);
-
-        // 채팅방 생성
-        log.info("======================== 채팅방 생성 1 : " + gameRoom.getGameRoomId());
-        chatRoomService.createChatRoom(gameRoom.getGameRoomId());
 
         // data에 데이터를 담아주기 위해 HashMap 생성
         HashMap<String, String> roomInfo = new HashMap<>();
@@ -261,9 +253,9 @@ public class GameRoomService {
     }
 
     @Transactional
-    public void roomExit(Long RoomId, Member member) {
+    public void roomExit(Long roomId, Member member) {
         // 나가려고 하는 방 정보 DB에서 불러오기
-        GameRoom enterGameRoom = gameRoomRepository.findById(RoomId).orElseThrow(
+        GameRoom enterGameRoom = gameRoomRepository.findById(roomId).orElseThrow(
                 () -> new CustomException(NOT_EXIST_ROOMS)
         );
 
@@ -285,13 +277,13 @@ public class GameRoomService {
         }
 
         // 게임 채팅방도 삭제해줌
-        chatRoomRepository.deleteRoom(enterGameRoom.getGameRoomId().toString());
+        sessionRepositoryRepo.deleteAllclientsInRoom(roomId);
 
         // 게임이 시작 중인 상태에서 3명 아래로 떨어졌을 경우에
         if (enterGameRoom.getStatus().equals("false")){
             if (existGameRoomAttendee.size() < 3) {
                 // 게임을 끝내버림
-                gameRearService.forcedEndGame(RoomId);
+                gameRearService.forcedEndGame(roomId);
             }
         }
 
@@ -311,7 +303,7 @@ public class GameRoomService {
         gameMessage.setType(GameMessage.MessageType.LEAVE);
 
         // 해당 주소에 있는 사람들에게 게임 메세지 모두 발송
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + RoomId, gameMessage);
+        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
         if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomAttendee.isEmpty()){
@@ -330,7 +322,7 @@ public class GameRoomService {
             alertOwner.setSender(nextOwner.getMember().getNickname());
             alertOwner.setType(GameMessage.MessageType.NEWOWNER);
 
-            messagingTemplate.convertAndSend("/sub/gameRoom" + RoomId, alertOwner);
+            messagingTemplate.convertAndSend("/sub/gameRoom" + roomId, alertOwner);
         }
     }
 }
