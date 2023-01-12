@@ -43,8 +43,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(signalHandler(), "/signal")
+                .setAllowedOrigins("*")
                 .setAllowedOrigins("http://localhost:3000")
-                .setAllowedOrigins("https://d34w3p8z4etsgt.cloudfront.net")
+                .setAllowedOriginPatterns("https://d34w3p8z4etsgt.cloudfront.net")
                 .withSockJS(); // allow all origins
     }
 

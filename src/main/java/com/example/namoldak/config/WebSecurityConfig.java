@@ -77,6 +77,9 @@ public class WebSecurityConfig {
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
+        config.addAllowedHeader("namoldak.com");
+        config.addAllowedHeader("http://localhost:3000");
+        config.addAllowedHeader("Authorization");
         config.setAllowCredentials(true);
         config.validateAllowCredentials();
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
