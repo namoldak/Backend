@@ -10,7 +10,7 @@ public class PostResponseListDto{
     private List<PostResponseDto> postResponseDtoList;
 
     public PostResponseListDto(int totalPage, List<PostResponseDto> postResponseDtoList) {
-        this.totalPage = (int) Math.ceil((double)totalPage / 10);
+        this.totalPage = totalPage;
         this.postResponseDtoList = postResponseDtoList;
     }
 }

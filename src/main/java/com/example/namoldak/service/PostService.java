@@ -48,7 +48,7 @@ public class PostService {
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
-        int totalPage = posts.size();
+        int totalPage = postList.getTotalPages();
 //        final Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
@@ -63,7 +63,7 @@ public class PostService {
             postResponseDtoList.add(new PostResponseDto(post));
         }
 
-        int totalPage = posts.size();
+        int totalPage = postList.getTotalPages();
 //        Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
