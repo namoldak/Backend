@@ -225,7 +225,7 @@ public class GameService {
         List<GameRoomAttendee> memberListInGame = gameRoomAttendeeRepository.findByGameRoom(playRoom);
 
         // 라운드 진행 중
-        if (gameStartSet.getSpotNum() < memberListInGame.size()) {
+        if (gameStartSet.getSpotNum() < memberListInGame.size() - 1) {
 
             // 현재 스포트라이트 받는 멤버
             Member spotMember = memberRepository.findById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
@@ -246,7 +246,7 @@ public class GameService {
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() + 1);
             gameStartSetRepository.saveGameSet(gameStartSet);
 
-        } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
+        } else if (gameStartSet.getSpotNum() == memberListInGame.size() - 1) {
 
 
             if (gameStartSet.getRound() < 20) {
