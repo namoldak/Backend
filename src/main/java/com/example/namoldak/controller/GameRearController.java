@@ -5,6 +5,8 @@ import com.example.namoldak.service.GameRearService;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,15 +21,15 @@ public class GameRearController {
     private final GameRearService gameRearService;
 
     // 게임 끝내기
-    @PostMapping("/pub/game/{gameRoomId}/endGame")
-    public void endGame(@PathVariable Long gameRoomId) {
+    @MessageMapping("/pub/game/{gameRoomId}/endGame")
+    public void endGame(@DestinationVariable Long gameRoomId) {
         gameRearService.endGame(gameRoomId);
     }
 
     // 정답
-    @PostMapping("/pub/game/{gameRoomId}/answer")
+    @MessageMapping("/pub/game/{gameRoomId}/answer")
     public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                           @PathVariable Long gameRoomId,
+                           @DestinationVariable Long gameRoomId,
                            @RequestBody AnswerDto answerDto) {
 
         log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameRoomId, answerDto);

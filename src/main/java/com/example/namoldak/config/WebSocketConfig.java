@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         config.setApplicationDestinationPrefixes("/pub");   //
     }
 
-    // 프론트에서 Stomp 사용시 엔드포인트로 연결 (첫 연결)
+    // 프론트에서 웹소켓 사용시 Stomp 엔드포인트로 연결 (첫 연결)
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
@@ -39,15 +39,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         registration.interceptors(stompHandler);
     }
 
-    // WebSocket 연결시
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(signalHandler(), "/signal")
                 .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://d34w3p8z4etsgt.cloudfront.net")
                 .withSockJS(); // allow all origins
     }
 
-    // 시그널링에 필요한 핸들러
     @Bean
     public WebSocketHandler signalHandler() {
         return new SignalHandler();
