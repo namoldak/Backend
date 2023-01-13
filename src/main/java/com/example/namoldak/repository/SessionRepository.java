@@ -7,6 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // 기능 : 웹소켓에 필요한 세션 정보를 저장, 관리 (싱글톤)
 @Slf4j
@@ -14,7 +15,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class SessionRepository {
     private static SessionRepository sessionRepositoryRepo;
-    // 세션 저장 1) clientsInRoom : 방 Id를 key 값으로 하여 방마다 가지고 있는 Client들의 session Id 와 session 객체를 저장 
+    // 세션 저장 1) clientsInRoom : 방 Id를 key 값으로 하여 방마다 가지고 있는 Client들의 session Id 와 session 객체를 저장
     private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
     // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
     private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
@@ -71,10 +72,17 @@ public class SessionRepository {
     public void addClient(Long roomId, WebSocketSession session) {
         clientsInRoom.get(roomId).put(session.getId(), session);
     }
-    
+
     // 방정보 모두 삭제 (방 폭파시 연계 작동)
     public void deleteAllclientsInRoom(Long roomId){
         clientsInRoom.remove(roomId);
+    }
+
+    public Map<WebSocketSession, Long> searchRooIdToSessionList(Long roomId){
+        return roomIdToSession.entrySet()
+                .stream()
+                .filter(entry ->  entry.getValue() == roomId)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void saveRoomIdToSession(WebSocketSession session, Long roomId) {
