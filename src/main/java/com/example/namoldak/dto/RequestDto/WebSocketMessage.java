@@ -9,6 +9,7 @@ public class WebSocketMessage {
     private String type;
     private String data;
     private Long roomId;
+    private String nickname;
     private String receiver;
     private Object offer;
     private Object answer;
