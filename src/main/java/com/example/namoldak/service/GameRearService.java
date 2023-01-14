@@ -6,6 +6,8 @@ import com.example.namoldak.dto.ResponseDto.VictoryDto;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.Member;
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -43,7 +45,7 @@ public class GameRearService{
         sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
 
         // Redis DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteGameSet(roomId);
+        gameStartSetRepository.deleteById(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -56,7 +58,9 @@ public class GameRearService{
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findGameSetById(roomId);
+        GameStartSet gameStartSet = gameStartSetRepository.findById(roomId).orElseThrow(
+                ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
+        );
 
         // 현재 게임룸 데이터 불러오기
         Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
@@ -101,8 +105,7 @@ public class GameRearService{
         sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
-//        gameStartSetRepository.delete(gameStartSet);
-        gameStartSetRepository.deleteGameSet(roomId);
+        gameStartSetRepository.deleteById(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -116,7 +119,9 @@ public class GameRearService{
         String answer = answerDto.getAnswer();
 
         // gameStartSet 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findGameSetById(gameRoomId);
+        GameStartSet gameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
+                ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
+        );
 
         GameMessage gameMessage = new GameMessage();
 
@@ -125,7 +130,7 @@ public class GameRearService{
 
             // 정답자
             gameStartSet.setWinner(member.getNickname());
-            gameStartSetRepository.saveGameSet(gameStartSet);
+            gameStartSetRepository.save(gameStartSet);
 
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));
