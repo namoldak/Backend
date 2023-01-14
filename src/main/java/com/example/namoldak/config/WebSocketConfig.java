@@ -29,6 +29,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
+                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://namoldak.com")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
@@ -39,13 +41,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         registration.interceptors(stompHandler);
     }
 
-
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(signalHandler(), "/signal")
                 .setAllowedOrigins("*")
-                .setAllowedOrigins("http://localhost:3000")
-                .setAllowedOriginPatterns("https://d34w3p8z4etsgt.cloudfront.net")
+                .setAllowedOrigins("http://localhost:3000", "https://namoldak.com")
                 .withSockJS(); // allow all origins
     }
 
