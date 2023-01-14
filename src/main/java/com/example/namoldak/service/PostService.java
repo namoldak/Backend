@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
+    private final RepositoryService repositoryService;
 
 
     // 포스트 생성
@@ -41,22 +41,19 @@ public class PostService {
     // 포스트 전체 조회
     @Transactional
     public PostResponseListDto getAllPost(Pageable pageable) {
-        Page<Post> postList = postRepository.findAll(pageable);
-        List<Post> posts = postRepository.findAll();
+        Page<Post> postList = repositoryService.findAllPostByPageable(pageable);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
         int totalPage = postList.getTotalPages();
-//        final Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
 
     // 카테고리별 포스트 조회
     public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
-        Page<Post> postList = postRepository.findAllByCategoryOrderByCreatedAtDesc(pageable, category);
-        List<Post> posts = postRepository.findAllByCategory(category);
+        Page<Post> postList = repositoryService.findAllPostByPageableAndCategory(pageable, category);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
@@ -64,7 +61,6 @@ public class PostService {
         }
 
         int totalPage = postList.getTotalPages();
-//        Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
 
@@ -72,17 +68,12 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostResponseDto> getOnePost(Long id) {
         List<PostResponseDto> result = new ArrayList<>();
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
-
-//        List<Comment> comments = commentRepository.findByPost(post);
-        List<Comment> comments = commentRepository.findByPost(post);
+        Post post = repositoryService.findPostById(id);
+        List<Comment> comments = repositoryService.findAllCommentByPost(post);
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : comments) {
             commentResponseDtoList.add(new CommentResponseDto(comment));
         }
-
         result.add(new PostResponseDto(post, commentResponseDtoList));
         return result;
     }
@@ -90,9 +81,7 @@ public class PostService {
     // 포스트 수정
     @Transactional
     public PrivateResponseBody updatePost(Long id, PostRequestDto postRequestDto, Member member) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
+        Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK, "포스트 수정 완료");
@@ -104,9 +93,7 @@ public class PostService {
     // 포스트 삭제
     @Transactional
     public PrivateResponseBody deletePost(Long id, Member member) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
+        Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
             postRepository.delete(post);
         } else {
