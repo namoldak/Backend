@@ -27,11 +27,12 @@ public class SignalHandler extends TextWebSocketHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-//    private final SessionRepository sessionRepositoryRepo = SessionRepository.getInstance();  // 세션 데이터 저장소
+    //    private final SessionRepository sessionRepositoryRepo = SessionRepository.getInstance();  // 세션 데이터 저장소
     // 세션 저장 1) clientsInRoom : 방 Id를 key 값으로 하여 방마다 가지고 있는 Client들의 session Id 와 session 객체를 저장
     private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
     // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
     private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
+    private final Map<String, String> temp = new HashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String MSG_TYPE_JOIN_ROOM = "join_room";
     private static final String MSG_TYPE_OFFER = "offer";
@@ -89,6 +90,7 @@ public class SignalHandler extends TextWebSocketHandler {
                     // 세션 저장 2) : 이 세션이 어느 방에 들어가 있는지 저장
 //                    sessionRepositoryRepo.saveRoomIdToSession(session, roomId);
                     roomIdToSession.put(session, roomId);
+                    temp.put(session.getId(), message.getNickname());
 
 //                    log.info("==========join 3 : 지금 세션이 들어간 방 : {}", sessionRepositoryRepo.getRoomId(session));
                     log.info("==========join 3 : 지금 세션이 들어간 방 : {}", roomIdToSession.get(session));
@@ -104,6 +106,16 @@ public class SignalHandler extends TextWebSocketHandler {
 
                     log.info("==========join 4 : allUsers로 Client List  :" + exportClientList);
 
+//                    List<String> exportClientList = new ArrayList<>();
+                    Map<String, String> exportClientList1 = new HashMap<>();
+                    for (Map.Entry<String, WebSocketSession> entry : clientsInRoom.get(roomId).entrySet()) {
+                        if (entry.getValue() != session) {
+                            exportClientList1.put(entry.getKey(), temp.get(entry.getKey()));
+                        }
+                    }
+
+                    log.info("==========join 5 : allUsersNickNames로 Client List  :" + exportClientList1);
+
                     // 접속한 본인에게 방안 참가자들 정보를 전송
                     sendMessage(session,
                             new WebSocketResponseMessage().builder()
@@ -111,6 +123,7 @@ public class SignalHandler extends TextWebSocketHandler {
                                     .sender(userName)
                                     .data(message.getData())
                                     .allUsers(exportClientList)
+                                    .allUsersNickNames(exportClientList1)
                                     .candidate(message.getCandidate())
                                     .sdp(message.getSdp())
                                     .build());
@@ -134,6 +147,7 @@ public class SignalHandler extends TextWebSocketHandler {
                                     new WebSocketResponseMessage().builder()
                                             .type(message.getType())
                                             .sender(session.getId())            // 보낸사람 session Id
+                                            .senderNickName(message.getNickname())
                                             .receiver(message.getReceiver())    // 받을사람 session Id
                                             .data(message.getData())
                                             .offer(message.getOffer())
@@ -199,9 +213,9 @@ public class SignalHandler extends TextWebSocketHandler {
 //       log.info("==========leave 4 : (삭제 후) roomId to Session - {}", sessionRepositoryRepo.searchRooIdToSessionList(roomId));
         log.info("==========leave 4 : (삭제 후) roomId to Session - {}",
                 roomIdToSession.entrySet()
-                .stream()
-                .filter(entry ->  entry.getValue() == roomId)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                        .stream()
+                        .filter(entry ->  entry.getValue() == roomId)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         // 본인 제외 모두에게 전달
 //        for(Map.Entry<String, WebSocketSession> oneClient : sessionRepositoryRepo.getClientList(roomId).entrySet()){

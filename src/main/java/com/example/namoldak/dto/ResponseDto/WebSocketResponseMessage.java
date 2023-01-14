@@ -20,10 +20,12 @@ import java.util.Objects;
 @AllArgsConstructor
 public class WebSocketResponseMessage {
     private String sender;
+    private String senderNickName;
     private String type;
     private String data;
     private Long roomId;
     private List<String> allUsers;
+    private Map<String, String> allUsersNickNames;
     private String receiver;
     private Object offer;
     private Object answer;
