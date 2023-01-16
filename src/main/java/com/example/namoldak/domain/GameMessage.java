@@ -15,6 +15,7 @@ public class GameMessage<T> {
     private String roomId;
     private String senderId;
     private String sender;
+    private String nickname;
     private T content;
     private GameMessage.MessageType type;
 
