@@ -53,4 +53,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public WebSocketHandler signalHandler() {
         return new SignalHandler();
     }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.setTimeToFirstMessage(99999); // Time
+    }
 }

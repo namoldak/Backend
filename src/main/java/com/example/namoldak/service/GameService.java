@@ -40,10 +40,11 @@ public class GameService {
                 () -> new CustomException(StatusCode.NOT_FOUND_ROOM)
         );
 
-        // 게임 시작은 방장만이 할 수 있음
-        if (!member.getNickname().equals(gameRoom.getOwner())) {
-            throw new CustomException(StatusCode.UNAUTHORIZE);
-        }
+//        // 게임 시작은 방장만이 할 수 있음
+//        if (!member.getNickname().equals(gameRoom.getOwner())) {
+//            throw new CustomException(StatusCode.UNAUTHORIZE);
+//        }
+
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
         List<GameRoomAttendee> gameRoomAttendees = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
@@ -55,7 +56,7 @@ public class GameService {
         List<Keyword> keywordList1 = keywordRepository.findAll();
 
         // 랜덤으로 키워드 하나 뽑기
-        Keyword keyword1 = keywordList1.get((int) Math.random() * keywordList1.size());
+        Keyword keyword1 = keywordList1.get((int) (Math.random() * keywordList1.size()) + 1);
 
         // 위에서 랜덤으로 뽑은 키워드의 카테고리
         String category = keyword1.getCategory();
@@ -89,16 +90,29 @@ public class GameService {
             keywordToMember.put(memberNicknameList.get(i), keywordList.get(i).getWord());
         }
 
+        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
+        log.info("카테고리 정보 : " + category);
+        log.info("멤버별 키워드 정보 : " + keywordToMember);
+
         GameStartSet gameStartSet = GameStartSet.builder()
                 .roomId(gameRoomId)
                 .category(category)
                 .keywordToMember(keywordToMember)
                 .round(0)
                 .spotNum(0)
+                .winner("")
                 .build();
+
+        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
+        log.info("카테고리 정보 : " + category);
+        log.info("멤버별 키워드 정보 : " + keywordToMember);
 
         // StartSet 저장
         gameStartSetRepository.save(gameStartSet);
+
+        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
+        log.info("카테고리 정보 : " + category);
+        log.info("멤버별 키워드 정보 : " + keywordToMember);
 
         GameStartSet SearchOneGameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)

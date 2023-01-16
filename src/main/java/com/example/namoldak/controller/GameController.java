@@ -24,7 +24,7 @@ public class GameController {
     private final GameService gameService;
 
     // 게임 시작
-    @MessageMapping("/pub/game/{gameRoomId}/start")
+    @MessageMapping("/game/{gameRoomId}/start")
     public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
 //    @PostMapping("/pub/game/{gameRoomId}/start")
 //    public ResponseEntity<?> gameStart(@PathVariable Long gameRoomId,
@@ -34,7 +34,7 @@ public class GameController {
     }
 
     // 건너뛰기
-    @MessageMapping("/pub/game/{gameRoomId}/skip")
+    @MessageMapping("/game/{gameRoomId}/skip")
     public void gameSkip(@AuthenticationPrincipal UserDetailsImpl userDetails,
                          @DestinationVariable Long gameRoomId) {
 
@@ -43,7 +43,7 @@ public class GameController {
     }
 
     // 발언권 부여
-    @MessageMapping("/pub/game/{gameRoomId}/spotlight")
+    @MessageMapping("/game/{gameRoomId}/spotlight")
     public ResponseEntity<?> spotlight(
             @DestinationVariable Long gameRoomId) {
 //    @PostMapping("/pub/game/{gameRoomId}/spotlight")

@@ -21,13 +21,13 @@ public class GameRearController {
     private final GameRearService gameRearService;
 
     // 게임 끝내기
-    @MessageMapping("/pub/game/{gameRoomId}/endGame")
+    @MessageMapping("/game/{gameRoomId}/endGame")
     public void endGame(@DestinationVariable Long gameRoomId) {
         gameRearService.endGame(gameRoomId);
     }
 
     // 정답
-    @MessageMapping("/pub/game/{gameRoomId}/answer")
+    @MessageMapping("/game/{gameRoomId}/answer")
     public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
                            @DestinationVariable Long gameRoomId,
                            @RequestBody AnswerDto answerDto) {
