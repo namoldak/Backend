@@ -53,13 +53,14 @@ public class GameService {
         gameRoom.setStatus("false");
 
         // 멤버들에게 뿌려지게 될 키워드 전체 목록 불러오기
-        List<Keyword> keywordList1 = keywordRepository.findAll();
+//        List<Keyword> keywordList1 = keywordRepository.findAll();
 
         // 랜덤으로 키워드 하나 뽑기
-        Keyword keyword1 = keywordList1.get((int) (Math.random() * keywordList1.size()) + 1);
+//        Keyword keyword1 = keywordList1.get((int) (Math.random() * keywordList1.size()) + 1);
 
         // 위에서 랜덤으로 뽑은 키워드의 카테고리
-        String category = keyword1.getCategory();
+//        String category = keyword1.getCategory();
+        String category = Category.getRandom().name();
 
         // 같은 카테고리를 가진 키워드 리스트 만들기
         List<Keyword> keywordList;
