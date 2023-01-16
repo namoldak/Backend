@@ -12,13 +12,14 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatMessage <T> {
     public enum MessageType {
-        TALK, ENTER, OFFER, ICE, ANSWER
+        TALK, ENTER, OFFER, ICE, ANSWER, CAMERAOFF
     }
 
     private String type;         // 메세지 타입
     private String roomId;       // 방번호
     private String sender;       // 메시지 보낸사람
     private String message;      // 메시지
+    private String nickname;
 
     // 시그널링 타입
     private String offer;
