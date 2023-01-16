@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AnswerDto {
     private String answer;
+    private String nickname;
 }

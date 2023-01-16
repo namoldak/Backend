@@ -1,5 +1,6 @@
 package com.example.namoldak.controller;
 
+import com.example.namoldak.dto.RequestDto.AnswerDto;
 import com.example.namoldak.service.GameService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -35,11 +36,10 @@ public class GameController {
 
     // 건너뛰기
     @MessageMapping("/game/{gameRoomId}/skip")
-    public void gameSkip(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public void gameSkip(AnswerDto answerDto,
                          @DestinationVariable Long gameRoomId) {
 
-        log.info("건너뛰기 - 게임 메세지 : {}, 게임방 아이디 : {}", userDetails.getMember(), gameRoomId);
-        gameService.gameSkip(userDetails.getMember(), gameRoomId);
+        gameService.gameSkip(answerDto, gameRoomId);
     }
 
     // 발언권 부여

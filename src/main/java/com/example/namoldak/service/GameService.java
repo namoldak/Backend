@@ -1,6 +1,7 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.*;
+import com.example.namoldak.dto.RequestDto.AnswerDto;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -29,6 +30,7 @@ public class GameService {
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameStartSetRepository gameStartSetRepository;
+    private final GameRearService gameRearService;
 
 
     // 게임 시작
@@ -143,13 +145,12 @@ public class GameService {
 
     // 건너뛰기
     @Transactional
-    public void gameSkip(Member member, Long gameRoomId) {
+    public void gameSkip(AnswerDto answerDto, Long gameRoomId) {
 
         // stomp로 메세지 전달
         GameMessage gameMessage = new GameMessage();
         gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 방 id
-        gameMessage.setSenderId(String.valueOf(member.getId())); // 로그인한 유저의 id
-        gameMessage.setSender(member.getNickname()); // 로그인한 유저의 닉네임
+        gameMessage.setSender(answerDto.getNickname()); // 로그인한 유저의 닉네임
         gameMessage.setContent(gameMessage.getSender() + "님이 건너뛰기를 선택하셨습니다.");
         gameMessage.setType(GameMessage.MessageType.SKIP);
 
@@ -202,13 +203,15 @@ public class GameService {
         } else if (gameStartSet.getSpotNum() >= memberListInGame.size()) {
 
 
-            if (gameStartSet.getRound() < 20) {
+            if (gameStartSet.getRound() < 3) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
                 gameStartSetRepository.save(gameStartSet);
+                spotlight(gameRoomId);
 
-            } else if (gameStartSet.getRound() == 20) {
+                // 0번부터 시작이다
+            } else if (gameStartSet.getRound() == 3) {
                 // 메세지 알림 = 여기 말할 이야기
                 GameMessage gameMessage = new GameMessage();
                 gameMessage.setRoomId(Long.toString(gameRoomId));               // 현재 게임룸 id
@@ -219,6 +222,7 @@ public class GameService {
 
                 messagingTemplate.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
 
+                gameRearService.forcedEndGame(gameRoomId);
             }
         }
         return gameStartSet;

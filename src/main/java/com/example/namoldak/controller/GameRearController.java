@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 // 기능 : 게임 진행 관련 부가기능 컨트롤
 @Slf4j
 @RequiredArgsConstructor
@@ -28,11 +30,9 @@ public class GameRearController {
 
     // 정답
     @MessageMapping("/game/{gameRoomId}/answer")
-    public void gameAnswer(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                           @DestinationVariable Long gameRoomId,
+    public void gameAnswer(@DestinationVariable Long gameRoomId,
                            @RequestBody AnswerDto answerDto) {
 
-        log.info("정답 - 게임 메세지 : {}, 게임방 아이디 : {}, 정답 : {}", userDetails.getMember(), gameRoomId, answerDto);
-        gameRearService.gameAnswer(userDetails.getMember(), gameRoomId, answerDto);
+        gameRearService.gameAnswer(gameRoomId, answerDto);
     }
 }
