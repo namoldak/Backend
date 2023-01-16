@@ -15,13 +15,21 @@ public class ChatService{
 
     public void meesage(ChatMessage message){
 
-        log.info("수빈님의 채팅을 보여줘!!!!!!!!!!!!!!!");
-
         ChatMessage exportMessage;
         exportMessage = ChatMessage.builder()
                 .type(message.getType())
                 .sender(message.getSender())
                 .message(message.getMessage())
+                .build();
+
+        sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);
+    }
+
+    public void cameraControl(ChatMessage message) {
+        ChatMessage exportMessage;
+        exportMessage = ChatMessage.builder()
+                .type(message.getType())
+                .nickname(message.getNickname())
                 .build();
 
         sendingOperations.convertAndSend("/sub/gameRoom/" + message.getRoomId(), exportMessage);

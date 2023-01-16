@@ -18,4 +18,9 @@ public class ChatController {
     public void message(ChatMessage message) {
         chatService.meesage(message);
     }
+
+    @MessageMapping("/chat/camera")
+    public void cameraControl(ChatMessage message) {
+        chatService.cameraControl(message);
+    }
 }
