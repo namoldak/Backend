@@ -51,7 +51,7 @@ jobs:
         shell: bash
 
       # 키 정보 있는 properties 따로 관리
-      - name: make application-local.properties
+      - name: make application-key.properties
         if: true
         run: |
           cd ./src/main/resources
