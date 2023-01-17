@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswerDto {
+public class GameDto {
     private String answer;
     private String nickname;
 }
