@@ -8,8 +8,6 @@
 name: Java CI with Gradle
 
 on:
-  push:
-    branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
 
@@ -23,31 +21,34 @@ permissions:
   contents: read
 
 jobs:
-   deploy:
+  deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-        # 기본 체크아웃
+      # 기본 체크아웃
       - name: Checkout
       - uses: actions/checkout@v3
-        # JDK 11 세팅
+
+      # JDK 11 세팅
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
-        # gradlew 권한 설정
+
+      # gradlew 권한 설정
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
-        # build
+
+      # build
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-           arguments: build
-        # 키 정보 있는 properties 따로 관리
+        run: ./gradlew clean build -x test
+        shell: bash
+
+      # 키 정보 있는 properties 따로 관리
       - name: make application-local.properties
         if: true
         run: |
@@ -55,16 +56,19 @@ jobs:
           touch ./application.properties
           echo "${{ secrets.PROPERTIES }}" > ./application.properties
         shell: bash
-        # aws 인증
+
+      # aws 인증
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-        # S3 bucket으로 copy
+
+      # S3 bucket으로 copy
       - name: Upload to AWS S3
         run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
-        # S3 bucket에 있는 파일을 대상으로 CodeDeploy 실행
+
+      # S3 bucket에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy to AWS EC2 from S3
         run: aws deploy create-deployment --application-name $CODE_DEPLOY_APPLICATION_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
