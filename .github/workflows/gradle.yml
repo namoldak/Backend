@@ -86,6 +86,10 @@ jobs:
       - name: Copy deploy.sh
         run: cp ./deploy.sh ./deploy/
 
+      # properties 파일 Copy
+      - name: Copy properties
+        run: cp ./application.properties ./deploy/
+
       # 압축파일 형태로 전달
       - name: Make zip file
         run: zip -r -qq -j ./springboot-build.zip ./deploy
