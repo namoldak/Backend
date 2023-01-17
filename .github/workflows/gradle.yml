@@ -52,8 +52,8 @@ jobs:
         if: true
         run: |
           cd ./src/main/resources
-          touch ./application-sub.properties
-          echo "${{ secrets.PROPERTIES }}" > ./application-sub.properties
+          touch ./application.properties
+          echo "${{ secrets.PROPERTIES }}" > ./application.properties
         shell: bash
         # aws 인증
       - name: Configure AWS credentials
