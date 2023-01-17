@@ -101,4 +101,4 @@ jobs:
 
       # S3 bucket에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy to AWS EC2 from S3
-        run: aws deploy create-deployment --application-name $CODE_DEPLOY_APPLICATION_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+        run: aws deploy create-deployment --application-name $CODE_DEPLOY_APPLICATION_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $CODE_DEPLOY_DEPLOYMENT_GROUP_NAME --s3-location bucket=$S3_BUCKET_NAME,key=springboot-build.zip,bundleType=zip
