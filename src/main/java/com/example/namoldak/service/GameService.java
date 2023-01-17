@@ -151,7 +151,7 @@ public class GameService {
         GameMessage gameMessage = new GameMessage();
         gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 방 id
         gameMessage.setSender(gameDto.getNickname()); // 로그인한 유저의 닉네임
-        gameMessage.setContent(gameMessage.getSender() + "님이 건너뛰기를 선택하셨습니다.");
+        gameMessage.setContent(gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.");
         gameMessage.setType(GameMessage.MessageType.SKIP);
 
         // 방 안의 구독자 모두가 메세지 받음
