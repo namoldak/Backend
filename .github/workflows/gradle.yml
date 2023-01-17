@@ -51,18 +51,18 @@ jobs:
         shell: bash
 
       # 키 정보 있는 properties 따로 관리
-      - name: make application-key.properties
+      - name: make application.properties
         if: true
         run: |
           cd ./src/main/resources
-          touch ./src/main/resources/application-key.properties
-          echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application-key.properties
+          touch ./src/main/resources/application.properties
+          echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
         shell: bash
 
       - uses: actions/upload-artifact@v2
         with:
-          name: application-key.properties
-          path: ./src/main/resources/application-key.properties
+          name: application.properties
+          path: ./src/main/resources/application.properties
 
       # aws 인증
       - name: Configure AWS credentials
