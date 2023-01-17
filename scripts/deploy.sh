@@ -1,13 +1,13 @@
 #! /usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/app
+REPOSITORY=/home/ubuntu/namoldak
 cd $REPOSITORY
 
 APP_NAME=namoldak
-JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
-JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
+JAR_NAME=$(ls $REPOSITORY/ | grep '*.jar' | tail -n 1)
+JAR_PATH=$REPOSITORY/$JAR_NAME
 
-CURRENT_PID=$( ps -ef | grep "$JAR_NAME" | grep -v 'grep' | awk '{print $2}')
+CURRENT_PID=$( ps -ef | grep "$JAR_NAME" | grep -v 'grep' | awk '{print $1}')
 
 if [ -z $CURRENT_PID ]
 then
