@@ -55,8 +55,8 @@ jobs:
         if: true
         run: |
           cd ./src/main/resources
-          touch ./src/main/resources/application.properties
-          echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
+          touch ./application.properties
+          echo "${{ secrets.PROPERTIES }}" > ./application.properties
         shell: bash
 
       - uses: actions/upload-artifact@v2
