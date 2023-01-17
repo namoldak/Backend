@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - sources: /
+  - sources: /deploy
     destination: /home/ubuntu
     overwrite: yes
 permissions:
