@@ -43,7 +43,7 @@ public class GameRearService{
         gameMessage.setSender("양계장 주인");
         gameMessage.setContent("게임 진행 가능한 최소 인원이 충족되지 못 하여 게임이 종료된닭.");
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
-        sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
+        sendingOperations.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // Redis DB에서 게임 셋팅 삭제
         gameStartSetRepository.deleteById(roomId);
@@ -54,17 +54,17 @@ public class GameRearService{
 
     // 게임 정상 종료
     @Transactional
-    public void endGame(Long roomId){
+    public void endGame(Long gameRoomId){
         // 승리자와 패배자를 list로 반환할 DTO 생성
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findById(roomId).orElseThrow(
+        GameStartSet gameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
         // 현재 게임룸 데이터 불러오기
-        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
+        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(gameRoomId);
 
         // 불러온 게임룸으로 들어간 GameRoomMember들 구하기
         List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
@@ -97,16 +97,15 @@ public class GameRearService{
         }
 
         // 발송할 메세지 데이터 저장
-        GameMessage<VictoryDto> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(roomId));
-        gameMessage.setSenderId("");
+        GameMessage gameMessage = new GameMessage();
+        gameMessage.setRoomId(Long.toString(gameRoomId));
         gameMessage.setSender("양계장 주인");
         gameMessage.setContent(victoryDto);
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
-        sendingOperations.convertAndSend("/sub/gameRoom" + roomId, gameMessage);
+        sendingOperations.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteById(roomId);
+        gameStartSetRepository.deleteById(gameRoomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -136,7 +135,7 @@ public class GameRearService{
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSender("양계장 주인");
-            gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답입니닭!");
+            gameMessage.setContent(gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답입니닭!");
             gameMessage.setNickname(gameDto.getNickname());
             gameMessage.setType(GameMessage.MessageType.SUCCESS);
 
@@ -146,7 +145,7 @@ public class GameRearService{
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(gameRoomId));
             gameMessage.setSender("양계장 주인");
-            gameMessage.setContent(gameMessage.getSender() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!");
+            gameMessage.setContent(gameMessage.getNickname() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!");
             gameMessage.setNickname(gameDto.getNickname());
             gameMessage.setType(GameMessage.MessageType.FAIL);
 
