@@ -8,7 +8,7 @@
 name: Java CI with Gradle
 
 on:
-  pull_request:
+  push:
     branches: [ "dev" ]
 
 env:
@@ -84,7 +84,7 @@ jobs:
 
       # deploy.sh 파일 Copy
       - name: Copy deploy.sh
-        run: cp ./deploy.sh ./deploy/
+        run: cp ./scripts/deploy.sh ./deploy/
 
       # properties 파일 Copy
       - name: Copy properties
