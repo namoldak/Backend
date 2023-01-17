@@ -4,7 +4,7 @@ REPOSITORY=/home/ubuntu/namoldak
 cd $REPOSITORY
 
 APP_NAME=namoldak
-JAR_NAME=$(ls $REPOSITORY/ | grep '*.jar' | tail -n 1)
+JAR_NAME=$(ls $REPOSITORY/ | grep 'SNAPSHOT.jar' | tail -n 1)
 JAR_PATH=$REPOSITORY/$JAR_NAME
 
 CURRENT_PID=$( ps -ef | grep "$JAR_NAME" | grep -v 'grep' | awk '{print $1}')
@@ -19,4 +19,4 @@ else
 fi
 
 echo"> $JAR_PATH 배포"
-nohup java -jar $JAR_PATH
+nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
