@@ -55,9 +55,14 @@ jobs:
         if: true
         run: |
           cd ./src/main/resources
-          touch ./application-key.properties
-          echo "${{ secrets.PROPERTIES }}" > ./application-key.properties
+          touch ./src/main/resources/application-key.properties
+          echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application-key.properties
         shell: bash
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: application-key.properties
+          path: ./src/main/resources/application-key.properties
 
       # aws 인증
       - name: Configure AWS credentials
