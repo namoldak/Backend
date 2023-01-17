@@ -1,7 +1,7 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.*;
-import com.example.namoldak.dto.RequestDto.AnswerDto;
+import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -35,17 +35,17 @@ public class GameService {
 
     // 게임 시작
     @Transactional
-    public void gameStart(Long gameRoomId, Member member) {
+    public void gameStart(Long gameRoomId, GameDto gameDto) {
 
         // 현재 입장한 게임방의 정보를 가져옴
         GameRoom gameRoom = gameRoomRepository.findByGameRoomId(gameRoomId).orElseThrow(
                 () -> new CustomException(StatusCode.NOT_FOUND_ROOM)
         );
 
-//        // 게임 시작은 방장만이 할 수 있음
-//        if (!member.getNickname().equals(gameRoom.getOwner())) {
-//            throw new CustomException(StatusCode.UNAUTHORIZE);
-//        }
+        // 게임 시작은 방장만이 할 수 있음
+        if (!gameDto.getNickname().equals(gameRoom.getOwner())) {
+            throw new CustomException(StatusCode.UNAUTHORIZE);
+        }
 
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
@@ -145,12 +145,12 @@ public class GameService {
 
     // 건너뛰기
     @Transactional
-    public void gameSkip(AnswerDto answerDto, Long gameRoomId) {
+    public void gameSkip(GameDto gameDto, Long gameRoomId) {
 
         // stomp로 메세지 전달
         GameMessage gameMessage = new GameMessage();
         gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 방 id
-        gameMessage.setSender(answerDto.getNickname()); // 로그인한 유저의 닉네임
+        gameMessage.setSender(gameDto.getNickname()); // 로그인한 유저의 닉네임
         gameMessage.setContent(gameMessage.getSender() + "님이 건너뛰기를 선택하셨습니다.");
         gameMessage.setType(GameMessage.MessageType.SKIP);
 
