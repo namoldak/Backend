@@ -50,19 +50,29 @@ jobs:
         run: ./gradlew clean build -x test
         shell: bash
 
-      # 키 정보 있는 properties 따로 관리
-      - name: make application.properties
-        if: true
-        run: |
-          cd ./src/main/resources
-          touch ./application.properties
-          echo "${{ secrets.PROPERTIES }}" > ./application.properties
+      # 암호화 했던 설정파일 복호화
+      - name: Decrypt applications properties
+        run: gpg --quiet --batch --yes --always-trust --decrypt --passphrase=${{ secrets.PROPERTIES }} --output ./src/main/resources/application.tar ./src/main/resources/application.tar.gpg
         shell: bash
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: application.properties
-          path: ./src/main/resources/application.properties
+      # 설정파일 압축 해제
+      - name: Unzip application properties
+        run: tar xvf ./src/main/resources/application.tar -C ./src/main/resources/
+        shell: bash
+
+      # 키 정보 있는 properties 따로 관리
+#      - name: make application.properties
+#        if: true
+#        run: |
+#          cd ./src/main/resources
+#          touch ./application.properties
+#          echo "${{ secrets.PROPERTIES }}" > ./application.properties
+#        shell: bash
+#
+#      - uses: actions/upload-artifact@v2
+#        with:
+#          name: application.properties
+#          path: ./src/main/resources/application.properties
 
       # aws 인증
       - name: Configure AWS credentials
