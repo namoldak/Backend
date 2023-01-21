@@ -5,6 +5,7 @@ import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -31,21 +32,22 @@ public class GameService {
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameStartSetRepository gameStartSetRepository;
     private final GameRearService gameRearService;
+    private final RepositoryService repositoryService;
 
 
     // 게임 시작
     @Transactional
-    public void gameStart(Long gameRoomId, GameDto gameDto) {
+    public void gameStart(Long gameRoomId, GameDto gameDto) throws JsonProcessingException {
 
         // 현재 입장한 게임방의 정보를 가져옴
         GameRoom gameRoom = gameRoomRepository.findByGameRoomId(gameRoomId).orElseThrow(
                 () -> new CustomException(StatusCode.NOT_FOUND_ROOM)
         );
 
-        // 게임 시작은 방장만이 할 수 있음
-        if (!gameDto.getNickname().equals(gameRoom.getOwner())) {
-            throw new CustomException(StatusCode.UNAUTHORIZE);
-        }
+//        // 게임 시작은 방장만이 할 수 있음
+//        if (!gameDto.getNickname().equals(gameRoom.getOwner())) {
+//            throw new CustomException(StatusCode.UNAUTHORIZE);
+//        }
 
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
@@ -100,7 +102,7 @@ public class GameService {
         GameStartSet gameStartSet = GameStartSet.builder()
                 .roomId(gameRoomId)
                 .category(category)
-                .keywordToMember(keywordToMember)
+                .keywordToMember(repositoryService.getStrFromMap(keywordToMember))
                 .round(0)
                 .spotNum(0)
                 .winner("")
@@ -117,10 +119,10 @@ public class GameService {
         log.info("카테고리 정보 : " + category);
         log.info("멤버별 키워드 정보 : " + keywordToMember);
 
-        GameStartSet SearchOneGameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
+        GameStartSet searchOneGameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)
         );
-        log.info("카테고리 : " + SearchOneGameStartSet.getCategory());
+        log.info("카테고리 : " + searchOneGameStartSet.getCategory());
         for (String memberNick : memberNicknameList) {
             log.info("키워드 : " + keywordToMember.get(memberNick));
         }
@@ -128,7 +130,7 @@ public class GameService {
         // 웹소켓으로 전달드릴 content 내용
         HashMap<String, Object> startSet = new HashMap<>();
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
-        startSet.put("keyword", gameStartSet.getKeywordToMember()); // 키워드
+        startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
 
 
@@ -163,7 +165,7 @@ public class GameService {
         GameRoom playRoom = gameRoomRepository.findByGameRoomId(gameRoomId).get();
 
         // 해당 게임룸의 게임셋을 조회
-        GameStartSet gameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
+        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)
         );
 

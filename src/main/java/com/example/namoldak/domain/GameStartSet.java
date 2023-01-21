@@ -2,30 +2,46 @@ package com.example.namoldak.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
+import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 
-// 기능 : Redis에 게임 진행상황 저장
 @Getter
-@RedisHash("GAME_SET")
+@Entity
+@Builder
+@NoArgsConstructor
 public class GameStartSet {
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    private Long gameSetId;
+
+    @Column(nullable = false)
     private Long roomId;
+
+    @Column(nullable = false)
     private String category;
-    private Map<String, String> keywordToMember;
-    private Integer round;
+
+    @Column
+    private String keywordToMember;     // JSON화
+
+    @Column(nullable = false)
+    private Integer round = 0;
+
+    @Column(nullable = false)
     private Integer spotNum = 0;
+
+    @Column
     private String winner;
 
-    @Builder
-    public GameStartSet(Long roomId,
-                        String category,
-                        Map<String, String> keywordToMember,
-                        Integer round,
-                        Integer spotNum,
-                        String winner) {
+    public GameStartSet(Long gameSetId,
+                        Long roomId,
+                         String category,
+                         String keywordToMember,
+                         Integer round,
+                         Integer spotNum,
+                         String winner) {
+        this.gameSetId = gameSetId;
         this.roomId = roomId;
         this.category = category;
         this.keywordToMember = keywordToMember;
@@ -34,25 +50,21 @@ public class GameStartSet {
         this.winner = winner;
     }
 
-    // Setter
-    public void setKeywordToMember(Map<String, String> keywordToMember) {
-        this.keywordToMember = keywordToMember;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
+    public void setSpotNum(Integer num) {
+        this.spotNum = num;
     }
 
     public void setRound(Integer round) {
         this.round = round;
     }
 
-    public void setSpotNum(Integer spotNum) {
-        this.spotNum = spotNum;
-    }
-
     public void setWinner(String winner) {
         this.winner = winner;
     }
-}
 
+    public GameStartSet update(GameStartSet gameStartSet){
+        this.round = gameStartSet.getRound();
+        this.winner = gameStartSet.getWinner();
+        return gameStartSet;
+    }
+}

@@ -2,6 +2,7 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.service.GameRearService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,7 +26,7 @@ public class GameRearController {
     // 정답
     @MessageMapping("/game/{gameRoomId}/answer")
     public void gameAnswer(@DestinationVariable Long gameRoomId,
-                           @RequestBody GameDto gameDto) {
+                           @RequestBody GameDto gameDto) throws JsonProcessingException {
 
         gameRearService.gameAnswer(gameRoomId, gameDto);
     }

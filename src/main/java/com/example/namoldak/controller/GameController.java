@@ -4,6 +4,7 @@ import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.service.GameService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class GameController {
     // 게임 시작
     @MessageMapping("/game/{gameRoomId}/start")
     public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
-                                       GameDto gameDto) {
+                                       GameDto gameDto) throws JsonProcessingException {
         gameService.gameStart(gameRoomId, gameDto);
         return ResponseUtil.response(StatusCode.GAME_START);
     }
