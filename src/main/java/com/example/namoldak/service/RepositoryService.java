@@ -154,6 +154,10 @@ public class RepositoryService {
         Optional<GameRoom> gameRoom = gameRoomRepository.findByGameRoomId(roomId);
         return gameRoom;
     }
+    public Optional<GameRoom> findGameRoomByRoomIdLock(Long roomId) {
+        Optional<GameRoom> gameRoom = gameRoomRepository.findByGameRoomId2(roomId);
+        return gameRoom;
+    }
 
     // 페이징 처리해서 모든 게임방 갖고 오기
     public Page<GameRoom> findGameRoomByPageable(Pageable pageable) {
