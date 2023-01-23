@@ -10,7 +10,7 @@ public class PostResponseListDto{
     private List<PostResponseDto> postResponseDtoList;
 
     public PostResponseListDto(int totalPage, List<PostResponseDto> postResponseDtoList) {
-        this.totalPage = totalPage;
+        this.totalPage           = totalPage;
         this.postResponseDtoList = postResponseDtoList;
     }
 }

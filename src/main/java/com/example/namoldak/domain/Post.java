@@ -33,15 +33,15 @@ public class Post extends Timestamped {
     private List<Comment> commentList = new ArrayList<>();                    // 댓글 리스트
 
     public Post(PostRequestDto postRequestDto, Member member) {
-        this.member = member;
-        this.title = postRequestDto.getTitle();
-        this.content = postRequestDto.getContent();
-        this.nickname = member.getNickname();
-        this.category = postRequestDto.getCategory();
+        this.member    = member;
+        this.title     = postRequestDto.getTitle();
+        this.content   = postRequestDto.getContent();
+        this.nickname  = member.getNickname();
+        this.category  = postRequestDto.getCategory();
     }
 
     public void update(PostRequestDto postRequestDto) {
-        this.title = postRequestDto.getTitle();
-        this.content = postRequestDto.getContent();
+        this.title     = postRequestDto.getTitle();
+        this.content   = postRequestDto.getContent();
     }
 }

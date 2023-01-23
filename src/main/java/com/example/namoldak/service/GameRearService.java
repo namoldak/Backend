@@ -118,7 +118,6 @@ public class GameRearService{
     public void gameAnswer(Long gameRoomId, GameDto gameDto) throws JsonProcessingException {
         // 모달창에 작성한 정답
         String answer = gameDto.getAnswer().replaceAll(" ", "");
-        log.info("============================== 정답 : " + answer);
 
         // gameStartSet 불러오기
         GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(

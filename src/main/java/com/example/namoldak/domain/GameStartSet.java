@@ -41,13 +41,13 @@ public class GameStartSet {
                          Integer round,
                          Integer spotNum,
                          String winner) {
-        this.gameSetId = gameSetId;
-        this.roomId = roomId;
-        this.category = category;
+        this.gameSetId       = gameSetId;
+        this.roomId          = roomId;
+        this.category        = category;
         this.keywordToMember = keywordToMember;
-        this.round = round;
-        this.spotNum = spotNum;
-        this.winner = winner;
+        this.round           = round;
+        this.spotNum         = spotNum;
+        this.winner          = winner;
     }
 
     public void setSpotNum(Integer num) {
@@ -63,8 +63,8 @@ public class GameStartSet {
     }
 
     public GameStartSet update(GameStartSet gameStartSet){
-        this.round = gameStartSet.getRound();
-        this.winner = gameStartSet.getWinner();
+        this.round      = gameStartSet.getRound();
+        this.winner     = gameStartSet.getWinner();
         return gameStartSet;
     }
 }
