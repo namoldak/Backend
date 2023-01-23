@@ -4,7 +4,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ public class SessionRepository {
     private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
     // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
     private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
-
+    // 세션 저장 3) nicknamesInRoom : 참가자들의 세션 Id와 닉네임을 저장
     private final Map<String, String> nicknamesInRoom = new HashMap<>();
 
     // Session 데이터를 공통으로 사용하기 위해 싱글톤으로 구현
@@ -63,7 +62,6 @@ public class SessionRepository {
                 removeKey = oneClient.getKey();
             }
         }
-        log.info("========== 지워질 session id : " + removeKey);
         clientList.remove(removeKey);
 
         // 끊어진 세션을 제외한 나머지 세션들을 다시 저장
@@ -75,11 +73,12 @@ public class SessionRepository {
         clientsInRoom.get(roomId).put(session.getId(), session);
     }
 
-    // 방정보 모두 삭제 (방 폭파시 연계 작동)
+    // 방 정보 모두 삭제 (방 폭파시 연계 작동)
     public void deleteAllclientsInRoom(Long roomId){
         clientsInRoom.remove(roomId);
     }
 
+    // roomIdToSession에서 동일한 roomId에 해당하는 session을 모두 조회
     public Map<WebSocketSession, Long> searchRooIdToSessionList(Long roomId){
         return roomIdToSession.entrySet()
                 .stream()
@@ -87,22 +86,27 @@ public class SessionRepository {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    // session을 key로 roomIdToSession에 이 세션이 어느방에 속해 있는 지 저장
     public void saveRoomIdToSession(WebSocketSession session, Long roomId) {
         roomIdToSession.put(session, roomId);
     }
 
+    // session을 key로 roomIdToSession에서 해당 세션 정보 삭제
     public void deleteRoomIdToSession(WebSocketSession session) {
         roomIdToSession.remove(session);
     }
 
+    // session Id로 닉네임 정보 조회
     public String getNicknameInRoom(String sessionId) {
         return this.nicknamesInRoom.get(sessionId);
     }
 
+    // session Id를 키로 닉네임 정보 저장
     public void addNicknameInRoom(String sessionId, String nickname) {
         this.nicknamesInRoom.put(sessionId, nickname);
     }
 
+    // session Id를 키로 닉네임 정보 삭제
     public void deleteNicknameInRoom(String sessionId) {
         this.nicknamesInRoom.remove(sessionId);
     }

@@ -195,6 +195,10 @@ public class RepositoryService {
         return gameRoomAttendeeList;
     }
 
+    public List<GameRoomAttendee> findAttendeeByRoomId(Long roomId) {
+        return gameRoomAttendeeRepository.findByGameRoom_GameRoomId(roomId);
+    }
+
     // 게임룸 객체로 참가자 찾아오기 (GameRoom 객체가 Optional로 감싸져있는 경우)
     public List<GameRoomAttendee> findAttendeeByGameRoomOptional(Optional<GameRoom> gameRoom) {
         List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
