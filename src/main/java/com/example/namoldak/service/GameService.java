@@ -49,21 +49,13 @@ public class GameService {
 //            throw new CustomException(StatusCode.UNAUTHORIZE);
 //        }
 
-
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
         List<GameRoomAttendee> gameRoomAttendees = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
 
         // 게임방의 상태를 start 상태로 업데이트
         gameRoom.setStatus("false");
 
-        // 멤버들에게 뿌려지게 될 키워드 전체 목록 불러오기
-//        List<Keyword> keywordList1 = keywordRepository.findAll();
-
-        // 랜덤으로 키워드 하나 뽑기
-//        Keyword keyword1 = keywordList1.get((int) (Math.random() * keywordList1.size()) + 1);
-
-        // 위에서 랜덤으로 뽑은 키워드의 카테고리
-//        String category = keyword1.getCategory();
+        // 랜덤으로 뽑은 키워드의 카테고리
         String category = Category.getRandom().name();
 
         // 같은 카테고리를 가진 키워드 리스트 만들기
@@ -82,8 +74,7 @@ public class GameService {
         HashMap<String, String> keywordToMember = new HashMap<>();
 
         List<Optional<Member>> memberList = new ArrayList<>();
-        // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트
-        // 닉네임만 필요하기에 닉네임만 담음
+        // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
         List<String> memberNicknameList = new ArrayList<>();
 
         for (GameRoomAttendee gameRoomAttendee : gameRoomAttendees) {
@@ -95,10 +86,6 @@ public class GameService {
             keywordToMember.put(memberNicknameList.get(i), keywordList.get(i).getWord());
         }
 
-        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
-        log.info("카테고리 정보 : " + category);
-        log.info("멤버별 키워드 정보 : " + keywordToMember);
-
         GameStartSet gameStartSet = GameStartSet.builder()
                 .roomId(gameRoomId)
                 .category(category)
@@ -108,16 +95,8 @@ public class GameService {
                 .winner("")
                 .build();
 
-        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
-        log.info("카테고리 정보 : " + category);
-        log.info("멤버별 키워드 정보 : " + keywordToMember);
-
         // StartSet 저장
         gameStartSetRepository.save(gameStartSet);
-
-        log.info("게임방 정보 : " + String.valueOf(gameRoomId));
-        log.info("카테고리 정보 : " + category);
-        log.info("멤버별 키워드 정보 : " + keywordToMember);
 
         GameStartSet searchOneGameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)
@@ -132,7 +111,6 @@ public class GameService {
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
         startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
-
 
         GameMessage gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(gameRoomId)); // 현재 게임방 id

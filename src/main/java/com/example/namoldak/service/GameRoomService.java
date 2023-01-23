@@ -144,7 +144,6 @@ public class GameRoomService {
         // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
         if (enterGameRoom.get().getStatus().equals("false")){
             // 뒤로 넘어가면 안 되니까 return으로 호다닥 끝내버림
-//            return new PrivateResponseBody(StatusCode.ALREADY_PLAYING, "게임이 시작해서 못 들어간닭!!");
             throw new CustomException(ALREADY_PLAYING);
         }
 
@@ -154,7 +153,6 @@ public class GameRoomService {
         // 만약 방에 4명이 넘어가면
         if (gameRoomAttendeeList.size() > 3){
             // 입장 안 된다고 입구컷
-//            return new PrivateResponseBody(StatusCode.CANT_ENTER, "정원이 다 차있닭!!");
             throw new CustomException(CANT_ENTER);
         }
 

@@ -30,14 +30,14 @@ public class GameRoomAttendee extends Timestamped{
     private String memberNickname;
 
     public GameRoomAttendee(GameRoom gameRoom, Member member){
-        this.gameRoom = gameRoom;
-        this.member   = member;
+        this.gameRoom       = gameRoom;
+        this.member         = member;
         this.memberNickname = member.getNickname();
     }
 
     public GameRoomAttendee(Optional <GameRoom> gameRoom, Member member){
-        this.gameRoom = gameRoom.get();
-        this.member   = member;
+        this.gameRoom       = gameRoom.get();
+        this.member         = member;
         this.memberNickname = member.getNickname();
     }
 }

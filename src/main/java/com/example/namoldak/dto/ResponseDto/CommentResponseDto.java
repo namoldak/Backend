@@ -20,10 +20,10 @@ public class CommentResponseDto {
 
 
     public CommentResponseDto(Comment comment) {
-        this.id = comment.getId();
-        this.nickname = comment.getNickname();
-        this.comment = comment.getComment();
-        this.createdAt = comment.getCreatedAt();
-        this.modifiedAt = comment.getModifiedAt();
+        this.id          = comment.getId();
+        this.nickname    = comment.getNickname();
+        this.comment     = comment.getComment();
+        this.createdAt   = comment.getCreatedAt();
+        this.modifiedAt  = comment.getModifiedAt();
     }
 }
