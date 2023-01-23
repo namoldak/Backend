@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 // 기능 : 게임 진행 관련 주요 서비스들을 컨트롤
@@ -21,26 +22,40 @@ public class GameController {
     private final GameService gameService;
 
     // 게임 시작
-    @MessageMapping("/game/{gameRoomId}/start")
-    public ResponseEntity<?> gameStart(@DestinationVariable Long gameRoomId,
+    @MessageMapping("/game/{roomId}/start")
+    public ResponseEntity<?> gameStart(@DestinationVariable Long roomId,
                                        GameDto gameDto) throws JsonProcessingException {
-        gameService.gameStart(gameRoomId, gameDto);
+        gameService.gameStart(roomId, gameDto);
         return ResponseUtil.response(StatusCode.GAME_START);
     }
 
     // 건너뛰기
-    @MessageMapping("/game/{gameRoomId}/skip")
+    @MessageMapping("/game/{roomId}/skip")
     public void gameSkip(GameDto gameDto,
-                         @DestinationVariable Long gameRoomId) {
+                         @DestinationVariable Long roomId) {
 
-        gameService.gameSkip(gameDto, gameRoomId);
+        gameService.gameSkip(gameDto, roomId);
     }
 
     // 발언권 부여
-    @MessageMapping("/game/{gameRoomId}/spotlight")
+    @MessageMapping("/game/{roomId}/spotlight")
     public ResponseEntity<?> spotlight(
-            @DestinationVariable Long gameRoomId) {
-        log.info("스포트라이트 - 게임방 아이디 : {}", gameRoomId);
-        return ResponseUtil.response(gameService.spotlight(gameRoomId));
+            @DestinationVariable Long roomId) {
+        log.info("스포트라이트 - 게임방 아이디 : {}", roomId);
+        return ResponseUtil.response(gameService.spotlight(roomId));
+    }
+
+    // 정답
+    @MessageMapping("/game/{roomId}/answer")
+    public void gameAnswer(@DestinationVariable Long roomId,
+                           @RequestBody GameDto gameDto) throws JsonProcessingException {
+
+        gameService.gameAnswer(roomId, gameDto);
+    }
+
+    // 게임 끝내기
+    @MessageMapping("/game/{roomId}/endGame")
+    public void endGame(@DestinationVariable Long roomId) {
+        gameService.endGame(roomId);
     }
 }
