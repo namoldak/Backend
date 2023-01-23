@@ -17,13 +17,13 @@ public class GlobalResponseDto<T> {
     public GlobalResponseDto(StatusCode statusCode) {
         this.httpStatus = statusCode.getHttpStatus();
         this.statusCode = statusCode.getStatusCode();
-        this.statusMsg = statusCode.getStatusMsg();
+        this.statusMsg  = statusCode.getStatusMsg();
     }
 
     public GlobalResponseDto(StatusCode statusCode, T data){
         this.httpStatus = statusCode.getHttpStatus();
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg  = statusCode.getStatusMsg();
-        this.data = data;
+        this.data       = data;
     }
 }

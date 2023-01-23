@@ -10,7 +10,7 @@ public class GameRoomResponseListDto {
     List<GameRoomResponseDto> gameRoomResponseDtoList;
 
     public GameRoomResponseListDto(int totalPage, List<GameRoomResponseDto> gameRoomResponseDtoList) {
-        this.totalPage = totalPage;
+        this.totalPage               = totalPage;
         this.gameRoomResponseDtoList = gameRoomResponseDtoList;
     }
 }

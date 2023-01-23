@@ -40,14 +40,14 @@ public class PostResponseDto {
     }
 
     public PostResponseDto(Post post, List<CommentResponseDto> commentList) {
-        this.id = post.getId();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.cmtCnt = post.getCommentList().size();
-        this.nickname = post.getNickname();
-        this.category = post.getCategory();
+        this.id           =     post.getId();
+        this.title        =     post.getTitle();
+        this.content      =     post.getContent();
+        this.cmtCnt       =     post.getCommentList().size();
+        this.nickname     =     post.getNickname();
+        this.category     =     post.getCategory();
         this.createdAt    =     post.getCreatedAt();
         this.modifiedAt   =     post.getModifiedAt();
-        this.commentList = commentList;
+        this.commentList  =     commentList;
     }
 }
