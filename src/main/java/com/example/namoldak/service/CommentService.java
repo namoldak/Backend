@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
     private final RepositoryService repositoryService;
 
     // 댓글 작성
@@ -26,7 +23,7 @@ public class CommentService {
         // Comment 생성자로 객체 생성 후 반환
         Comment comment = new Comment(commentRequestDto, member, post);
         // 코멘트 저장
-        commentRepository.save(comment);
+        repositoryService.saveComment(comment);
     }
 
     // 댓글 수정
@@ -52,7 +49,7 @@ public class CommentService {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
         // 코멘트 삭제
-        commentRepository.delete(comment);
+        repositoryService.deleteComment(comment);
     }
 }
 

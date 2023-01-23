@@ -25,13 +25,7 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.GAME_SET_
 @RequiredArgsConstructor
 @Service
 public class GameService {
-
-    private final GameRoomRepository gameRoomRepository;
-    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
-    private final KeywordRepository keywordRepository;
-    private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final GameStartSetRepository gameStartSetRepository;
     private final RepositoryService repositoryService;
 
 
@@ -40,7 +34,7 @@ public class GameService {
     public void gameStart(Long roomId, GameDto gameDto) throws JsonProcessingException {
 
         // 현재 입장한 게임방의 정보를 가져옴
-        GameRoom gameRoom = gameRoomRepository.findByGameRoomId(roomId).orElseThrow(
+        GameRoom gameRoom = repositoryService.findGameRoomByRoomId(roomId).orElseThrow(
                 () -> new CustomException(StatusCode.NOT_FOUND_ROOM)
         );
 
@@ -50,7 +44,7 @@ public class GameService {
         }
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
-        List<GameRoomAttendee> gameRoomAttendees = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
+        List<GameRoomAttendee> gameRoomAttendees = repositoryService.findAttendeeByGameRoom(gameRoom);
 
         // 게임방의 상태를 start 상태로 업데이트
         gameRoom.setStatus("false");
@@ -63,10 +57,10 @@ public class GameService {
 
         if (gameRoomAttendees.size() == 4) {
             // 참여 멤버가 4명 이라면, 랜덤으로 키워드 4장이 담긴 리스트를 만들어 준다.
-            keywordList = keywordRepository.findTop4ByCategory(category);
+            keywordList = repositoryService.findTop4KeywordByCategory(category);
         } else if (gameRoomAttendees.size() == 3) {
             // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
-            keywordList = keywordRepository.findTop3ByCategory(category);
+            keywordList = repositoryService.findTop3KeywordByCategory(category);
         } else {
             throw new CustomException(NOT_ENOUGH_MEMBER);
         }
@@ -96,9 +90,9 @@ public class GameService {
                 .build();
 
         // StartSet 저장
-        gameStartSetRepository.save(gameStartSet);
+        repositoryService.saveGameStartSet(gameStartSet);
 
-        GameStartSet searchOneGameStartSet = gameStartSetRepository.findByRoomId(roomId).orElseThrow(
+        GameStartSet searchOneGameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)
         );
         log.info("카테고리 : " + searchOneGameStartSet.getCategory());
@@ -140,10 +134,10 @@ public class GameService {
 
     public GameStartSet spotlight(Long roomId) {
 
-        GameRoom playRoom = gameRoomRepository.findByGameRoomId(roomId).get();
+        GameRoom playRoom = repositoryService.findGameRoomByRoomId(roomId).get();
 
         // 해당 게임룸의 게임셋을 조회
-        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId).orElseThrow(
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
                 ()-> new CustomException(GAME_SET_NOT_FOUND)
         );
 
@@ -151,18 +145,18 @@ public class GameService {
         if (playRoom.getStatus().equals("true")) { // false : 게임이 진행 중, true : 게임 시작 전
             gameStartSet.setRound(0);
             gameStartSet.setSpotNum(0);
-            gameStartSetRepository.save(gameStartSet);
+            repositoryService.saveGameStartSet(gameStartSet);
 
         }
 
         // 유저들 정보 조회
-        List<GameRoomAttendee> memberListInGame = gameRoomAttendeeRepository.findByGameRoom(playRoom);
+        List<GameRoomAttendee> memberListInGame = repositoryService.findAttendeeByGameRoom(playRoom);
 
         // 라운드 진행 중
         if (gameStartSet.getSpotNum() < memberListInGame.size()) {
 
             // 현재 스포트라이트 받는 멤버
-            Member spotMember = memberRepository.findById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
+            Member spotMember = repositoryService.findMemberById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
                     () -> new CustomException(SPOTLIGHT_ERR)
             );
 
@@ -178,7 +172,7 @@ public class GameService {
 
             // 다음 차례로!
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() +1);
-            gameStartSetRepository.save(gameStartSet);
+            repositoryService.saveGameStartSet(gameStartSet);
 
         } else if (gameStartSet.getSpotNum() >= memberListInGame.size()) {
 
@@ -187,7 +181,7 @@ public class GameService {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
-                gameStartSetRepository.save(gameStartSet);
+                repositoryService.saveGameStartSet(gameStartSet);
                 spotlight(roomId);
 
                 // 0번부터 시작이다
@@ -215,7 +209,7 @@ public class GameService {
         String answer = gameDto.getAnswer().replaceAll(" ", "");
 
         // gameStartSet 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId).orElseThrow(
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
@@ -226,7 +220,7 @@ public class GameService {
 
             // 정답자
             gameStartSet.setWinner(gameDto.getNickname());
-            gameStartSetRepository.save(gameStartSet);
+            repositoryService.saveGameStartSet(gameStartSet);
 
             // stomp로 메세지 전달
             gameMessage.setRoomId(Long.toString(roomId));
@@ -254,7 +248,7 @@ public class GameService {
     public void forcedEndGame(Long roomId){
 
         // 현재 게임방 정보 불러오기
-        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
+        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 발송할 메세지 데이터 저장
         GameMessage gameMessage = new GameMessage<>();
@@ -266,7 +260,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // Redis DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteByRoomId(roomId);
+        repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -279,25 +273,25 @@ public class GameService {
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(roomId).orElseThrow(
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
         // 현재 게임룸 데이터 불러오기
-        Optional<GameRoom> enterGameRoom = gameRoomRepository.findById(roomId);
+        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 불러온 게임룸으로 들어간 GameRoomMember들 구하기
-        List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
+        List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByGameRoomOptional(enterGameRoom);
 
         // 닉네임을 구하기 위해서 멤버 객체를 담을 리스트 선언
         List<Member> memberList = new ArrayList<>();
 
         // for문으로 하나씩 빼서 DB 조회 후 List에 넣어주기
         for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList){
-            Optional<Member> member = memberRepository.findById(gameRoomAttendee.getMember().getId());
+            Optional<Member> member = repositoryService.findMemberById(gameRoomAttendee.getMember().getId());
             // 멤버 총 게임 횟수 증가
             member.get().updateTotalGame(1L);
-            memberRepository.save(member.get());
+            repositoryService.saveMember(member.get());
             memberList.add(member.get());
         }
 
@@ -307,12 +301,12 @@ public class GameService {
                 victoryDto.setLoser(member.getNickname());
                 // 멤버 패배 기록 추가
                 member.updateLoseNum(1L);
-                memberRepository.save(member);
+                repositoryService.saveMember(member);
             } else {
                 victoryDto.setWinner(member.getNickname());
                 // 멤버 승리 기록 추가
                 member.updateWinNum(1L);
-                memberRepository.save(member);
+                repositoryService.saveMember(member);
             }
         }
 
@@ -325,7 +319,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteByRoomId(roomId);
+        repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
