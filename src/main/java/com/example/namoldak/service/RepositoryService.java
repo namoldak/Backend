@@ -3,16 +3,22 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.Comment;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.repository.CommentRepository;
+import com.example.namoldak.repository.GameStartSetRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,6 +26,8 @@ import java.util.List;
 public class RepositoryService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final GameStartSetRepository gameStartSetRepository;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
 
     //////////////TODO 댓글 관련
@@ -55,5 +63,16 @@ public class RepositoryService {
     public Page<Post> findAllPostByPageableAndCategory(Pageable pageable, String category){
         Page<Post> postList = postRepository.findAllByCategoryOrderByCreatedAtDesc(pageable, category);
         return postList;
+    }
+
+    //////////////TODO GameStartSet Map <-> String
+    public Map<String, String> getMapFromStr(String keywordToMember) throws JsonProcessingException {
+        Map<String, String> map = objectMapper.readValue(keywordToMember, new TypeReference<Map<String, String>>() {});
+        return map;
+    }
+
+    public String getStrFromMap(Map<String, String> keywordToMember) throws JsonProcessingException {
+        String str = objectMapper.writeValueAsString(keywordToMember);
+        return str;
     }
 }

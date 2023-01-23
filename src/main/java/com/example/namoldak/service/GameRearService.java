@@ -8,6 +8,7 @@ import com.example.namoldak.domain.GameMessage;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -28,6 +29,7 @@ public class GameRearService{
     private final GameRoomRepository gameRoomRepository;
     private final MemberRepository memberRepository;
     private final GameStartSetRepository gameStartSetRepository;
+    private final RepositoryService repositoryService;
 
     // 게임 강제 종료
     @Transactional
@@ -46,7 +48,7 @@ public class GameRearService{
         sendingOperations.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // Redis DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteById(roomId);
+        gameStartSetRepository.deleteByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -59,7 +61,7 @@ public class GameRearService{
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
+        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
@@ -105,7 +107,7 @@ public class GameRearService{
         sendingOperations.convertAndSend("/sub/gameRoom/" + gameRoomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
-        gameStartSetRepository.deleteById(gameRoomId);
+        gameStartSetRepository.deleteByRoomId(gameRoomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.get().setStatus("true");
@@ -113,20 +115,20 @@ public class GameRearService{
 
     // 정답
     @Transactional
-    public void gameAnswer(Long gameRoomId, GameDto gameDto){
+    public void gameAnswer(Long gameRoomId, GameDto gameDto) throws JsonProcessingException {
         // 모달창에 작성한 정답
         String answer = gameDto.getAnswer().replaceAll(" ", "");
         log.info("============================== 정답 : " + answer);
 
         // gameStartSet 불러오기
-        GameStartSet gameStartSet = gameStartSetRepository.findById(gameRoomId).orElseThrow(
+        GameStartSet gameStartSet = gameStartSetRepository.findByRoomId(gameRoomId).orElseThrow(
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
         GameMessage gameMessage = new GameMessage();
 
         // 정답을 맞추면 게임 끝
-        if (gameStartSet.getKeywordToMember().get(gameDto.getNickname()).equals(answer)){
+        if (repositoryService.getMapFromStr(gameStartSet.getKeywordToMember()).get(gameDto.getNickname()).equals(answer)){
 
             // 정답자
             gameStartSet.setWinner(gameDto.getNickname());
