@@ -209,6 +209,7 @@ public class SignalHandler extends TextWebSocketHandler {
         // 2) 별도 해당 참가자 세션 정보도 삭제
 //        sessionRepositoryRepo.deleteRoomIdToSession(session);
         roomIdToSession.remove(session);
+        temp.remove(session.getId());
 
 //       log.info("==========leave 4 : (삭제 후) roomId to Session - {}", sessionRepositoryRepo.searchRooIdToSessionList(roomId));
         log.info("==========leave 4 : (삭제 후) roomId to Session - {}",

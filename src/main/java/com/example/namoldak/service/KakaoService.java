@@ -68,7 +68,7 @@ public class KakaoService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
 //        body.add("redirect_uri", "http://localhost:8080/auth/kakao/callback"); // 이부분 서비스 배포전 주소 수정 필요
-        body.add("redirect_uri", "http://localhost:3000/login"); // 이부분 서비스 배포전 주소 수정 필요
+        body.add("redirect_uri", "https://namoldak.com/login"); // 이부분 서비스 배포전 주소 수정 필요
         body.add("code", code);
 
         // HTTP 요청 보내기
