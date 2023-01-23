@@ -143,6 +143,7 @@ public class SignalHandler extends TextWebSocketHandler {
     // 웹소켓 연결이 끊어지면 실행되는 메소드
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
+        String nickname = sessionRepository.getNicknameInRoom(session.getId());
         // 끊어진 세션이 어느방에 있었는지 조회
         Long roomId = sessionRepository.getRoomId(session);
 
@@ -164,8 +165,6 @@ public class SignalHandler extends TextWebSocketHandler {
                             .receiver(oneClient.getKey())
                             .build());
         }
-
-        String nickname = sessionRepository.getNicknameInRoom(session.getId());
         Optional<Member> member = repositoryService.findMemberByNickname(nickname);
         List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByRoomId(roomId);
         for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
