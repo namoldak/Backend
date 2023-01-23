@@ -10,7 +10,6 @@ import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
-import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,7 @@ public class GameRoomService {
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
     private final GameRearService gameRearService;
-    private final SessionRepository sessionRepositoryRepo = SessionRepository.getInstance();
+    private final SessionRepository sessionRepository = SessionRepository.getInstance();
 
 
     // 게임룸 전체 조회
@@ -265,6 +264,7 @@ public class GameRoomService {
 
         // 위에서 구한 GameRoomMemeber 객체로 DB 데이터 삭제
         gameRoomAttendeeRepository.delete(gameRoomAttendee);
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>> GameRoom에 남아있는 사람 : {}", gameRoomRepository.findById(roomId));
 
         // 게임방에 남아있는 유저들 구하기
         List<GameRoomAttendee> existGameRoomAttendee = gameRoomAttendeeRepository.findByGameRoom(enterGameRoom);
@@ -275,10 +275,10 @@ public class GameRoomService {
             member.updateSoloExit(1L);
             memberRepository.save(member);
             gameRoomRepository.delete(enterGameRoom);
-        }
 
-        // 게임 채팅방도 삭제해줌
-        sessionRepositoryRepo.deleteAllclientsInRoom(roomId);
+            // 게임 채팅방도 삭제해줌
+            sessionRepository.deleteAllclientsInRoom(roomId);
+        }
 
         // 게임이 시작 중인 상태에서 3명 아래로 떨어졌을 경우에
         if (enterGameRoom.getStatus().equals("false")){

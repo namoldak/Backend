@@ -14,20 +14,22 @@ import java.util.stream.Collectors;
 @Component
 @NoArgsConstructor
 public class SessionRepository {
-    private static SessionRepository sessionRepositoryRepo;
+    private static SessionRepository sessionRepository;
     // 세션 저장 1) clientsInRoom : 방 Id를 key 값으로 하여 방마다 가지고 있는 Client들의 session Id 와 session 객체를 저장
     private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
     // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
     private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
 
+    private final Map<String, String> nicknamesInRoom = new HashMap<>();
+
     // Session 데이터를 공통으로 사용하기 위해 싱글톤으로 구현
     public static SessionRepository getInstance(){
-        if(sessionRepositoryRepo == null){
+        if(sessionRepository == null){
             synchronized (SessionRepository.class){
-                sessionRepositoryRepo = new SessionRepository();
+                sessionRepository = new SessionRepository();
             }
         }
-        return sessionRepositoryRepo;
+        return sessionRepository;
     }
 
     // 해당 방의 ClientList 조회
@@ -91,5 +93,17 @@ public class SessionRepository {
 
     public void deleteRoomIdToSession(WebSocketSession session) {
         roomIdToSession.remove(session);
+    }
+
+    public String getNicknameInRoom(String sessionId) {
+        return this.nicknamesInRoom.get(sessionId);
+    }
+
+    public void addNicknameInRoom(String sessionId, String nickname) {
+        this.nicknamesInRoom.put(sessionId, nickname);
+    }
+
+    public void deleteNicknameInRoom(String sessionId) {
+        this.nicknamesInRoom.remove(sessionId);
     }
 }
