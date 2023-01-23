@@ -136,7 +136,7 @@ public class GameRoomService {
     public HashMap<String, String> enterGame(Long roomId, Member member) {
 
         // roomId로 DB에서 데이터 찾아와서 담음
-        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
+        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId);
 
         // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
         if (enterGameRoom.get().getStatus().equals("false")){
@@ -251,7 +251,7 @@ public class GameRoomService {
     @Transactional
     public void roomExit(Long roomId, Member member) {
         // 나가려고 하는 방 정보 DB에서 불러오기
-        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomId(roomId).orElseThrow(
+        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId).orElseThrow(
                 () -> new CustomException(NOT_EXIST_ROOMS)
         );
 
@@ -260,7 +260,6 @@ public class GameRoomService {
 
         // 위에서 구한 GameRoomMemeber 객체로 DB 데이터 삭제
         repositoryService.deleteGameRoomAttendee(gameRoomAttendee);
-        log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>> GameRoom에 남아있는 사람 : {}", repositoryService.findGameRoomByRoomId(roomId));
 
         // 게임방에 남아있는 유저들 구하기
         List<GameRoomAttendee> existGameRoomAttendee = repositoryService.findAttendeeByGameRoom(enterGameRoom);
