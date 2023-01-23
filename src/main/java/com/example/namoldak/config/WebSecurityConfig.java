@@ -49,7 +49,6 @@ public class WebSecurityConfig {
                 .antMatchers("/ws-stomp").permitAll()
                 .antMatchers("/signal/**").permitAll()
                 .antMatchers("/signal").permitAll()
-//                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil),

@@ -33,7 +33,7 @@ public class GameRoomService {
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final MemberRepository memberRepository;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final GameRearService gameRearService;
+    private final GameService gameService;
     private final SessionRepository sessionRepository = SessionRepository.getInstance();
 
 
@@ -282,7 +282,7 @@ public class GameRoomService {
         if (enterGameRoom.getStatus().equals("false")){
             if (existGameRoomAttendee.size() < 3) {
                 // 게임을 끝내버림
-                gameRearService.forcedEndGame(roomId);
+                gameService.forcedEndGame(roomId);
             }
         }
 

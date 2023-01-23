@@ -38,10 +38,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
 
-    // Swagger
-//    implementation 'io.springfox:springfox-swagger2:3.0.0'
-//    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-//    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
     // JsonObject
     implementation group: 'org.json', name: 'json', version: '20090211'
@@ -49,6 +45,11 @@ dependencies {
     // 직렬화
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Swagger
+    implementation 'io.springfox:springfox-swagger2:3.0.0'
+//    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+//    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
 }
 
