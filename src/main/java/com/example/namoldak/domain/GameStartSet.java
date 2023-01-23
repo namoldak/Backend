@@ -26,10 +26,10 @@ public class GameStartSet {
     private String keywordToMember;     // JSON화
 
     @Column(nullable = false)
-    private Integer round = 0;
+    private Integer round;
 
     @Column(nullable = false)
-    private Integer spotNum = 0;
+    private Integer spotNum;
 
     @Column
     private String winner;
