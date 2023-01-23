@@ -23,14 +23,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final PostRepository postRepository;
     private final RepositoryService repositoryService;
 
 
     // 포스트 생성
     @Transactional
     public PrivateResponseBody addPost(PostRequestDto postRequestDto, Member member) {
-        Post post = postRepository.save(new Post(postRequestDto, member));
+        Post post = repositoryService.savePost(new Post(postRequestDto, member));
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : post.getCommentList()) {
             commentResponseDtoList.add(new CommentResponseDto(comment));
@@ -95,7 +94,7 @@ public class PostService {
     public PrivateResponseBody deletePost(Long id, Member member) {
         Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
-            postRepository.delete(post);
+            repositoryService.deletePost(post);
         } else {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
