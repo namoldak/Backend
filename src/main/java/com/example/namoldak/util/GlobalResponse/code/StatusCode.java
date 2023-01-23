@@ -47,6 +47,7 @@ public enum StatusCode {
     ROOMNAME_BLANK(HttpStatus.BAD_REQUEST,"131","게임방 이름은 공백일 수 없습니다."),
     NOT_EXIST_ROOMS(HttpStatus.BAD_REQUEST,"132","조건에 맞는 방이 존재하지 않습니다."),
     SPOTLIGHT_ERR(HttpStatus.BAD_REQUEST,"133","스포트라이트 처리에서 예외가 발생했습니다."),
+    SIGNATURE_EXCEPTION(HttpStatus.BAD_REQUEST,"134","JWT 서명에 문제가 발생했습니다."),
 
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"404","댓글이 존재하지 않습니다."),
