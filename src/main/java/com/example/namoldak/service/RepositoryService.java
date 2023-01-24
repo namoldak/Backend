@@ -28,6 +28,7 @@ public class RepositoryService {
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final KeywordRepository keywordRepository;
     private final GameStartSetRepository gameStartSetRepository;
+    private final RewardReposiroty rewardReposiroty;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -254,5 +255,16 @@ public class RepositoryService {
     // GameStartSet 객체로 DB에서 삭제하기
     public void deleteGameStartSetByRoomId(Long roomId) {
         gameStartSetRepository.deleteByRoomId(roomId);
+    }
+
+    //////////////TODO Reward 관련
+    // 리워드 저장하기
+    public void saveReward(Reward reward) {
+        rewardReposiroty.save(reward);
+    }
+
+    public List<Reward> findAllReward(Member member) {
+        List<Reward> rewardList = rewardReposiroty.findByMember(member);
+        return rewardList;
     }
 }

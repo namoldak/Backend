@@ -1,5 +1,6 @@
 package com.example.namoldak.domain;
 
+import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,4 +24,9 @@ public class Reward {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public Reward(String rewardName, Member member) {
+        this.rewardName = rewardName;
+        this.member = member;
+    }
 }

@@ -29,11 +29,11 @@ public class MemberService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        if (repositoryService.MemberDuplicateByEmail(email)) {
+        if (!repositoryService.MemberDuplicateByEmail(email)) {
             throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
-        if (repositoryService.MemberDuplicateByNickname(nickname)) {
+        if (!repositoryService.MemberDuplicateByNickname(nickname)) {
             throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 

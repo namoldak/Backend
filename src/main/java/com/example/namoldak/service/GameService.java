@@ -26,6 +26,7 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.GAME_SET_
 @Service
 public class GameService {
     private final SimpMessageSendingOperations messagingTemplate;
+    private final RewardService rewardService;
     private final RepositoryService repositoryService;
 
 
@@ -293,6 +294,7 @@ public class GameService {
             member.get().updateTotalGame(1L);
             repositoryService.saveMember(member.get());
             memberList.add(member.get());
+            rewardService.createTotalGameReward(member.get());
         }
 
         // member의 닉네임이 정답자와 같지 않을 경우 전부 Loser에 저장하고 같을 경우 Winner에 저장
@@ -302,11 +304,13 @@ public class GameService {
                 // 멤버 패배 기록 추가
                 member.updateLoseNum(1L);
                 repositoryService.saveMember(member);
+                rewardService.createLoseReward(member);
             } else {
                 victoryDto.setWinner(member.getNickname());
                 // 멤버 승리 기록 추가
                 member.updateWinNum(1L);
                 repositoryService.saveMember(member);
+                rewardService.createWinReward(member);
             }
         }
 
