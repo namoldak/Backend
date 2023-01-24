@@ -22,13 +22,26 @@ public class PostResponseDto {
     private String nickname;                                               // 작성자 닉네임
     private int cmtCnt;                                                    // 댓글 갯수
     private String category;                                               // 카테고리
+    private String imageFile;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;                                     // 작성 시간
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime modifiedAt;                                    // 수정 시간
     private List<CommentResponseDto> commentList = new ArrayList<>();
 
-    public PostResponseDto(Post post) {
+    public PostResponseDto(Post post, String imageFile) { // 게시글 생성
+        this.id           =     post.getId();
+        this.title        =     post.getTitle();
+        this.content      =     post.getContent();
+        this.cmtCnt       =     post.getCommentList().size();
+        this.nickname     =     post.getMember().getNickname();
+        this.category     =     post.getCategory();
+        this.createdAt    =     post.getCreatedAt();
+        this.modifiedAt   =     post.getModifiedAt();
+        this.imageFile    =     imageFile;
+    }
+
+    public PostResponseDto(Post post) { // 게시글 전체 조회, 카테고리별 조회
         this.id           =     post.getId();
         this.title        =     post.getTitle();
         this.content      =     post.getContent();
@@ -39,7 +52,7 @@ public class PostResponseDto {
         this.modifiedAt   =     post.getModifiedAt();
     }
 
-    public PostResponseDto(Post post, List<CommentResponseDto> commentList) {
+    public PostResponseDto(Post post, String imageFile, List<CommentResponseDto> commentList) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
@@ -49,5 +62,6 @@ public class PostResponseDto {
         this.createdAt    =     post.getCreatedAt();
         this.modifiedAt   =     post.getModifiedAt();
         this.commentList = commentList;
+        this.imageFile = imageFile;
     }
 }

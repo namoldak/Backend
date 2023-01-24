@@ -2,16 +2,22 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.service.PostService;
+import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 // 포스트 관련 CRUD 컨트롤러
@@ -21,10 +27,11 @@ public class PostController {
     private final PostService postService;
 
     // 게시글 작성
-    @PostMapping ("/posts/write")
-    public ResponseEntity<?> addPost(@RequestBody PostRequestDto postRequestDto,
-                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseUtil.response(postService.addPost(postRequestDto, userDetails.getMember()));
+    @PostMapping (value = "/posts/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> addPost(@RequestPart PostRequestDto postRequestDto,
+                                     @RequestPart("data") MultipartFile multipartFile,
+                                     @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return ResponseUtil.response(postService.addPost(postRequestDto, multipartFile, userDetails.getMember()));
     }
 
     // 게시글 전체 불러오기
@@ -49,9 +56,10 @@ public class PostController {
     // 게시글 수정
     @PutMapping("/posts/{id}")
     public ResponseEntity<?> updatePost(@PathVariable Long id,
-                                        @RequestBody PostRequestDto postRequestDto,
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseUtil.response(postService.updatePost(id, postRequestDto, userDetails.getMember()));
+                                        @RequestPart PostRequestDto postRequestDto,
+                                        @RequestPart(value = "data", required = false) MultipartFile multipartFile,
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return ResponseUtil.response(postService.updatePost(id, postRequestDto, multipartFile, userDetails.getMember()));
     }
 
     // 게시글 삭제
@@ -59,6 +67,6 @@ public class PostController {
     public ResponseEntity<?> deletePost(@PathVariable Long id,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         postService.deletePost(id, userDetails.getMember());
-        return ResponseUtil.response(postService.deletePost(id, userDetails.getMember()));
+        return ResponseUtil.response(StatusCode.DELETE_OK);
     }
 }

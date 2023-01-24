@@ -2,6 +2,7 @@ package com.example.namoldak.util.s3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,8 +34,8 @@ public class S3Uploader {
         return upload(uploadFile, dirName);
     }
 
-    public String upload(File uploadFile, String dirName) { // dirName이란 S3에 생성된 디렉토리
-        String fileName = dirName + "/" + uploadFile.getName(); // 파일 이름(디렉토리명 + / + 파일명)
+    private String upload(File uploadFile, String dirName) { // dirName이란 S3에 생성된 디렉토리
+        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName(); // 파일 이름(디렉토리명 + / + 랜덤 + 파일명)
         String uploadImageUrl = putS3(uploadFile, fileName); // 업로드 image url
         removeNewFile(uploadFile); // 로컬에 생성된 File 삭제
         return uploadImageUrl; // 업로드된 파일의 S3 URL 주소 반환
@@ -41,7 +43,7 @@ public class S3Uploader {
 
     // 전환된 File을 S3에 public 읽기 권한으로 put
     // 외부에서 정적 파일을 읽을 수 있도록 하기 위함
-    public String putS3(File uploadFile, String fileName) {
+    private String putS3(File uploadFile, String fileName) {
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
@@ -49,7 +51,7 @@ public class S3Uploader {
     // 로컬에 생성된 File 삭제
     // 삭제 시 전체 경로 다 반환
     // multipartFile -> File로 전환되면서 로컬에 파일 생성된 것 삭제
-    public void removeNewFile(File targetFile) {
+    private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
             log.info("파일 삭제");
         } else {
@@ -57,14 +59,21 @@ public class S3Uploader {
         }
     }
 
-    private Optional<File> convert(MultipartFile file) throws IOException {
-        File convertFile = new File(file.getOriginalFilename());
+    private Optional<File> convert(MultipartFile multipartFile) throws IOException {
+        File convertFile = new File(multipartFile.getOriginalFilename());
         if (convertFile.createNewFile()) {
-            try (FileOutputStream fos = new FileOutputStream(convertFile)) {
-                fos.write(file.getBytes());
+            try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
+                fos.write(multipartFile.getBytes());
             }
             return Optional.of(convertFile);
         }
         return Optional.empty();
     }
+
+    public String delete(String fileName) {
+        String imageName = fileName.substring(58);
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageName));
+        return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
 }
