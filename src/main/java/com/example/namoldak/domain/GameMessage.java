@@ -15,12 +15,13 @@ public class GameMessage<T> {
     private String roomId;
     private String senderId;
     private String sender;
+    private String nickname;
     private T content;
     private GameMessage.MessageType type;
 
     public enum MessageType {
         JOIN, OWNER, ENTER, RULE, READY, START, KEYWORD, SPOTLIGHT,
         FAIL, SKIP, SUCCESS, WINNER, ENDGAME,
-        LEAVE, NEWOWNER
+        LEAVE, NEWOWNER, END, REWARD
     }
 }

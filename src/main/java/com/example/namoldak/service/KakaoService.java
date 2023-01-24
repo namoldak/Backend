@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KakaoService {
     private final PasswordEncoder passwordEncoder;
-    private final MemberRepository memberRepository;
+    private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
 
     public List<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
@@ -67,8 +67,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
-//        body.add("redirect_uri", "http://localhost:8080/auth/kakao/callback"); // 이부분 서비스 배포전 주소 수정 필요
-        body.add("redirect_uri", "http://localhost:3000/login"); // 이부분 서비스 배포전 주소 수정 필요
+        body.add("redirect_uri", "https://namoldak.com/login");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -123,12 +122,12 @@ public class KakaoService {
     private Member registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
-        Member kakaoUser = memberRepository.findByKakaoId(kakaoId)
+        Member kakaoUser = repositoryService.findMemberByKakaoId(kakaoId)
                 .orElse(null);
         if (kakaoUser == null) {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
             String kakaoEmail = kakaoUserInfo.getEmail();
-            Member sameEmailUser = memberRepository.findByEmail(kakaoEmail).orElse(null);
+            Member sameEmailUser = repositoryService.findMemberByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
                 kakaoUser = sameEmailUser;
                 // 기존 회원정보에 카카오 Id 추가
@@ -144,7 +143,7 @@ public class KakaoService {
 
                 kakaoUser = new Member(email, encodedPassword, kakaoId, kakaoUserInfo.getNickname());
             }
-            memberRepository.save(kakaoUser);
+            repositoryService.saveMember(kakaoUser);
         }
         return kakaoUser;
     }

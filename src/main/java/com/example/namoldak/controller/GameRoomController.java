@@ -2,6 +2,7 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
+import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.service.GameRoomService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -14,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 
 // 기능 : 게임룸 관련 CRUD 컨트롤
@@ -39,8 +42,7 @@ public class GameRoomController {
 
     // 게임룸 키워드 조회
     @GetMapping("/rooms/search") // '/rooms/search?keyword=검색어'
-    public List<GameRoomResponseDto> searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable,
-                                                String keyword) {
+    public GameRoomResponseListDto searchGame(@PageableDefault(size = 4, sort = "gameRoomId", direction = Sort.Direction.DESC) Pageable pageable, String keyword) {
         return gameRoomService.searchGame(pageable, keyword);
     }
 
@@ -57,6 +59,12 @@ public class GameRoomController {
                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         gameRoomService.roomExit(roomId, userDetails.getMember());
         return ResponseUtil.response(StatusCode.EXIT_SUCCESS);
+    }
+
+    // 게임룸 방장 조회하기
+    @GetMapping("/rooms/{roomId}/ownerInfo")
+    public ResponseEntity<?> ownerInfo(@PathVariable Long roomId) {
+        return ResponseUtil.response(gameRoomService.ownerInfo(roomId));
     }
 }
 

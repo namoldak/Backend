@@ -1,5 +1,6 @@
 package com.example.namoldak.util.jwt;
 
+import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 // 기능 : JWT 유틸
 @Slf4j
@@ -68,15 +71,16 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            throw new CustomException(LOGIN_WRONG_SIGNATURE_JWT_TOKEN);
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token, 만료된 JWT token 입니다.");
+            throw new CustomException(LOGIN_EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            throw new CustomException(LOGIN_NOT_SUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            throw new CustomException(LOGIN_WRONG_FORM_JWT_TOKEN);
+        } catch (SignatureException e) {
+            throw new CustomException(SIGNATURE_EXCEPTION);
         }
-        return false;
     }
 
     public Claims getUserInfoFromToken(String token) {

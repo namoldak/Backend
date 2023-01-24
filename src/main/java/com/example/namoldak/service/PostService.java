@@ -30,6 +30,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final S3Uploader s3Uploader;
+    private final RepositoryService repositoryService;
 
 
     // 포스트 생성
@@ -51,30 +52,26 @@ public class PostService {
     // 포스트 전체 조회
     @Transactional
     public PostResponseListDto getAllPost(Pageable pageable) {
-        Page<Post> postList = postRepository.findAll(pageable);
-        List<Post> posts = postRepository.findAll();
+        Page<Post> postList = repositoryService.findAllPostByPageable(pageable);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
-        int totalPage = posts.size();
-//        final Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
+        int totalPage = postList.getTotalPages();
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
 
     // 카테고리별 포스트 조회
     public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
-        Page<Post> postList = postRepository.findAllByCategoryOrderByCreatedAtDesc(pageable, category);
-        List<Post> posts = postRepository.findAllByCategory(category);
+        Page<Post> postList = repositoryService.findAllPostByPageableAndCategory(pageable, category);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
 
-        int totalPage = posts.size();
-//        Page<PostResponseDto> page = new PageImpl<>(postResponseDtoList);
+        int totalPage = postList.getTotalPages();
         return new PostResponseListDto(totalPage, postResponseDtoList);
     }
 
@@ -82,14 +79,11 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostResponseDto> getOnePost(Long id) {
         List<PostResponseDto> result = new ArrayList<>();
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
+        Post post = repositoryService.findPostById(id);
 
         String image = post.getImageFile();
 
-//        List<Comment> comments = commentRepository.findByPost(post);
-        List<Comment> comments = commentRepository.findByPost(post);
+        List<Comment> comments = repositoryService.findAllCommentByPost(post);
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : comments) {
             commentResponseDtoList.add(new CommentResponseDto(comment));
@@ -102,9 +96,7 @@ public class PostService {
     // 포스트 수정
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
+        Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
         } else {
@@ -124,13 +116,11 @@ public class PostService {
     // 포스트 삭제
     @Transactional
     public void deletePost(Long id, Member member) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new CustomException(StatusCode.POST_ERROR)
-        );
+        Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
             Post post1 = postRepository.findById(id).orElseThrow();
             s3Uploader.delete(post1.getImageFile());
-            postRepository.delete(post);
+            repositoryService.deletePost(post);
         } else {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }

@@ -8,11 +8,11 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// 기능 : 포스트 정보 Entity
 @Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-// 기능 : 포스트 정보 Entity
 public class Post extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +44,8 @@ public class Post extends Timestamped {
     }
 
     public void update(PostRequestDto postRequestDto) {
-        this.title = postRequestDto.getTitle();
-        this.content = postRequestDto.getContent();
+        this.title     = postRequestDto.getTitle();
+        this.content   = postRequestDto.getContent();
     }
 
     public void update(String imageFile) {

@@ -47,6 +47,7 @@ public enum StatusCode {
     ROOMNAME_BLANK(HttpStatus.BAD_REQUEST,"131","게임방 이름은 공백일 수 없습니다."),
     NOT_EXIST_ROOMS(HttpStatus.BAD_REQUEST,"132","조건에 맞는 방이 존재하지 않습니다."),
     SPOTLIGHT_ERR(HttpStatus.BAD_REQUEST,"133","스포트라이트 처리에서 예외가 발생했습니다."),
+    SIGNATURE_EXCEPTION(HttpStatus.BAD_REQUEST,"134","JWT 서명에 문제가 발생했습니다."),
 
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"404","댓글이 존재하지 않습니다."),
@@ -54,6 +55,9 @@ public enum StatusCode {
     ACCESS_DENIED(HttpStatus.NOT_ACCEPTABLE, "403", "접근이 불가능합니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 게시글이 없습니다."),
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸 정보가 없습니다."),
+    IN_CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸에 해당 유저 정보가 없습니다."),
+    GAME_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "게임 스타트 셋을 찾을 수 없습니다."),
 
 
     //TODO ========================= 성공 응답 코드 ===============================

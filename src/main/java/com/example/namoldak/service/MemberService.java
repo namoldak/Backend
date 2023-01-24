@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 @Service
 public class MemberService {
-    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
 
     // 회원가입
@@ -29,16 +29,16 @@ public class MemberService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        if (memberRepository.findByEmail(email).isPresent()) {
+        if (!repositoryService.MemberDuplicateByEmail(email)) {
             throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
-        if (memberRepository.findByNickname(nickname).isPresent()) {
+        if (!repositoryService.MemberDuplicateByNickname(nickname)) {
             throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 
         Member member = new Member(email, nickname, password);
-        memberRepository.save(member);
+        repositoryService.saveMember(member);
     }
 
     // 로그인
@@ -47,7 +47,7 @@ public class MemberService {
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
 
-        Member member = memberRepository.findByEmail(email).orElseThrow(
+        Member member = repositoryService.findMemberByEmail(email).orElseThrow(
                 () -> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
         );
 
@@ -63,18 +63,18 @@ public class MemberService {
     // 이메일 중복 확인
     @Transactional(readOnly = true)
     public boolean emailCheck(String email){
-        return memberRepository.findByEmail(email).isPresent();
+        return repositoryService.MemberDuplicateByEmail(email);
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
-        return memberRepository.findByNickname(nickname).isPresent();
+        return repositoryService.MemberDuplicateByNickname(nickname);
     }
 
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
-            memberRepository.delete(member);
+            repositoryService.deleteMember(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
@@ -83,14 +83,14 @@ public class MemberService {
     // 닉네임 변경
     @Transactional
     public PrivateResponseBody changeNickname(SignupRequestDto signupRequestDto, Member member) {
-        Member member1 = memberRepository.findById(member.getId()).orElseThrow(
+        Member member1 = repositoryService.findMemberById(member.getId()).orElseThrow(
                 ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
         );
         if(member.getId().equals(member1.getId())){
             member1.update(signupRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");
         }else {
-            throw new CustomException(StatusCode.CANT_ENTER);
+            throw new CustomException(StatusCode.LOGIN_MATCH_FAIL);
         }
     }
 }

@@ -9,6 +9,5 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByCategoryOrderByCreatedAtDesc(Pageable pageable, String category);
-
     List<Post> findAllByCategory(String category);
 }
