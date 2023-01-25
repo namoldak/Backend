@@ -22,7 +22,7 @@ import java.io.IOException;
 
 // 포스트 관련 CRUD 컨트롤러
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class PostController {
     private final PostService postService;
 

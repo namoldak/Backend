@@ -2,7 +2,6 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
-import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 // 기능 : OAuth.2.0 카카오 로그인
