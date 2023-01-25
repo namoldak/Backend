@@ -1,6 +1,7 @@
 package com.example.namoldak.dto.ResponseDto;
 
 import com.example.namoldak.domain.Comment;
+import com.example.namoldak.domain.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import java.time.LocalDateTime;
