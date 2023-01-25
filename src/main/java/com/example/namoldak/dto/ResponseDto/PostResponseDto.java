@@ -22,14 +22,14 @@ public class PostResponseDto {
     private String nickname;                                               // 작성자 닉네임
     private int cmtCnt;                                                    // 댓글 갯수
     private String category;                                               // 카테고리
-    private String imageFile;
+    private List<String> imageList;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;                                     // 작성 시간
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime modifiedAt;                                    // 수정 시간
     private List<CommentResponseDto> commentList = new ArrayList<>();
 
-    public PostResponseDto(Post post, String imageFile) { // 게시글 생성
+    public PostResponseDto(Post post, List<String> imageFileList) { // 게시글 생성
         this.id           =     post.getId();
         this.title        =     post.getTitle();
         this.content      =     post.getContent();
@@ -38,7 +38,7 @@ public class PostResponseDto {
         this.category     =     post.getCategory();
         this.createdAt    =     post.getCreatedAt();
         this.modifiedAt   =     post.getModifiedAt();
-        this.imageFile    =     imageFile;
+        this.imageList    =     imageFileList;
     }
 
     public PostResponseDto(Post post) { // 게시글 전체 조회, 카테고리별 조회
@@ -52,16 +52,16 @@ public class PostResponseDto {
         this.modifiedAt   =     post.getModifiedAt();
     }
 
-    public PostResponseDto(Post post, String imageFile, List<CommentResponseDto> commentList) {
-        this.id = post.getId();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.cmtCnt = post.getCommentList().size();
-        this.nickname = post.getNickname();
-        this.category = post.getCategory();
+    public PostResponseDto(Post post, List<String> imageFileList, List<CommentResponseDto> commentList) {
+        this.id           =     post.getId();
+        this.title        =     post.getTitle();
+        this.content      =     post.getContent();
+        this.cmtCnt       =     post.getCommentList().size();
+        this.nickname     =     post.getNickname();
+        this.category     =     post.getCategory();
         this.createdAt    =     post.getCreatedAt();
         this.modifiedAt   =     post.getModifiedAt();
-        this.commentList = commentList;
-        this.imageFile = imageFile;
+        this.commentList  =     commentList;
+        this.imageList    =     imageFileList;
     }
 }

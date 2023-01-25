@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 // 포스트 관련 CRUD 컨트롤러
@@ -28,10 +29,10 @@ public class PostController {
 
     // 게시글 작성
     @PostMapping (value = "/posts/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> addPost(@RequestPart PostRequestDto postRequestDto,
-                                     @RequestPart(value = "data", required = false) MultipartFile multipartFile,
+    public ResponseEntity<?> addPost(@RequestPart(value = "data") PostRequestDto postRequestDto,
+                                     @RequestPart(value = "file",required = false) List<MultipartFile> multipartFilelist,
                                      @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return ResponseUtil.response(postService.addPost(postRequestDto, multipartFile, userDetails.getMember()));
+        return ResponseUtil.response(postService.addPost(postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 
     // 게시글 전체 불러오기
@@ -56,10 +57,10 @@ public class PostController {
     // 게시글 수정
     @PutMapping("/posts/{id}")
     public ResponseEntity<?> updatePost(@PathVariable Long id,
-                                        @RequestPart PostRequestDto postRequestDto,
-                                        @RequestPart(value = "data", required = false) MultipartFile multipartFile,
+                                        @RequestPart(value = "data") PostRequestDto postRequestDto,
+                                        @RequestPart(value = "file", required = false) List<MultipartFile> multipartFilelist,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return ResponseUtil.response(postService.updatePost(id, postRequestDto, multipartFile, userDetails.getMember()));
+        return ResponseUtil.response(postService.updatePost(id, postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 
     // 게시글 삭제

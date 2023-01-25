@@ -1,15 +1,14 @@
 package com.example.namoldak.service;
 
-import com.example.namoldak.domain.Comment;
-import com.example.namoldak.domain.Member;
-import com.example.namoldak.domain.Post;
+import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.dto.ResponseDto.*;
-import com.example.namoldak.repository.CommentRepository;
+import com.example.namoldak.repository.ImageFileRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
-import com.example.namoldak.util.s3.S3Uploader;
+import com.example.namoldak.util.s3.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,24 +27,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final S3Uploader s3Uploader;
+    private final AwsS3Service awsS3Service;
+    private final ImageFileRepository imageFileRepository;
     private final RepositoryService repositoryService;
 
 
     // 포스트 생성
     @Transactional
-    public PostResponseDto addPost(PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
-        String image = null;
-        Post post;
-        if (multipartFile != null) {
-            image = s3Uploader.upload(multipartFile, "static");
-            post = postRepository.save(new Post(postRequestDto, image, member));
-        } else {
-            post = postRepository.save(new Post(postRequestDto, "", member));
-        }
+    public GlobalResponseDto<?> addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+        Post post = new Post(postRequestDto, member);
+        postRepository.save(post);
 
-        return new PostResponseDto(post, image);
+        if (multipartFilelist != null) {
+            awsS3Service.upload(multipartFilelist, "static", post, member);
+        }
+        return new GlobalResponseDto<>(StatusCode.CREATE_OK);
     }
 
     // 포스트 전체 조회
@@ -80,7 +76,10 @@ public class PostService {
         List<PostResponseDto> result = new ArrayList<>();
         Post post = repositoryService.findPostById(id);
 
-        String image = post.getImageFile();
+        List<String> imageFileList = new ArrayList<>();
+        for (ImageFile imageFile : post.getImageFileList()) {
+            imageFileList.add(imageFile.getPath());
+        }
 
         List<Comment> comments = repositoryService.findAllCommentByPost(post);
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
@@ -88,13 +87,13 @@ public class PostService {
             commentResponseDtoList.add(new CommentResponseDto(comment));
         }
 
-        result.add(new PostResponseDto(post, image, commentResponseDtoList));
+        result.add(new PostResponseDto(post, imageFileList, commentResponseDtoList));
         return result;
     }
 
     // 포스트 수정
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
+    public GlobalResponseDto<?> updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
         Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
@@ -102,26 +101,47 @@ public class PostService {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
 
-        String image = null;
-        if (!multipartFile.isEmpty()) {
-            image = (s3Uploader.upload(multipartFile, "static"));
-            Post post1 = postRepository.findById(id).orElseThrow();
-            s3Uploader.delete(post1.getImageFile());
-            post1.update(image);
+        try {
+            post.update(postRequestDto);
+
+            if (multipartFilelist != null) {
+                List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
+                for (ImageFile File : imageFileList) {
+                    String path = File.getPath();
+                    String filename = path.substring(58);
+                    awsS3Service.deleteFile(filename);
+                }
+                imageFileRepository.deleteAll(imageFileList);
+
+                awsS3Service.upload(multipartFilelist, "static", post, member);
+            }
+        } catch (IOException e) {
+            throw new CustomException(StatusCode.FILE_UPLOAD_FAILED);
         }
-        return new PostResponseDto(post, image);
+        return new GlobalResponseDto<>(StatusCode.MODIFY_OK);
     }
 
     // 포스트 삭제
     @Transactional
-    public void deletePost(Long id, Member member) {
+    public GlobalResponseDto<?> deletePost(Long id, Member member) {
         Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
-            Post post1 = postRepository.findById(id).orElseThrow();
-            s3Uploader.delete(post1.getImageFile());
-            repositoryService.deletePost(post);
-        } else {
-            throw new CustomException(StatusCode.NO_AUTH_MEMBER);
+            try {
+
+                List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
+                for (ImageFile imageFile : imageFileList) {
+                    String path = imageFile.getPath();
+                    String filename = path.substring(58);
+                    awsS3Service.deleteFile(filename);
+                }
+
+                imageFileRepository.deleteAllByPost(post); // 게시글에 해당하는 이미지 파일 삭제
+
+                postRepository.deleteById(id);
+            } catch (CustomException e) {
+                throw new CustomException(StatusCode.FILE_DELETE_FAILED);
+            }
         }
+        return new GlobalResponseDto<>(StatusCode.DELETE_OK);
     }
 }

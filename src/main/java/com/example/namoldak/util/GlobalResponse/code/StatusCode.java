@@ -58,6 +58,8 @@ public enum StatusCode {
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸 정보가 없습니다."),
     IN_CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸에 해당 유저 정보가 없습니다."),
     GAME_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "게임 스타트 셋을 찾을 수 없습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "404", "파일 업로드 실패"),
+    FILE_DELETE_FAILED(HttpStatus.NOT_FOUND, "404", "파일 삭제 실패"),
 
 
     //TODO ========================= 성공 응답 코드 ===============================

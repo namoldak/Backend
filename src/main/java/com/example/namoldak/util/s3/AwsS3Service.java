@@ -4,38 +4,49 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.namoldak.domain.ImageFile;
+import com.example.namoldak.domain.Member;
+import com.example.namoldak.domain.Post;
+import com.example.namoldak.repository.ImageFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class S3Uploader {
+@Service
+public class AwsS3Service {
 
     private final AmazonS3Client amazonS3Client;
+    private final ImageFileRepository imageFileRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     // multipartFile 전달 받고 S3에 전달할 수 있도록 multiPartFile을 File로 전환
     // S3에 multipartFile은 전송 안됨
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        File uploadFile = convert(multipartFile).orElseThrow( // 파일 변환
-                () -> new IllegalArgumentException("MultipartFile -> File로 전환 실패")
-        );
-        return upload(uploadFile, dirName);
+    public void upload(List<MultipartFile> multipartFilelist, String dirName, Post post, Member member) throws IOException {
+        for (MultipartFile multipartFile : multipartFilelist){
+            if (multipartFile != null){
+                File uploadFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
+                ImageFile imageFile = new ImageFile(upload(uploadFile, dirName), member, post); //url, user, post 정보 저장
+                imageFileRepository.save(imageFile);
+            }
+        }
     }
 
     private String upload(File uploadFile, String dirName) { // dirName이란 S3에 생성된 디렉토리
-        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName(); // 파일 이름(디렉토리명 + / + 랜덤 + 파일명)
+        String fileName = dirName + "/" + UUID.randomUUID(); // 파일 이름(디렉토리명 + / + 랜덤 + 파일명)
         String uploadImageUrl = putS3(uploadFile, fileName); // 업로드 image url
         removeNewFile(uploadFile); // 로컬에 생성된 File 삭제
         return uploadImageUrl; // 업로드된 파일의 S3 URL 주소 반환
@@ -54,9 +65,9 @@ public class S3Uploader {
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
             log.info("파일 삭제");
-        } else {
-            log.info("파일 삭제 실패");
+            return;
         }
+        log.info("파일 삭제 실패");
     }
 
     private Optional<File> convert(MultipartFile multipartFile) throws IOException {
@@ -70,10 +81,14 @@ public class S3Uploader {
         return Optional.empty();
     }
 
-    public String delete(String fileName) {
-        String imageName = fileName.substring(53);
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageName));
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+    // find image from s3
+    public String getThumbnailPath(String path) {
+        return amazonS3Client.getUrl(bucket, path).toString();
     }
 
+    //remove s3 object
+    public void deleteFile(String fileName){
+        DeleteObjectRequest request = new DeleteObjectRequest(bucket, fileName);
+        amazonS3Client.deleteObject(request);
+    }
 }
