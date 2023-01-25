@@ -71,7 +71,7 @@ public class S3Uploader {
     }
 
     public String delete(String fileName) {
-        String imageName = fileName.substring(58);
+        String imageName = fileName.substring(53);
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageName));
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
