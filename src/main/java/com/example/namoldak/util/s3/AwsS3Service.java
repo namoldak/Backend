@@ -45,7 +45,6 @@ public class AwsS3Service {
         }
     }
 
-
     private String upload(File uploadFile, String dirName) { // dirName이란 S3에 생성된 디렉토리
         String fileName = dirName + "/" + UUID.randomUUID(); // 파일 이름(디렉토리명 + / + 랜덤 + 파일명)
         String uploadImageUrl = putS3(uploadFile, fileName); // 업로드 image url

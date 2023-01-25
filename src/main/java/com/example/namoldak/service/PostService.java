@@ -3,7 +3,6 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.dto.ResponseDto.*;
-import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.ImageFileRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -101,7 +100,7 @@ public class PostService {
         } else {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
-        
+
         try {
             post.update(postRequestDto);
 
