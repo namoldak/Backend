@@ -28,7 +28,7 @@ public class Post extends Timestamped {
     private String nickname;                                                  // 작성자 닉네임
     @Column
     private String category;                                                  // 카테고리
-    @Column // 게시판 이미지는 0개 이상, 1개 이하로 Null 값 허용
+    @Column(nullable = false) // 게시판 이미지는 0개 이상, 1개 이하로 Null 값 허용
     private String imageFile; // s3 Upload Url
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정
