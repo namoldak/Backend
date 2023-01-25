@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,14 +35,15 @@ public class PostService {
 
     // 포스트 생성
     @Transactional
-    public GlobalResponseDto<?> addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+    public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
         Post post = new Post(postRequestDto, member);
         postRepository.save(post);
 
         if (multipartFilelist != null) {
             awsS3Service.upload(multipartFilelist, "static", post, member);
         }
-        return new GlobalResponseDto<>(StatusCode.CREATE_OK);
+
+        return new PostResponseDto(post);
     }
 
     // 포스트 전체 조회
