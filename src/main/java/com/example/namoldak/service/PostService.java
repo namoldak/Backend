@@ -41,7 +41,7 @@ public class PostService {
             image = s3Uploader.upload(multipartFile, "static");
         }
 
-        Post post = postRepository.save(new Post(postRequestDto, image, member));
+        Post post = postRepository.save(new Post(postRequestDto, "", member));
         return new PostResponseDto(post, image);
     }
 

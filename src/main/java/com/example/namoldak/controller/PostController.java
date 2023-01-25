@@ -29,7 +29,7 @@ public class PostController {
     // 게시글 작성
     @PostMapping (value = "/posts/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> addPost(@RequestPart PostRequestDto postRequestDto,
-                                     @RequestPart("data") MultipartFile multipartFile,
+                                     @RequestPart(value = "data", required = false) MultipartFile multipartFile,
                                      @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return ResponseUtil.response(postService.addPost(postRequestDto, multipartFile, userDetails.getMember()));
     }
