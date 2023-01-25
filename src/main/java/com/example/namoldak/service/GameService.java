@@ -3,7 +3,6 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.*;
 import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.dto.ResponseDto.VictoryDto;
-import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,7 +45,6 @@ public class GameService {
 
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
         List<GameRoomAttendee> gameRoomAttendees = repositoryService.findAttendeeByGameRoom(gameRoom);
-
         // 게임방의 상태를 start 상태로 업데이트
         gameRoom.setStatus("false");
 
@@ -88,6 +86,7 @@ public class GameService {
                 .round(0)
                 .spotNum(0)
                 .winner("")
+                .gameStartTime(System.currentTimeMillis())
                 .build();
 
         // StartSet 저장
@@ -296,19 +295,23 @@ public class GameService {
             memberList.add(member.get());
             rewardService.createTotalGameReward(member.get());
         }
-
+        Long startTime = gameStartSet.getGameStartTime();
+        Long currentTime = System.currentTimeMillis();
+        Long playTime = (currentTime - startTime) / 1000;
         // member의 닉네임이 정답자와 같지 않을 경우 전부 Loser에 저장하고 같을 경우 Winner에 저장
         for (Member member : memberList){
             if (!member.getNickname().equals(gameStartSet.getWinner())){
                 victoryDto.setLoser(member.getNickname());
                 // 멤버 패배 기록 추가
                 member.updateLoseNum(1L);
+                member.updatePlayTime(playTime);
                 repositoryService.saveMember(member);
                 rewardService.createLoseReward(member);
             } else {
                 victoryDto.setWinner(member.getNickname());
                 // 멤버 승리 기록 추가
                 member.updateWinNum(1L);
+                member.updatePlayTime(playTime);
                 repositoryService.saveMember(member);
                 rewardService.createWinReward(member);
             }

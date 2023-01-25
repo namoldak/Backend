@@ -17,6 +17,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -170,6 +171,7 @@ public class SignalHandler extends TextWebSocketHandler {
         for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
             if(nickname.equals(gameRoomAttendee.getMemberNickname())){
                 gameRoomService.roomExit(roomId, member.get());
+                log.info("============== 빡종 안 했는데 왜 실행됨???");
             }
         }
     }

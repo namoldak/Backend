@@ -5,9 +5,6 @@ import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
-import com.example.namoldak.repository.GameRoomAttendeeRepository;
-import com.example.namoldak.repository.GameRoomRepository;
-import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -300,6 +297,7 @@ public class GameRoomService {
 
         // 해당 주소에 있는 사람들에게 게임 메세지 모두 발송
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        log.info("============== 이거는 그냥 나가기 로직임");
 
         // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
         if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomAttendee.isEmpty()){

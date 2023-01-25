@@ -11,7 +11,7 @@ import java.util.Map;
 @Entity
 @Builder
 @NoArgsConstructor
-public class GameStartSet {
+public class GameStartSet{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long gameSetId;
@@ -34,13 +34,17 @@ public class GameStartSet {
     @Column
     private String winner;
 
+    @Column
+    private Long gameStartTime;
+
     public GameStartSet(Long gameSetId,
                         Long roomId,
                          String category,
                          String keywordToMember,
                          Integer round,
                          Integer spotNum,
-                         String winner) {
+                         String winner,
+                         Long gameStartTime) {
         this.gameSetId       = gameSetId;
         this.roomId          = roomId;
         this.category        = category;
@@ -48,6 +52,7 @@ public class GameStartSet {
         this.round           = round;
         this.spotNum         = spotNum;
         this.winner          = winner;
+        this.gameStartTime   = gameStartTime;
     }
 
     public void setSpotNum(Integer num) {

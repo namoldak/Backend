@@ -8,15 +8,17 @@ import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
-import com.example.namoldak.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RepositoryService repositoryService;

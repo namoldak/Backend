@@ -35,6 +35,7 @@ public class Member {
 
     @Column
     private Long totalGameNum = 0L;
+
     @Column
     private Long enterGameNum = 0L;
 
@@ -43,6 +44,10 @@ public class Member {
 
     @Column
     private Long makeRoomNum = 0L;
+
+    @Column
+    private Long playTime = 0L;
+
 
     public Member(String email, String nickname, String password) {
         this.email    = email;
@@ -88,5 +93,8 @@ public class Member {
 
     public void updateEnterGame(Long num) {
         this.enterGameNum += num;
+    }
+    public void updatePlayTime(Long num) {
+        this.playTime += num;
     }
 }
