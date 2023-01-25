@@ -37,7 +37,7 @@ public class PostService {
     @Transactional
     public PostResponseDto addPost(PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
         String image = null;
-        if (!multipartFile.isEmpty()) {
+        if (multipartFile != null) {
             image = s3Uploader.upload(multipartFile, "static");
         }
 
