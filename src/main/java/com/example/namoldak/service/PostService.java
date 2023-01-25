@@ -9,12 +9,16 @@ import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.example.namoldak.util.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,18 +27,26 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final S3Uploader s3Uploader;
     private final RepositoryService repositoryService;
 
 
     // 포스트 생성
     @Transactional
-    public PrivateResponseBody addPost(PostRequestDto postRequestDto, Member member) {
-        Post post = repositoryService.savePost(new Post(postRequestDto, member));
+    public PostResponseDto addPost(PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
+        String image = null;
+        if (!multipartFile.isEmpty()) {
+            image = s3Uploader.upload(multipartFile, "static");
+        }
+
+        Post post = postRepository.save(new Post(postRequestDto, image, member));
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : post.getCommentList()) {
             commentResponseDtoList.add(new CommentResponseDto(comment));
         }
-        return new PrivateResponseBody<>(StatusCode.OK, "포스트 생성이 완료되었습니다.");
+        return new PostResponseDto(post, image);
     }
 
     // 포스트 전체 조회
@@ -68,36 +80,49 @@ public class PostService {
     public List<PostResponseDto> getOnePost(Long id) {
         List<PostResponseDto> result = new ArrayList<>();
         Post post = repositoryService.findPostById(id);
+
+        String image = post.getImageFile();
+
         List<Comment> comments = repositoryService.findAllCommentByPost(post);
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : comments) {
             commentResponseDtoList.add(new CommentResponseDto(comment));
         }
-        result.add(new PostResponseDto(post, commentResponseDtoList));
+
+        result.add(new PostResponseDto(post, image, commentResponseDtoList));
         return result;
     }
 
     // 포스트 수정
     @Transactional
-    public PrivateResponseBody updatePost(Long id, PostRequestDto postRequestDto, Member member) {
+    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, MultipartFile multipartFile, Member member) throws IOException {
         Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
-            return new PrivateResponseBody<>(StatusCode.OK, "포스트 수정 완료");
         } else {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
+
+        String image = null;
+        if (!multipartFile.isEmpty()) {
+            image = (s3Uploader.upload(multipartFile, "static"));
+            Post post1 = postRepository.findById(id).orElseThrow();
+            s3Uploader.delete(post1.getImageFile());
+            post1.update(image);
+        }
+        return new PostResponseDto(post, image);
     }
 
     // 포스트 삭제
     @Transactional
-    public PrivateResponseBody deletePost(Long id, Member member) {
+    public void deletePost(Long id, Member member) {
         Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
+            Post post1 = postRepository.findById(id).orElseThrow();
+            s3Uploader.delete(post1.getImageFile());
             repositoryService.deletePost(post);
         } else {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
-        return new PrivateResponseBody<>(StatusCode.OK, "포스트 삭제가 완료되었습니다.");
     }
 }
