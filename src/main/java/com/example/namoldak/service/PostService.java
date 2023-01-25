@@ -43,7 +43,14 @@ public class PostService {
             awsS3Service.upload(multipartFilelist, "static", post, member);
         }
 
-        return new PostResponseDto(post);
+        List<ImageFile> imageFiles = imageFileRepository.findAllByPost(post);
+        List<String> imagePath = new ArrayList();
+        for (ImageFile imageFile : imageFiles) {
+            imagePath.add(imageFile.getPath());
+        }
+        PostResponseDto postResponseDto = new PostResponseDto(post, imagePath);
+
+        return postResponseDto;
     }
 
     // 포스트 전체 조회
