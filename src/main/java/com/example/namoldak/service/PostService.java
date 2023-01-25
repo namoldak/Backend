@@ -34,14 +34,22 @@ public class PostService {
 
     // 포스트 생성
     @Transactional
-    public GlobalResponseDto<?> addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+    public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
         Post post = new Post(postRequestDto, member);
         postRepository.save(post);
 
         if (multipartFilelist != null) {
             awsS3Service.upload(multipartFilelist, "static", post, member);
         }
-        return new GlobalResponseDto<>(StatusCode.CREATE_OK);
+
+        List<ImageFile> imageFiles = imageFileRepository.findAllByPost(post);
+        List<String> imagePath = new ArrayList();
+        for (ImageFile imageFile : imageFiles) {
+            imagePath.add(imageFile.getPath());
+        }
+        PostResponseDto postResponseDto = new PostResponseDto(post, imagePath);
+
+        return postResponseDto;
     }
 
     // 포스트 전체 조회
