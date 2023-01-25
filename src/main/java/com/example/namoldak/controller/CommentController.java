@@ -22,8 +22,7 @@ public class CommentController {
             @PathVariable Long postId,
             @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        commentService.createComment(postId, commentRequestDto, userDetails.getMember());
-        return ResponseUtil.response(StatusCode.CREATE_OK);
+        return ResponseUtil.response(commentService.createComment(postId, commentRequestDto, userDetails.getMember()));
     }
 
     @PutMapping("/comments/{commentId}")
@@ -31,8 +30,7 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        commentService.updateComment(commentId, commentRequestDto, userDetails.getMember());
-        return ResponseUtil.response(StatusCode.MODIFY_OK);
+        return ResponseUtil.response(commentService.updateComment(commentId, commentRequestDto, userDetails.getMember()));
     }
 
     @DeleteMapping("/comments/{commentId}")

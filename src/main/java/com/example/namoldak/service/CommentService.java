@@ -4,6 +4,8 @@ import com.example.namoldak.domain.Comment;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.dto.RequestDto.CommentRequestDto;
+import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
+import com.example.namoldak.dto.ResponseDto.PostResponseDto;
 import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -19,17 +21,18 @@ public class CommentService {
     private final RepositoryService repositoryService;
 
     // 댓글 작성
-    public void createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
+    public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
         // 매개변수로 받아온 포스트 Id를 활용해서 Post 객체 저장
         Post post = repositoryService.findPostById(postId);
         // Comment 생성자로 객체 생성 후 반환
         Comment comment = new Comment(commentRequestDto, member, post);
         // 코멘트 저장
         repositoryService.saveComment(comment);
+        return new CommentResponseDto(comment);
     }
 
     // 댓글 수정
-    public void updateComment(Long commentId, CommentRequestDto commentRequestDto, Member member) {
+    public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, Member member) {
         // 매개변수로 받아온 코멘트 Id를 활용해서 Comment 객체 저장
         Comment comment = repositoryService.findCommentById(commentId);
 
@@ -39,7 +42,9 @@ public class CommentService {
         }
         // 코멘트 업데이트
         comment.update(commentRequestDto);
+        return new CommentResponseDto(comment);
     }
+
 
     // 댓글 삭제
     public void deleteComment(Long commentId, Member member) {
