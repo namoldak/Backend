@@ -42,10 +42,6 @@ public class PostService {
         }
 
         Post post = postRepository.save(new Post(postRequestDto, image, member));
-        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-        for (Comment comment : post.getCommentList()) {
-            commentResponseDtoList.add(new CommentResponseDto(comment));
-        }
         return new PostResponseDto(post, image);
     }
 
