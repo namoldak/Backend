@@ -117,7 +117,7 @@ public class PostService {
                 List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
                 for (ImageFile File : imageFileList) {
                     String path = File.getPath();
-                    String filename = path.substring(58);
+                    String filename = path.substring(53);
                     awsS3Service.deleteFile(filename);
                 }
                 imageFileRepository.deleteAll(imageFileList);
@@ -140,7 +140,7 @@ public class PostService {
                 List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
                 for (ImageFile imageFile : imageFileList) {
                     String path = imageFile.getPath();
-                    String filename = path.substring(58);
+                    String filename = path.substring(53);
                     awsS3Service.deleteFile(filename);
                 }
 
