@@ -64,7 +64,7 @@ public class WebSecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("https://charleybucket.s3-website.ap-northeast-2.amazonaws.com");
+        config.addAllowedOrigin("https://namoldak.com.s3.ap-northeast-2.amazonaws.com");
         config.addAllowedOrigin("https://namoldak.com");
         config.addAllowedOrigin("https://d3j37rx7mer6cg.cloudfront.net");
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
