@@ -272,12 +272,10 @@ public class GameRoomService {
             sessionRepository.deleteAllclientsInRoom(roomId);
         }
 
-        // 게임이 시작 중인 상태에서 3명 아래로 떨어졌을 경우에
+        // 게임이 시잓된 상태에서 나갔을 경우
         if (enterGameRoom.getStatus().equals("false")){
-            if (existGameRoomAttendee.size() < 3) {
                 // 게임을 끝내버림
-                gameService.forcedEndGame(roomId);
-            }
+                gameService.forcedEndGame(roomId, member.getNickname());
         }
 
         // 방을 나갈 경우의 알림 문구와 나간 이후의 방 인원 수를 저장하기 위한 해시맵
