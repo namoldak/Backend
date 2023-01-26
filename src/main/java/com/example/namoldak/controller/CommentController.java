@@ -25,6 +25,14 @@ public class CommentController {
         return ResponseUtil.response(commentService.createComment(postId, commentRequestDto, userDetails.getMember()));
     }
 
+    @PostMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<?> createReply(@PathVariable Long postId,
+                                         @PathVariable Long commentId,
+                                         @RequestBody CommentRequestDto commentRequestDto,
+                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseUtil.response(commentService.createReply(postId, commentId, commentRequestDto, userDetails.getMember()));
+    }
+
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long commentId,
