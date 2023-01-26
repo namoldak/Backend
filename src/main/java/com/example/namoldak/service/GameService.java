@@ -196,7 +196,7 @@ public class GameService {
 
                 messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
-                forcedEndGame(roomId);
+                forcedEndGame(roomId, null);
             }
         }
         return gameStartSet;
@@ -245,7 +245,7 @@ public class GameService {
 
     // 게임 강제 종료
     @Transactional
-    public void forcedEndGame(Long roomId){
+    public void forcedEndGame(Long roomId, String nickname){
 
         // 현재 게임방 정보 불러오기
         Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
@@ -255,7 +255,11 @@ public class GameService {
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setSenderId("");
         gameMessage.setSender("양계장 주인");
-        gameMessage.setContent("게임 진행 가능한 최소 인원이 충족되지 못 하여 게임이 종료된닭.");
+        if (nickname == null) {
+            gameMessage.setContent("게임이 종료되었닭!!");
+        } else {
+            gameMessage.setContent(nickname + " 님이 방에서 탈주해서 강제 종료되었닭!!");
+        }
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
