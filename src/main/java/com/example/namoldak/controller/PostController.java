@@ -4,7 +4,6 @@ import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.dto.ResponseDto.PostResponseDto;
 import com.example.namoldak.dto.ResponseDto.PostResponseListDto;
 import com.example.namoldak.service.PostService;
-import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -16,10 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 

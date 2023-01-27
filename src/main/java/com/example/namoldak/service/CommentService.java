@@ -5,23 +5,37 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.dto.RequestDto.CommentRequestDto;
 import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
-import com.example.namoldak.dto.ResponseDto.PostResponseDto;
+import com.example.namoldak.dto.ResponseDto.CommentResponseListDto;
 import com.example.namoldak.repository.CommentRepository;
-import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CommentService {
     private final RepositoryService repositoryService;
-    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+
+    // 댓글 전체 불러오기
+    public CommentResponseListDto getAllComment(Pageable pageable) {
+        Page<Comment> comments = commentRepository.findAllByOrderByCreatedAtDesc(pageable);
+
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+        for (Comment comment : comments) {
+            commentResponseDtoList.add(new CommentResponseDto(comment));
+        }
+        int totalPage = comments.getTotalPages();
+        return new CommentResponseListDto(totalPage, commentResponseDtoList);
+    }
 
     // 댓글 작성
     public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
@@ -35,21 +49,18 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    public CommentResponseDto createReply(Long postId, Long commentsId, CommentRequestDto commentRequestDto, Member member) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new CustomException(StatusCode.POST_NOT_FOUND)
-        );
+    // 대댓글 작성
+    public CommentResponseDto createReply(Long postId, Long commentId, CommentRequestDto commentRequestDto, Member member) {
+        Post post = repositoryService.findPostById(postId);
 
-        Comment comment = commentRepository.findById(commentsId).orElseThrow(
-                () -> new CustomException(StatusCode.COMMENT_NOT_FOUND)
-        );
+        Comment comment = repositoryService.findCommentById(commentId);
 
         Comment reply = new Comment(commentRequestDto, member, post, comment);
-        commentRepository.save(reply);
+        repositoryService.saveComment(reply);
         return new CommentResponseDto(reply);
     }
 
-    // 댓글 수정
+    // 댓글, 대댓글 수정
     @Transactional
     public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, Member member) {
         // 매개변수로 받아온 코멘트 Id를 활용해서 Comment 객체 저장
@@ -66,7 +77,7 @@ public class CommentService {
     }
 
 
-    // 댓글 삭제
+    // 댓글, 대댓글 삭제
     @Transactional
     public void deleteComment(Long commentId, Member member) {
         // 매개변수로 받아온 코멘트 Id를 활용해서 Comment 객체 저장
