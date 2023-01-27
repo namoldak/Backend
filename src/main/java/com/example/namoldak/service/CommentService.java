@@ -5,23 +5,16 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.dto.RequestDto.CommentRequestDto;
 import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
-import com.example.namoldak.dto.ResponseDto.PostResponseDto;
+import com.example.namoldak.dto.ResponseDto.CommentResponseListDto;
 import com.example.namoldak.repository.CommentRepository;
-import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
-import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.Repository;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +34,8 @@ public class CommentService {
             commentResponseDtoList.add(new CommentResponseDto(comment));
         }
         int totalPage = comments.getTotalPages();
-        return CommentResponseListDto
+        return new CommentResponseListDto(totalPage, commentResponseDtoList);
     }
-
-
 
     // 댓글 작성
     public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
