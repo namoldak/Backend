@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentService {
     private final RepositoryService repositoryService;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
 
     // 댓글 작성
     public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
@@ -35,17 +33,14 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    public CommentResponseDto createReply(Long postId, Long commentsId, CommentRequestDto commentRequestDto, Member member) {
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new CustomException(StatusCode.POST_NOT_FOUND)
-        );
+    // 대댓글 작성
+    public CommentResponseDto createReply(Long postId, Long commentId, CommentRequestDto commentRequestDto, Member member) {
+        Post post = repositoryService.findPostById(postId);
 
-        Comment comment = commentRepository.findById(commentsId).orElseThrow(
-                () -> new CustomException(StatusCode.COMMENT_NOT_FOUND)
-        );
+        Comment comment = repositoryService.findCommentById(commentId);
 
         Comment reply = new Comment(commentRequestDto, member, post, comment);
-        commentRepository.save(reply);
+        repositoryService.saveComment(reply);
         return new CommentResponseDto(reply);
     }
 
