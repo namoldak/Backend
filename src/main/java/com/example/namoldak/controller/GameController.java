@@ -2,6 +2,7 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.service.GameService;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,8 +24,8 @@ public class GameController {
 
     // 게임 시작
     @MessageMapping("/game/{roomId}/start")
-    public ResponseEntity<?> gameStart(@DestinationVariable Long roomId,
-                                       GameDto gameDto) throws JsonProcessingException {
+    public ResponseEntity<GlobalResponseDto> gameStart(@DestinationVariable Long roomId,
+                                                       GameDto gameDto) throws JsonProcessingException {
         gameService.gameStart(roomId, gameDto);
         return ResponseUtil.response(StatusCode.GAME_START);
     }
@@ -33,23 +34,21 @@ public class GameController {
     @MessageMapping("/game/{roomId}/skip")
     public void gameSkip(GameDto gameDto,
                          @DestinationVariable Long roomId) {
-
         gameService.gameSkip(gameDto, roomId);
     }
 
     // 발언권 부여
     @MessageMapping("/game/{roomId}/spotlight")
-    public ResponseEntity<?> spotlight(
+    public void spotlight(
             @DestinationVariable Long roomId) {
         log.info("스포트라이트 - 게임방 아이디 : {}", roomId);
-        return ResponseUtil.response(gameService.spotlight(roomId));
+        gameService.spotlight(roomId);
     }
 
     // 정답
     @MessageMapping("/game/{roomId}/answer")
     public void gameAnswer(@DestinationVariable Long roomId,
                            @RequestBody GameDto gameDto) throws JsonProcessingException {
-
         gameService.gameAnswer(roomId, gameDto);
     }
 

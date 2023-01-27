@@ -74,6 +74,7 @@ public class MemberService {
         return repositoryService.MemberDuplicateByNickname(nickname);
     }
 
+    // 회원탈퇴
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
             repositoryService.deleteMember(member);

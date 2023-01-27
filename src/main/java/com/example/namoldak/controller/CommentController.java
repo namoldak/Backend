@@ -1,7 +1,9 @@
 package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.CommentRequestDto;
+import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
 import com.example.namoldak.service.CommentService;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.security.UserDetailsImpl;
@@ -18,7 +20,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<?> createComment(
+    public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable Long postId,
             @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -26,7 +28,7 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<?> createReply(@PathVariable Long postId,
+    public ResponseEntity<CommentResponseDto> createReply(@PathVariable Long postId,
                                          @PathVariable Long commentId,
                                          @RequestBody CommentRequestDto commentRequestDto,
                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -34,7 +36,7 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<?> updateComment(
+    public ResponseEntity<CommentResponseDto> updateComment(
             @PathVariable Long commentId,
             @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -42,7 +44,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<?> deleteComment(
+    public ResponseEntity<GlobalResponseDto> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         commentService.deleteComment(commentId, userDetails.getMember());

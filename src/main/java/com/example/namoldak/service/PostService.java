@@ -101,7 +101,7 @@ public class PostService {
 
     // 포스트 수정
     @Transactional
-    public GlobalResponseDto<?> updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+    public void updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
         Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
@@ -126,12 +126,11 @@ public class PostService {
         } catch (IOException e) {
             throw new CustomException(StatusCode.FILE_UPLOAD_FAILED);
         }
-        return new GlobalResponseDto<>(StatusCode.MODIFY_OK);
     }
 
     // 포스트 삭제
     @Transactional
-    public GlobalResponseDto<?> deletePost(Long id, Member member) {
+    public void deletePost(Long id, Member member) {
         Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
             try {
@@ -150,6 +149,5 @@ public class PostService {
                 throw new CustomException(StatusCode.FILE_DELETE_FAILED);
             }
         }
-        return new GlobalResponseDto<>(StatusCode.DELETE_OK);
     }
 }

@@ -11,10 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.GAME_SET_NOT_FOUND;
@@ -64,7 +62,7 @@ public class GameService {
             throw new CustomException(NOT_ENOUGH_MEMBER);
         }
 
-        HashMap<String, String> keywordToMember = new HashMap<>();
+        Map<String, String> keywordToMember = new HashMap<>();
 
         List<Optional<Member>> memberList = new ArrayList<>();
         // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
@@ -101,7 +99,7 @@ public class GameService {
         }
 
         // 웹소켓으로 전달드릴 content 내용
-        HashMap<String, Object> startSet = new HashMap<>();
+        Map<String, Object> startSet = new HashMap<>();
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
         startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
@@ -132,7 +130,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
     }
 
-    public GameStartSet spotlight(Long roomId) {
+    public void spotlight(Long roomId) {
 
         GameRoom playRoom = repositoryService.findGameRoomByRoomId(roomId).get();
 
@@ -199,7 +197,6 @@ public class GameService {
                 forcedEndGame(roomId, null);
             }
         }
-        return gameStartSet;
     }
 
     // 정답
