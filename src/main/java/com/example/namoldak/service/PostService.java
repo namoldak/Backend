@@ -94,13 +94,14 @@ public class PostService {
             imageFileList.add(imageFile.getPath());
         }
 
-        List<Comment> comments = repositoryService.findAllCommentByPost(post);
-        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-        for (Comment comment : comments) {
-            commentResponseDtoList.add(new CommentResponseDto(comment));
-        }
+//        List<Comment> comments = repositoryService.findAllCommentByPost(post);
+//        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+//        for (Comment comment : comments) {
+//            commentResponseDtoList.add(new CommentResponseDto(comment));
+//        }
 
-        result.add(new PostResponseDto(post, imageFileList, commentResponseDtoList));
+        result.add(new PostResponseDto(post, imageFileList));
+//        result.add(new PostResponseDto(post, imageFileList, commentResponseDtoList));
         return result;
     }
 
