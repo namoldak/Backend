@@ -71,7 +71,7 @@ public class PostService {
     // 카테고리별 포스트 조회
     public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
         Page<Post> postList = repositoryService.findAllPostByPageableAndCategory(pageable, category);
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllByCategory(category);  //FIXME
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -138,7 +138,7 @@ public class PostService {
 
     // 포스트 삭제
     @Transactional
-    public GlobalResponseDto<?> deletePost(Long id, Member member) {
+    public void deletePost(Long id, Member member) {
         Post post = repositoryService.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
             try {
@@ -157,6 +157,5 @@ public class PostService {
                 throw new CustomException(StatusCode.FILE_DELETE_FAILED);
             }
         }
-        return new GlobalResponseDto<>(StatusCode.DELETE_OK);
     }
 }
