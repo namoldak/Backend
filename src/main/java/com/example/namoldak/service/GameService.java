@@ -11,10 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.GAME_SET_NOT_FOUND;
@@ -46,7 +44,7 @@ public class GameService {
         // 게임방에 입장한 멤버들 DB(GameRoomMember)에서 가져오기
         List<GameRoomAttendee> gameRoomAttendees = repositoryService.findAttendeeByGameRoom(gameRoom);
         // 게임방의 상태를 start 상태로 업데이트
-        gameRoom.setStatus("false");
+        gameRoom.setStatus(false);
 
         // 랜덤으로 뽑은 키워드의 카테고리
         String category = Category.getRandom().name();
@@ -106,7 +104,7 @@ public class GameService {
         startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
 
-        GameMessage gameMessage = new GameMessage<>();
+        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId)); // 현재 게임방 id
         gameMessage.setSenderId(""); // 준비된 유저의 id
         gameMessage.setSender("양계장 주인"); // 준비된 유저의 닉네임
@@ -122,7 +120,7 @@ public class GameService {
     public void gameSkip(GameDto gameDto, Long roomId) {
 
         // stomp로 메세지 전달
-        GameMessage gameMessage = new GameMessage();
+        GameMessage<String> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId)); // 현재 방 id
         gameMessage.setSender(gameDto.getNickname()); // 로그인한 유저의 닉네임
         gameMessage.setContent(gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.");
@@ -132,6 +130,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
     }
 
+    @Transactional
     public GameStartSet spotlight(Long roomId) {
 
         GameRoom playRoom = repositoryService.findGameRoomByRoomId(roomId).get();
@@ -142,7 +141,7 @@ public class GameService {
         );
 
         // 게임이 진행이 불가한 상태라면 초기화 시켜야 함
-        if (playRoom.getStatus().equals("true")) { // false : 게임이 진행 중, true : 게임 시작 전
+        if (playRoom.isStatus()) { // false : 게임이 진행 중, true : 게임 시작 전
             gameStartSet.setRound(0);
             gameStartSet.setSpotNum(0);
             repositoryService.saveGameStartSet(gameStartSet);
@@ -161,7 +160,7 @@ public class GameService {
             );
 
             // 메세지 알림
-            GameMessage gameMessage = new GameMessage();
+            GameMessage<String> gameMessage = new GameMessage<>();
             gameMessage.setRoomId(Long.toString(roomId));                   // 현재 게임룸 id
             gameMessage.setSenderId(String.valueOf(spotMember.getId()));        // 스포트라이트 멤버 id
             gameMessage.setSender(spotMember.getNickname());                    // 스포트라이트 멤버 닉네임
@@ -174,10 +173,10 @@ public class GameService {
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() +1);
             repositoryService.saveGameStartSet(gameStartSet);
 
-        } else if (gameStartSet.getSpotNum() >= memberListInGame.size()) {
+        } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
 
-            if (gameStartSet.getRound() < 3) {
+            if (gameStartSet.getRound() < 1) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -185,9 +184,9 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 3) {
+            } else if (gameStartSet.getRound() == 1) {
                 // 메세지 알림 = 여기 말할 이야기
-                GameMessage gameMessage = new GameMessage();
+                GameMessage<String> gameMessage = new GameMessage<>();
                 gameMessage.setRoomId(Long.toString(roomId));               // 현재 게임룸 id
                 gameMessage.setSenderId("");
                 gameMessage.setSender("양계장 주인");
@@ -195,6 +194,7 @@ public class GameService {
                 gameMessage.setType(GameMessage.MessageType.SKIP);
 
                 messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+                log.info("============== 잘 나오니?" + roomId);
 
                 forcedEndGame(roomId, null);
             }
@@ -213,7 +213,7 @@ public class GameService {
                 ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
         );
 
-        GameMessage gameMessage = new GameMessage();
+        GameMessage<String> gameMessage = new GameMessage<>();
 
         // 정답을 맞추면 게임 끝
         if (repositoryService.getMapFromStr(gameStartSet.getKeywordToMember()).get(gameDto.getNickname()).equals(answer)){
@@ -251,7 +251,7 @@ public class GameService {
         Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 발송할 메세지 데이터 저장
-        GameMessage gameMessage = new GameMessage<>();
+        GameMessage<String> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setSenderId("");
         gameMessage.setSender("양계장 주인");
@@ -267,7 +267,7 @@ public class GameService {
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().setStatus("true");
+        enterGameRoom.get().setStatus(true);
     }
 
     // 게임 정상 종료
@@ -322,7 +322,7 @@ public class GameService {
         }
 
         // 발송할 메세지 데이터 저장
-        GameMessage gameMessage = new GameMessage();
+        GameMessage<VictoryDto> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setSender("양계장 주인");
         gameMessage.setContent(victoryDto);
@@ -333,7 +333,7 @@ public class GameService {
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().setStatus("true");
+        enterGameRoom.get().setStatus(true);
     }
 
 }

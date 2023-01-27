@@ -14,10 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 // 기능 : 게임룸 서비스
@@ -71,7 +70,7 @@ public class GameRoomService {
                     .member(memberList)
                     .memberCnt(memberList.size())
                     .owner(room.getOwner())
-                    .status(room.getStatus())
+                    .status(room.isStatus())
                     .build();
 
             // memberList에 데이터가 있다면 gameRoomList에 gameRoomResponseDto 추가
@@ -102,7 +101,7 @@ public class GameRoomService {
                 .gameRoomName(gameRoomRequestDto.getGameRoomName())
                 .gameRoomPassword(gameRoomRequestDto.getGameRoomPassword())
                 .owner(member.getNickname())
-                .status("true")
+                .status(true)
                 .build();
 
         // DB에 데이터 저장
@@ -122,7 +121,7 @@ public class GameRoomService {
         roomInfo.put("roomId", Long.toString(gameRoom.getGameRoomId()));
         roomInfo.put("gameRoomPassword", gameRoom.getGameRoomPassword());
         roomInfo.put("owner", gameRoom.getOwner());
-        roomInfo.put("status", gameRoom.getStatus());
+        roomInfo.put("status", String.valueOf(gameRoom.isStatus()));
 
 //        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
         return roomInfo;
@@ -136,7 +135,7 @@ public class GameRoomService {
         Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId);
 
         // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
-        if (enterGameRoom.get().getStatus().equals("false")){
+        if (enterGameRoom.get().isStatus()){
             // 뒤로 넘어가면 안 되니까 return으로 호다닥 끝내버림
             throw new CustomException(ALREADY_PLAYING);
         }
@@ -172,7 +171,7 @@ public class GameRoomService {
 
         HashMap<String, Object> contentSet = new HashMap<>();
 
-        GameMessage gameMessage = new GameMessage<>();
+        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(String.valueOf(roomId));
         gameMessage.setSenderId(String.valueOf(member.getId()));
         gameMessage.setSender(member.getNickname());
@@ -192,7 +191,7 @@ public class GameRoomService {
         roomInfo.put("gameRoomName", enterGameRoom.get().getGameRoomName());
         roomInfo.put("roomId", String.valueOf(enterGameRoom.get().getGameRoomId()));
         roomInfo.put("owner", enterGameRoom.get().getOwner());
-        roomInfo.put("status", enterGameRoom.get().getStatus());
+        roomInfo.put("status", String.valueOf(enterGameRoom.get().isStatus()));
 
 //        return new PrivateResponseBody<>(StatusCode.OK, roomInfo);
         return roomInfo;
@@ -233,7 +232,7 @@ public class GameRoomService {
                     .member(memberList)
                     .memberCnt(memberList.size())
                     .owner(room.getOwner())
-                    .status(room.getStatus())
+                    .status(room.isStatus())
                     .build();
             // 방에 멤버가 1명 이상이라면, 담아줬던 데이터 저장하기
             if (!memberList.isEmpty()) {
@@ -248,7 +247,7 @@ public class GameRoomService {
     @Transactional
     public void roomExit(Long roomId, Member member) {
         // 나가려고 하는 방 정보 DB에서 불러오기
-        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId).orElseThrow(
+        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomId(roomId).orElseThrow(
                 () -> new CustomException(NOT_EXIST_ROOMS)
         );
 
@@ -273,7 +272,7 @@ public class GameRoomService {
         }
 
         // 게임이 시잓된 상태에서 나갔을 경우
-        if (enterGameRoom.getStatus().equals("false")){
+        if (enterGameRoom.isStatus()){
                 // 게임을 끝내버림
                 gameService.forcedEndGame(roomId, member.getNickname());
         }
@@ -282,7 +281,7 @@ public class GameRoomService {
         HashMap<String, Object> contentSet = new HashMap<>();
 
         // 누가 나갔는지 알려줄 메세지 정보 세팅
-        GameMessage gameMessage = new GameMessage();
+        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
         gameMessage.setSenderId(Long.toString(member.getId()));
         gameMessage.setSender(member.getNickname());
@@ -308,7 +307,7 @@ public class GameRoomService {
             // 들어간 방에 Owner 업데이트
             enterGameRoom.setOwner(nextOwner.getMember().getNickname());
             // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
-            GameMessage alertOwner = new GameMessage();
+            GameMessage<String> alertOwner = new GameMessage<>();
             alertOwner.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
             alertOwner.setSenderId(Long.toString(nextOwner.getMember().getId()));
             alertOwner.setSender(nextOwner.getMember().getNickname());

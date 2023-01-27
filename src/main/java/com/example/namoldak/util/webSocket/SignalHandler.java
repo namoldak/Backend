@@ -112,7 +112,12 @@ public class SignalHandler extends TextWebSocketHandler {
                         Map<String, WebSocketSession> oacClientList = sessionRepository.getClientList(roomId);
 
                         if (oacClientList.containsKey(message.getReceiver())) {
+                            log.info("1. =================================================== {}", message.getType());
                             WebSocketSession ws = oacClientList.get(message.getReceiver());
+                            log.info("2. =================================================== {}", message.getType());
+                            if(!ws.isOpen()){
+                                log.info("========================================== 끊겼나?");
+                            }
                             sendMessage(ws,
                                     new WebSocketResponseMessage().builder()
                                             .type(message.getType())
@@ -125,6 +130,7 @@ public class SignalHandler extends TextWebSocketHandler {
                                             .candidate(message.getCandidate())
                                             .sdp(message.getSdp())
                                             .build());
+                            log.info("3. =================================================== {}", message.getType());
                         }
                     } else {
                         throw new CustomException(CHAT_ROOM_NOT_FOUND);
@@ -137,13 +143,16 @@ public class SignalHandler extends TextWebSocketHandler {
                     log.info("============== 들어온 타입 : " + message.getType());
             }
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.info("=================== 핸들러 예외처리");
+        } catch (Exception e) {
+            log.info("=================== Exception 에러" + e.getMessage());
         }
     }
 
     // 웹소켓 연결이 끊어지면 실행되는 메소드
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
+        log.info("========================================= 도대체 왜 끊기는 거임 ㅆ");
         String nickname = sessionRepository.getNicknameInRoom(session.getId());
         // 끊어진 세션이 어느방에 있었는지 조회
         Long roomId = sessionRepository.getRoomId(session);
@@ -180,8 +189,11 @@ public class SignalHandler extends TextWebSocketHandler {
     private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
         try {
             String json = objectMapper.writeValueAsString(message);
-            session.sendMessage(new TextMessage(json));
-        } catch (IOException e) {
+            synchronized (session){
+                session.sendMessage(new TextMessage(json));
+            }
+        }
+        catch (IOException e) {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }
     }
