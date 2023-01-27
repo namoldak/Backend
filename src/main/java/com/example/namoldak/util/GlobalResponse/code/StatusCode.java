@@ -81,7 +81,8 @@ public enum StatusCode {
     EXIT_SUCCESS(HttpStatus.OK,"200", "방을 나가셨습니닭!"),
     ENTER_OK(HttpStatus.OK,"200", "방에 입장하셨습니닭!"),
     DELETE_MEMBER_OK(HttpStatus.OK,"200", "회원 탈퇴 성공했습니다."),
-    GAME_START(HttpStatus.OK,"200", "게임 시작!");
+    GAME_START(HttpStatus.OK,"200", "게임 시작!"),
+    ;
 
 
     private final HttpStatus httpStatus;

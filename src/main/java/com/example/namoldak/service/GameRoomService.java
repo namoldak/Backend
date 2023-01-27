@@ -85,7 +85,7 @@ public class GameRoomService {
 
     // 게임룸 생성
     @Transactional
-    public HashMap<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
+    public Map<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
 
 //        // 현재 계정이 이미 방장으로 설정된 방이 있다면 예외 처리
 //        if (gameRoomRepository.findByOwner(member.getNickname()).isPresent()) {
@@ -114,7 +114,7 @@ public class GameRoomService {
         repositoryService.saveGameRoomAttendee(gameRoomAttendee);
 
         // data에 데이터를 담아주기 위해 HashMap 생성
-        HashMap<String, String> roomInfo = new HashMap<>();
+        Map<String, String> roomInfo = new HashMap<>();
 
         // 앞에 키 값에 뒤에 밸류 값을 넣어줌
         roomInfo.put("gameRoomName", gameRoom.getGameRoomName());
@@ -129,7 +129,7 @@ public class GameRoomService {
 
     // 게임룸 입장
     @Transactional
-    public HashMap<String, String> enterGame(Long roomId, Member member) {
+    public Map<String, String> enterGame(Long roomId, Member member) {
 
         // roomId로 DB에서 데이터 찾아와서 담음
         Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId);
@@ -169,7 +169,7 @@ public class GameRoomService {
         // DB에 데이터 저장
         repositoryService.saveGameRoomAttendee(gameRoomAttendee);
 
-        HashMap<String, Object> contentSet = new HashMap<>();
+        Map<String, Object> contentSet = new HashMap<>();
 
         GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(String.valueOf(roomId));
@@ -186,7 +186,7 @@ public class GameRoomService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // 해시맵으로 데이터 정리해서 보여주기
-        HashMap<String, String> roomInfo = new HashMap<>();
+        Map<String, String> roomInfo = new HashMap<>();
 
         roomInfo.put("gameRoomName", enterGameRoom.get().getGameRoomName());
         roomInfo.put("roomId", String.valueOf(enterGameRoom.get().getGameRoomId()));
@@ -278,7 +278,7 @@ public class GameRoomService {
         }
 
         // 방을 나갈 경우의 알림 문구와 나간 이후의 방 인원 수를 저장하기 위한 해시맵
-        HashMap<String, Object> contentSet = new HashMap<>();
+        Map<String, Object> contentSet = new HashMap<>();
 
         // 누가 나갔는지 알려줄 메세지 정보 세팅
         GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
@@ -317,7 +317,7 @@ public class GameRoomService {
         }
     }
 
-    public HashMap<String, String> ownerInfo(Long roomId) {
+    public Map<String, String> ownerInfo(Long roomId) {
         // 전달받은 roomId로 DB 조회 후 저장
         Optional<GameRoom> enterRoom = repositoryService.findGameRoomByRoomId(roomId);
         // 방에서 방장의 닉네임을 저장
@@ -327,7 +327,7 @@ public class GameRoomService {
         String ownerId = member.get().getId().toString();
 
         // 데이터를 전달할 해시맵 생성 후 넣어주기
-        HashMap<String, String> ownerInfo = new HashMap<>();
+        Map<String, String> ownerInfo = new HashMap<>();
         ownerInfo.put("ownerId", ownerId);
         ownerInfo.put("ownerNickname", ownerNickname);
 

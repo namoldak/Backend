@@ -2,8 +2,11 @@ package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
+import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.service.KakaoService;
 import com.example.namoldak.service.MemberService;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
@@ -27,33 +30,33 @@ public class MemberController {
 
     // 회원가입
     @PostMapping(value = "/auth/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<GlobalResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto) {
         memberService.signup(signupRequestDto);
         return ResponseUtil.response(SIGNUP_OK);
     }
 
     // 로그인
     @PostMapping(value = "/auth/login")
-    public ResponseEntity<?> login(@RequestBody SignupRequestDto signupRequestDto,
-                                   HttpServletResponse response) {
+    public ResponseEntity<MemberResponseDto> login(@RequestBody SignupRequestDto signupRequestDto,
+                                                   HttpServletResponse response) {
         return ResponseUtil.response(memberService.login(signupRequestDto, response));
     }
 
     // 이메일 중복 확인
     @PostMapping("/auth/emailCheck")
-    public ResponseEntity<?> idCheck(@RequestParam ("email") String email) {
+    public ResponseEntity<Boolean> idCheck(@RequestParam ("email") String email) {
         return ResponseUtil.response(memberService.emailCheck(email));
     }
 
     // 닉네임 중복 확인
     @PostMapping("/auth/nicknameCheck")
-    public ResponseEntity<?> nicknameCheck(@RequestParam ("nickname") String nickname) {
+    public ResponseEntity<Boolean> nicknameCheck(@RequestParam ("nickname") String nickname) {
         return ResponseUtil.response(memberService.nicknameCheck(nickname));
     }
 
     // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code,
+    public ResponseEntity<String> kakaoLogin(@RequestParam String code,
                                         HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
         List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
@@ -67,7 +70,7 @@ public class MemberController {
 
     // 회원탈퇴
     @DeleteMapping("/auth/deleteMember")
-    public ResponseEntity<?> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<GlobalResponseDto> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
         memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
         return ResponseUtil.response(DELETE_MEMBER_OK);
@@ -75,8 +78,8 @@ public class MemberController {
 
     // 닉네임 변경
     @PutMapping("/auth/changeNickname")
-    public ResponseEntity<?> changeNickname(@RequestBody SignupRequestDto signupRequestDto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<PrivateResponseBody> changeNickname(@RequestBody SignupRequestDto signupRequestDto,
+                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(memberService.changeNickname(signupRequestDto, userDetails.getMember()));
     }
 }

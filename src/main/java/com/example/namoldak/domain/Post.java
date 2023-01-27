@@ -32,7 +32,7 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<ImageFile> imageFileList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정
     private List<Comment> commentList = new ArrayList<>();                    // 댓글 리스트
 
     public Post(PostRequestDto postRequestDto, Member member) {

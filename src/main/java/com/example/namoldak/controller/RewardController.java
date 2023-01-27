@@ -1,5 +1,6 @@
 package com.example.namoldak.controller;
 
+import com.example.namoldak.dto.ResponseDto.RewardResponseDto;
 import com.example.namoldak.service.RewardService;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.security.UserDetailsImpl;
@@ -17,7 +18,7 @@ public class RewardController {
     private final RewardService rewardService;
 
     @GetMapping("/rewards")
-    public ResponseEntity<?> allReward(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<RewardResponseDto> allReward(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(rewardService.allRewardList(userDetails.getMember()));
     }
 }
