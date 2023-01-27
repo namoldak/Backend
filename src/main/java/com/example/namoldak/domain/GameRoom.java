@@ -26,13 +26,13 @@ public class GameRoom extends Timestamped{
     private String owner;
 
     @Column(nullable = false)
-    private String status;
+    private boolean status;
 
     public void setOwner(String owner){
         this.owner = owner;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 }

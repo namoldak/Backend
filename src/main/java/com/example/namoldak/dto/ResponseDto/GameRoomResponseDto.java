@@ -12,7 +12,7 @@ public class GameRoomResponseDto {
     private String roomName;
     private String roomPassword;
     private String owner;
-    private String status;
+    private boolean status;
     private int memberCnt;
     private List<MemberResponseDto> member;
 }
