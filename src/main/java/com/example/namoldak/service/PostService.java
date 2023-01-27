@@ -56,26 +56,31 @@ public class PostService {
     @Transactional
     public PostResponseListDto getAllPost(Pageable pageable) {
         Page<Post> postList = repositoryService.findAllPostByPageable(pageable);
-        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        List<Post> posts = postRepository.findAll();
 
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
         int totalPage = postList.getTotalPages();
-        return new PostResponseListDto(totalPage, postResponseDtoList);
+        int postCnt = posts.size();
+
+        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
     }
 
     // 카테고리별 포스트 조회
     public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
         Page<Post> postList = repositoryService.findAllPostByPageableAndCategory(pageable, category);
-        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        List<Post> posts = postRepository.findAll();
 
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
 
         int totalPage = postList.getTotalPages();
-        return new PostResponseListDto(totalPage, postResponseDtoList);
+        int postCnt = posts.size();
+        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
     }
 
     // 포스트 상세 조회
