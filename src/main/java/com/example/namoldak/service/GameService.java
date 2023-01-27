@@ -130,6 +130,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
     }
 
+
     @Transactional
     public void spotlight(Long roomId) {
 
