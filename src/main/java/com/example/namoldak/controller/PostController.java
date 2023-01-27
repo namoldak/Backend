@@ -39,13 +39,13 @@ public class PostController {
     }
 
     // 게시글 전체 불러오기
-    @GetMapping("/posts/all")
+    @GetMapping("/posts/all") //'/posts/all?page=1&size=10'
     public ResponseEntity<PostResponseListDto> getAllPost(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseUtil.response(postService.getAllPost(pageable));
     }
 
     // 게시글 카테고리별 불러오기
-    @GetMapping("/posts/category") //posts/category?category=자유게시판
+    @GetMapping("/posts/category") //'posts/category?category=자유게시판&page=0&size=10'
     public ResponseEntity<PostResponseListDto> getCategoryPost(@PageableDefault(page = 0, size = 10) Pageable pageable,
                                              @RequestParam(required = false) String category) {
         return ResponseUtil.response(postService.getCategoryPost(pageable, category));
