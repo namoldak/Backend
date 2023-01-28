@@ -99,8 +99,8 @@ public class RepositoryService {
         return postList;
     }
     // 게시글 키워드 검색
-    public Page<Post> findPostByContainingKeyword(Pageable pageable, String keyword) {
-        Page<Post> posts = postRepository.findPostByContainingKeyword(pageable, keyword);
+    public Page<Post> findByTitleContaining(Pageable pageable, String keyword) {
+        Page<Post> posts = postRepository.findByTitleContaining(pageable, keyword);
         return posts;
     }
 
