@@ -9,6 +9,7 @@ import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -35,17 +36,19 @@ public class PostController {
         return ResponseUtil.response(postService.addPost(postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 
-    // 게시글 전체 불러오기
-    @GetMapping("/posts/all") //'/posts/all?page=1&size=10'
-    public ResponseEntity<PostResponseListDto> getAllPost(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseUtil.response(postService.getAllPost(pageable));
+    // 게시글 자유게시판 불러오기
+    @GetMapping("/posts") //'/posts?category=freeboard,page=1&size=10'
+    public ResponseEntity<PostResponseListDto> getFreeBoard(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                            @RequestParam String category) {
+        return ResponseUtil.response(postService.getFreeBoard(pageable, category));
     }
 
-    // 게시글 카테고리별 불러오기
-    @GetMapping("/posts/category") //'posts/category?category=자유게시판&page=0&size=10'
-    public ResponseEntity<PostResponseListDto> getCategoryPost(@PageableDefault(page = 0, size = 10) Pageable pageable,
-                                             @RequestParam(required = false) String category) {
-        return ResponseUtil.response(postService.getCategoryPost(pageable, category));
+    // 게시글 내가쓴피드백 불러오기
+    @GetMapping("/posts/myPost") //'posts?category=feedback&page=0&size=10'
+    public ResponseEntity<PostResponseListDto> getMyPost(@PageableDefault(page = 0, size = 10) Pageable pageable,
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                           @RequestParam String category) {
+        return ResponseUtil.response(postService.getMyPost(pageable, userDetails.getMember(), category));
     }
 
     // 게시글 상세 조회
@@ -56,12 +59,11 @@ public class PostController {
 
     // 게시글 수정
     @PutMapping("/posts/{id}")
-    public ResponseEntity<GlobalResponseDto> updatePost(@PathVariable Long id,
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
                                                         @RequestPart(value = "data") PostRequestDto postRequestDto,
                                                         @RequestPart(value = "file", required = false) List<MultipartFile> multipartFilelist,
                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        postService.updatePost(id, postRequestDto, multipartFilelist, userDetails.getMember());
-        return ResponseUtil.response(StatusCode.MODIFY_OK);
+        return ResponseUtil.response(postService.updatePost(id, postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 
     // 게시글 삭제

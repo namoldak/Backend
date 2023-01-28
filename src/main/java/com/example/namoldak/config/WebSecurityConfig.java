@@ -45,6 +45,7 @@ public class WebSecurityConfig {
         http.httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/posts/myPost").authenticated()
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .antMatchers("/ws-stomp").permitAll()
                 .antMatchers("/signal/**").permitAll()

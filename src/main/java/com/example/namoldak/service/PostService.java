@@ -6,7 +6,6 @@ import com.example.namoldak.dto.ResponseDto.*;
 import com.example.namoldak.repository.ImageFileRepository;
 import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
-import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.s3.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,8 @@ public class PostService {
     @Transactional
     public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
         Post post = new Post(postRequestDto, member);
-        postRepository.save(post);
+        repositoryService.savePost(post);
+//        postRepository.save(post);
 
         if (multipartFilelist != null) {
             awsS3Service.upload(multipartFilelist, "static", post, member);
@@ -52,11 +51,11 @@ public class PostService {
         return postResponseDto;
     }
 
-    // 포스트 전체 조회
-    @Transactional
-    public PostResponseListDto getAllPost(Pageable pageable) {
-        Page<Post> postList = repositoryService.findAllPostByPageable(pageable);
-        List<Post> posts = postRepository.findAll();
+//     자유게시판 전체 조회
+    public PostResponseListDto getFreeBoard(Pageable pageable, String category) {
+        Page<Post> postList = repositoryService.findAllByCategory(pageable, category);
+        List<Post> posts = repositoryService.findAllByCategory(category);
+//        List<Post> posts = postRepository.findAll();
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -64,20 +63,19 @@ public class PostService {
         }
         int totalPage = postList.getTotalPages();
         int postCnt = posts.size();
-
         return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
     }
 
-    // 카테고리별 포스트 조회
-    public PostResponseListDto getCategoryPost(Pageable pageable, String category) {
-        Page<Post> postList = repositoryService.findAllPostByPageableAndCategory(pageable, category);
-        List<Post> posts = postRepository.findAllByCategory(category);  //FIXME
+    // 내가쓴피드백 전체 조회
+    public PostResponseListDto getMyPost(Pageable pageable, Member member, String category) {
+        Page<Post> postList = repositoryService.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
+        List<Post> posts = repositoryService.findAllByMemberAndCategory(member, category); // memberid
+//        List<Post> posts = postRepository.findAllByCategory(category);
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
             postResponseDtoList.add(new PostResponseDto(post));
         }
-
         int totalPage = postList.getTotalPages();
         int postCnt = posts.size();
         return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
@@ -86,8 +84,8 @@ public class PostService {
     // 포스트 상세 조회
     @Transactional(readOnly = true)
     public List<PostResponseDto> getOnePost(Long id) {
-        List<PostResponseDto> result = new ArrayList<>();
         Post post = repositoryService.findPostById(id);
+        List<PostResponseDto> result = new ArrayList<>();
 
         List<String> imageFileList = new ArrayList<>();
         for (ImageFile imageFile : post.getImageFileList()) {
@@ -152,7 +150,8 @@ public class PostService {
 
                 imageFileRepository.deleteAllByPost(post); // 게시글에 해당하는 이미지 파일 삭제
 
-                postRepository.deleteById(id);
+                repositoryService.deletePost(id);
+//                postRepository.deleteById(id);
             } catch (CustomException e) {
                 throw new CustomException(StatusCode.FILE_DELETE_FAILED);
             }

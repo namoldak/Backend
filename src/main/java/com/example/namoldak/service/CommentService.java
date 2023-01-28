@@ -26,8 +26,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     // 댓글 전체 불러오기
-    public CommentResponseListDto getAllComment(Pageable pageable) {
-        Page<Comment> comments = commentRepository.findAllByOrderByCreatedAtDesc(pageable);
+    public CommentResponseListDto getAllComment(Long id, Pageable pageable) {
+        Page<Comment> comments = commentRepository.findAllByPost_IdOrderByCreatedAtDesc(pageable, id);
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
         for (Comment comment : comments) {
