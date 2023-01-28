@@ -98,6 +98,11 @@ public class RepositoryService {
         Page<Post> postList = postRepository.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
         return postList;
     }
+    // 게시글 키워드 검색
+    public Page<Post> findPostByContainingKeyword(Pageable pageable, String keyword) {
+        Page<Post> posts = postRepository.findPostByContainingKeyword(pageable, keyword);
+        return posts;
+    }
 
     //////////////TODO 이미지 관련
     // 이미지 파일 전체 불러오기
