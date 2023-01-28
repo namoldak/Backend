@@ -1,6 +1,7 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.GameRoomAttendee;
+import com.example.namoldak.domain.ImageFile;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
@@ -10,12 +11,14 @@ import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
+import com.example.namoldak.util.s3.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class MemberService {
     private final PostRepository postRepository;
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final RewardReposiroty rewardReposiroty;
+    private final AwsS3Service awsS3Service;
 
     // 회원가입
     @Transactional
@@ -94,6 +98,14 @@ public class MemberService {
             }
             // 이미지파일 여부 확인
             if(imageFileRepository.existsByMember(member)){
+
+                List<ImageFile> imageFileList = imageFileRepository.findAllByMember(member);
+                for (ImageFile imageFile : imageFileList) {
+                    String path = imageFile.getPath();
+                    String filename = path.substring(49);
+                    awsS3Service.deleteFile(filename);
+                }
+
                 imageFileRepository.deleteAllByMember(member);
             }
             // 글 여부 확인
