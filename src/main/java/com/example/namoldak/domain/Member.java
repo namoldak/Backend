@@ -4,6 +4,8 @@ import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 // 기능 : 유저 정보 Entity
 @Entity
@@ -47,6 +49,9 @@ public class Member {
 
     @Column
     private Long playTime = 0L;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Post> postList = new ArrayList<>();
 
 
     public Member(String email, String nickname, String password) {
