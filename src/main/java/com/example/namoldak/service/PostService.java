@@ -157,4 +157,18 @@ public class PostService {
             }
         }
     }
+
+    // 게시글 키워드 검색
+    public PostResponseListDto searchPosts(Pageable pageable, String keyword) {
+        Page<Post> posts = repositoryService.findPostByContainingKeyword(pageable, keyword);
+//        List<Post> postList = repositoryService.findPostByContainingKeyword(keyword);
+
+        List<PostResponseDto> postResponseDto = new ArrayList<>();
+        for (Post post : posts) {
+            postResponseDto.add(new PostResponseDto(post));
+        }
+
+        int totalPage = posts.getTotalPages();
+        return new PostResponseListDto(totalPage, postResponseDto);
+    }
 }

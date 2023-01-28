@@ -73,4 +73,10 @@ public class PostController {
         postService.deletePost(id, userDetails.getMember());
         return ResponseUtil.response(StatusCode.DELETE_OK);
     }
+
+    @GetMapping("/posts/search")
+    public ResponseEntity<PostResponseListDto> searchPosts(@PageableDefault(size = 5, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable, String keyword) {
+        return ResponseUtil.response(postService.searchPosts(pageable, keyword));
+    }
+
 }

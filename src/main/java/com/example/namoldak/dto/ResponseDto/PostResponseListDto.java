@@ -15,4 +15,8 @@ public class PostResponseListDto{
         this.postCnt             = postCnt;
         this.postResponseDtoList = postResponseDtoList;
     }
+    public PostResponseListDto(int totalPage, List<PostResponseDto> postResponseDtoList) {
+        this.totalPage           = totalPage;
+        this.postResponseDtoList = postResponseDtoList;
+    }
 }

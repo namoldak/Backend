@@ -50,10 +50,6 @@ public class Member {
     @Column
     private Long playTime = 0L;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Post> postList = new ArrayList<>();
-
-
     public Member(String email, String nickname, String password) {
         this.email    = email;
         this.nickname = nickname;
