@@ -63,10 +63,14 @@ public class RepositoryService {
         postRepository.save(post);
         return post;
     }
-
     // 포스트 삭제하기
-    public void deletePost(Post post) {
-        postRepository.delete(post);
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
+    }
+    // 모든 포스트 찾아오기
+    public List<Post> findAll() {
+        List<Post> posts = postRepository.findAll();
+        return posts;
     }
     // 포스트 ID로 포스트 찾아오기
     public Post findPostById(Long postId){
@@ -75,17 +79,28 @@ public class RepositoryService {
         );
         return post;
     }
-    // 페이징 처리해서 모든 포스트 불러오기
-    public Page<Post> findAllPostByPageable(Pageable pageable){
-        Page<Post> postList = postRepository.findAll(pageable);
+    // 카테고리별 모든 포스트 불러오기
+    public List<Post> findAllByCategory(String category) {
+        List<Post> posts = postRepository.findAllByCategory(category);
+        return posts;
+    }
+    public List<Post> findAllByMemberAndCategory(Member member, String category) {
+        List<Post> posts = postRepository.findAllByMemberAndCategory(member, category);
+        return posts;
+    }
+    // 페이징 처리한 자유게시판 불러오기
+    public Page<Post> findAllByCategory(Pageable pageable, String category){
+        Page<Post> postList = postRepository.findAllByCategory(pageable, category);
+        return postList;
+    }
+    // 페이징 처리한 내가쓴피드백 불러오기
+    public Page<Post> findAllByMemberAndCategoryOrderByCreatedAtDesc(Pageable pageable, Member member, String category){
+        Page<Post> postList = postRepository.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
         return postList;
     }
 
-    // 카테고리로 분류해서 모든 포스트 불러오기
-    public Page<Post> findAllPostByPageableAndCategory(Pageable pageable, String category){
-        Page<Post> postList = postRepository.findAllByCategoryOrderByCreatedAtDesc(pageable, category);
-        return postList;
-    }
+    //////////////TODO 이미지 관련
+    // 이미지 파일 전체 불러오기
 
     //////////////TODO GameStartSet Map <-> String
     public Map<String, String> getMapFromStr(String keywordToMember) throws JsonProcessingException {

@@ -22,9 +22,10 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 전체 불러오기
-    @GetMapping("/comments/all")
-    public ResponseEntity<?> getAllComment(@PageableDefault(page = 0, size = 10) Pageable pageable) {
-        return ResponseUtil.response(commentService.getAllComment(pageable));
+    @GetMapping("/{postId}/comments/all")
+    public ResponseEntity<?> getAllComment(@PathVariable Long postId,
+                                           @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return ResponseUtil.response(commentService.getAllComment(postId, pageable));
     }
 
     // 댓글 작성
