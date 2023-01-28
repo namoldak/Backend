@@ -75,8 +75,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/search")
-    public ResponseEntity<PostResponseListDto> searchPosts(@PageableDefault(size = 5, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable, String keyword) {
+    public ResponseEntity<PostResponseListDto> searchPosts(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, String keyword) {
         return ResponseUtil.response(postService.searchPosts(pageable, keyword));
     }
-
 }
