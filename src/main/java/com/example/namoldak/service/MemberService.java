@@ -1,10 +1,12 @@
 package com.example.namoldak.service;
 
+import com.example.namoldak.domain.GameRoomAttendee;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
+import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
@@ -23,6 +25,11 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
+    private final CommentRepository commentRepository;
+    private final ImageFileRepository imageFileRepository;
+    private final PostRepository postRepository;
+    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
+    private final RewardReposiroty rewardReposiroty;
 
     // 회원가입
     @Transactional
@@ -77,6 +84,27 @@ public class MemberService {
     // 회원탈퇴
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
+            // 코멘트 여부 확인
+            if(commentRepository.existsByMember(member)){
+                commentRepository.deleteAllByMember(member);
+            }
+            // 게임룸 참여 여부 확인
+            if(gameRoomAttendeeRepository.existsByMember(member)){
+                gameRoomAttendeeRepository.deleteAllByMember(member);
+            }
+            // 이미지파일 여부 확인
+            if(imageFileRepository.existsByMember(member)){
+                imageFileRepository.deleteAllByMember(member);
+            }
+            // 글 여부 확인
+            if(postRepository.existsByMember(member)){
+                postRepository.deleteAllByMember(member);
+            }
+            // 리워드 여부 확인
+            if(rewardReposiroty.existsByMember(member)){
+                rewardReposiroty.deleteAllByMember(member);
+            }
+            // 회원 삭제
             repositoryService.deleteMember(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
