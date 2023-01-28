@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface ImageFileRepository extends JpaRepository<ImageFile, Long> {
 
     List<ImageFile> findAllByPost(Post post);
+    List<ImageFile> findAllByMember(Member member);
     @Transactional
     void deleteAllByMember(Member member);
     @Transactional
