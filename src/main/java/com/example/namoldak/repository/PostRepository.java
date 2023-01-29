@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByCategory(Pageable pageable, String category);
     Page<Post> findAllByMemberAndCategoryOrderByCreatedAtDesc(Pageable pageable, Member member, String category);
-    Page<Post> findByTitleContaining(Pageable pageable, String keyword);
+//    Page<Post> findByTitleContaining(Pageable pageable, String keyword);
+//    Page<Post> findAllByCategoryIsAndTitleContainingOrderByCreatedAtDesc;
+    Page<Post> findAllByCategoryContainingAndTitleContaining(Pageable pageable, String category, String keyword);
     List<Post> findAllByMemberAndCategory(Member member, String category);
     List<Post> findAllByCategory(String category);
     @Transactional

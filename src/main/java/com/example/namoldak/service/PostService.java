@@ -159,8 +159,8 @@ public class PostService {
     }
 
     // 게시글 키워드 검색
-    public PostResponseListDto searchPosts(Pageable pageable, String keyword) {
-        Page<Post> posts = repositoryService.findByTitleContaining(pageable, keyword);
+    public PostResponseListDto searchPosts(Pageable pageable, String category, String keyword) {
+        Page<Post> posts = repositoryService.findByKeyword(pageable, category, keyword);
 //        List<Post> postList = repositoryService.findPostByContainingKeyword(keyword);
 
         List<PostResponseDto> postResponseDto = new ArrayList<>();
