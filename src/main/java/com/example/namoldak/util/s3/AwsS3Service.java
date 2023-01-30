@@ -9,7 +9,6 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.repository.ImageFileRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
-import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,9 +36,6 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.cloud_front.file_url_format}")
-    private String cloudfront;
-
     // multipartFile 전달 받고 S3에 전달할 수 있도록 multiPartFile을 File로 전환
     // S3에 multipartFile은 전송 안됨
     public void upload(List<MultipartFile> multipartFilelist, String dirName, Post post, Member member) {
@@ -54,9 +50,7 @@ public class AwsS3Service {
 
     private String upload(File uploadFile, String dirName) { // dirName이란 S3에 생성된 디렉토리
         String fileName = dirName + "/" + UUID.randomUUID(); // 파일 이름(디렉토리명 + / + 랜덤 + 파일명)
-//        String uploadImageUrl = putS3(uploadFile, fileName); // 업로드 image url
         putS3(uploadFile, fileName);
-//        String newUrl = "https://" + cloudfront + "/" + fileName;
         String newUrl = "https://" + bucket + "/" + fileName;
         removeNewFile(uploadFile); // 로컬에 생성된 File 삭제
         return newUrl; // 업로드된 파일의 S3 URL 주소 반환

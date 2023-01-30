@@ -37,7 +37,6 @@ public class PostService {
     public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) {
         Post post = new Post(postRequestDto, member);
         repositoryService.savePost(post);
-//        postRepository.save(post);
 
         if (multipartFilelist != null) {
             awsS3Service.upload(multipartFilelist, "static", post, member);
@@ -57,7 +56,6 @@ public class PostService {
     public PostResponseListDto getFreeBoard(Pageable pageable, String category) {
         Page<Post> postList = repositoryService.findAllByCategory(pageable, category);
         List<Post> posts = repositoryService.findAllByCategory(category);
-//        List<Post> posts = postRepository.findAll();
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -72,7 +70,6 @@ public class PostService {
     public PostResponseListDto getMyPost(Pageable pageable, Member member, String category) {
         Page<Post> postList = repositoryService.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
         List<Post> posts = repositoryService.findAllByMemberAndCategory(member, category); // memberid
-//        List<Post> posts = postRepository.findAllByCategory(category);
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -94,14 +91,7 @@ public class PostService {
             imageFileList.add(imageFile.getPath());
         }
 
-//        List<Comment> comments = repositoryService.findAllCommentByPost(post);
-//        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-//        for (Comment comment : comments) {
-//            commentResponseDtoList.add(new CommentResponseDto(comment));
-//        }
-
         result.add(new PostResponseDto(post, imageFileList));
-//        result.add(new PostResponseDto(post, imageFileList, commentResponseDtoList));
         return result;
     }
 
@@ -148,7 +138,6 @@ public class PostService {
                 imageFileRepository.deleteAllByPost(post); // 게시글에 해당하는 이미지 파일 삭제
 
                 repositoryService.deletePost(id);
-//                postRepository.deleteById(id);
             } catch (CustomException e) {
                 throw new CustomException(StatusCode.FILE_DELETE_FAILED);
             }
@@ -158,7 +147,6 @@ public class PostService {
     // 게시글 키워드 검색
     public PostResponseListDto searchPosts(Pageable pageable, String category, String keyword) {
         Page<Post> posts = repositoryService.findByKeyword(pageable, category, keyword);
-//        List<Post> postList = repositoryService.findPostByContainingKeyword(keyword);
 
         List<PostResponseDto> postResponseDto = new ArrayList<>();
         for (Post post : posts) {
