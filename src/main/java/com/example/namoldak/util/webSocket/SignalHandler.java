@@ -18,6 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import javax.websocket.SessionException;
 import java.io.IOException;
 import java.util.*;
 
@@ -112,9 +113,7 @@ public class SignalHandler extends TextWebSocketHandler {
                         Map<String, WebSocketSession> oacClientList = sessionRepository.getClientList(roomId);
 
                         if (oacClientList.containsKey(message.getReceiver())) {
-                            log.info("1. =================================================== {}", message.getType());
                             WebSocketSession ws = oacClientList.get(message.getReceiver());
-                            log.info("2. =================================================== {}", message.getType());
                             if(!ws.isOpen()){
                                 log.info("========================================== 끊겼나?");
                             }
@@ -143,9 +142,7 @@ public class SignalHandler extends TextWebSocketHandler {
                     log.info("============== 들어온 타입 : " + message.getType());
             }
         } catch (JsonProcessingException e) {
-            log.info("=================== 핸들러 예외처리");
-        } catch (Exception e) {
-            log.info("=================== Exception 에러" + e.getMessage());
+            log.info("=================== SignalHandler Json처리 에러 : {} ", e.getMessage());
         }
     }
 
@@ -180,7 +177,6 @@ public class SignalHandler extends TextWebSocketHandler {
         for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
             if(nickname.equals(gameRoomAttendee.getMemberNickname())){
                 gameRoomService.roomExit(roomId, member.get());
-                log.info("============== 빡종 안 했는데 왜 실행됨???");
             }
         }
     }
@@ -192,8 +188,7 @@ public class SignalHandler extends TextWebSocketHandler {
             synchronized (session){
                 session.sendMessage(new TextMessage(json));
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }
     }

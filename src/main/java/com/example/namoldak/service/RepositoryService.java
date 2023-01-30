@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -108,14 +110,22 @@ public class RepositoryService {
     // 이미지 파일 전체 불러오기
 
     //////////////TODO GameStartSet Map <-> String
-    public Map<String, String> getMapFromStr(String keywordToMember) throws JsonProcessingException {
-        Map<String, String> map = objectMapper.readValue(keywordToMember, new TypeReference<Map<String, String>>() {});
-        return map;
+    public Map<String, String> getMapFromStr(String keywordToMember) {
+        try {
+            Map<String, String> map = objectMapper.readValue(keywordToMember, new TypeReference<Map<String, String>>() {});
+            return map;
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
     }
 
-    public String getStrFromMap(Map<String, String> keywordToMember) throws JsonProcessingException {
-        String str = objectMapper.writeValueAsString(keywordToMember);
-        return str;
+    public String getStrFromMap(Map<String, String> keywordToMember) {
+        try {
+            String str = objectMapper.writeValueAsString(keywordToMember);
+            return str;
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
     }
 
     //////////////TODO Member 관련

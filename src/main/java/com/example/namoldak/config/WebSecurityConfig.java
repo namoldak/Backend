@@ -1,10 +1,9 @@
 package com.example.namoldak.config;
 
 import com.example.namoldak.util.jwt.JwtAuthFilter;
-import com.example.namoldak.util.jwt.JwtExceptionFilter;
+import com.example.namoldak.util.GlobalResponse.SecurityExceptionFilter;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,10 +11,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -54,7 +51,7 @@ public class WebSecurityConfig {
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtExceptionFilter(), JwtAuthFilter.class);
+                .addFilterBefore(new SecurityExceptionFilter(), JwtAuthFilter.class);
         http.cors();
 
         return http.build();

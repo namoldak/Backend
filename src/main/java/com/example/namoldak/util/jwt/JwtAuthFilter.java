@@ -20,19 +20,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain){
 
-        String token = jwtUtil.resolveToken(request);
-
-        if(token != null) {
-            if(jwtUtil.validateToken(token)){
-                // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
-                Claims info = jwtUtil.getUserInfoFromToken(token);
-                setAuthentication(info.getSubject());
+        try {
+            String token = jwtUtil.resolveToken(request);
+            if (token != null) {
+                if (jwtUtil.validateToken(token)) {
+                    // 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
+                    Claims info = jwtUtil.getUserInfoFromToken(token);
+                    setAuthentication(info.getSubject());
+                }
             }
+            // 다음 필터로 넘어간다
+            filterChain.doFilter(request, response);
+        } catch (IOException | ServletException e) {
+            log.info("====================== doFilterInternal에서 처리한 에러 : {}", e.getMessage());
         }
-        // 4. 다음 필터로 넘어간다
-        filterChain.doFilter(request, response);
     }
 
     public void setAuthentication(String loginId) {
