@@ -1,5 +1,7 @@
 package com.example.namoldak.util.jwt;
 
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     Claims info = jwtUtil.getUserInfoFromToken(token);
                     setAuthentication(info.getSubject());
                 }
+            } else {
+                throw new CustomException(StatusCode.BAD_REQUEST_TOKEN);
             }
             // 다음 필터로 넘어간다
             filterChain.doFilter(request, response);
