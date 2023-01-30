@@ -6,6 +6,7 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.dto.ResponseDto.MyDataResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
@@ -83,6 +84,11 @@ public class MemberService {
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
         return repositoryService.MemberDuplicateByNickname(nickname);
+    }
+
+    @Transactional
+    public MyDataResponseDto myData(Member member) {
+        return new MyDataResponseDto(member);
     }
 
     // 회원탈퇴
