@@ -2,6 +2,7 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
+import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,8 +21,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
 
 // 기능 : OAuth.2.0 카카오 로그인
 @Slf4j
@@ -32,7 +34,7 @@ public class KakaoService {
     private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
 
-    public List<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public List<String> kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -58,7 +60,7 @@ public class KakaoService {
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
-    private String getToken(String code) throws JsonProcessingException {
+    private String getToken(String code) {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -84,12 +86,16 @@ public class KakaoService {
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("access_token").asText();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            return jsonNode.get("access_token").asText();
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
     }
 
     // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -105,17 +111,22 @@ public class KakaoService {
                 String.class
         );
 
-        String responseBody = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties")
-                .get("nickname").asText();
-        String email = jsonNode.get("kakao_account")
-                .get("email").asText();
+        try {
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
-        return new KakaoUserInfoDto(id, nickname, email);
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            Long id = jsonNode.get("id").asLong();
+            String nickname = jsonNode.get("properties")
+                    .get("nickname").asText();
+            String email = jsonNode.get("kakao_account")
+                    .get("email").asText();
+
+            log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
+            return new KakaoUserInfoDto(id, nickname, email);
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
     }
 
     // 3. 필요시에 회원가입

@@ -29,7 +29,7 @@ public class GameService {
 
     // 게임 시작
     @Transactional
-    public void gameStart(Long roomId, GameDto gameDto) throws JsonProcessingException {
+    public void gameStart(Long roomId, GameDto gameDto) {
 
         // 현재 입장한 게임방의 정보를 가져옴
         GameRoom gameRoom = repositoryService.findGameRoomByRoomId(roomId).orElseThrow(
@@ -204,7 +204,7 @@ public class GameService {
 
     // 정답
     @Transactional
-    public void gameAnswer(Long roomId, GameDto gameDto) throws JsonProcessingException {
+    public void gameAnswer(Long roomId, GameDto gameDto) {
         // 모달창에 작성한 정답
         String answer = gameDto.getAnswer().replaceAll(" ", "");
 

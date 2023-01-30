@@ -8,6 +8,8 @@ import com.example.namoldak.domain.ImageFile;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
 import com.example.namoldak.repository.ImageFileRepository;
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.FILE_CONVERT_FAILED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,9 +39,9 @@ public class AwsS3Service {
 
     // multipartFile 전달 받고 S3에 전달할 수 있도록 multiPartFile을 File로 전환
     // S3에 multipartFile은 전송 안됨
-    public void upload(List<MultipartFile> multipartFilelist, String dirName, Post post, Member member) throws IOException {
-        for (MultipartFile multipartFile : multipartFilelist){
-            if (multipartFile != null){
+    public void upload(List<MultipartFile> multipartFilelist, String dirName, Post post, Member member) {
+        for (MultipartFile multipartFile : multipartFilelist) {
+            if (multipartFile != null) {
                 File uploadFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
                 ImageFile imageFile = new ImageFile(upload(uploadFile, dirName), member, post); //url, user, post 정보 저장
                 imageFileRepository.save(imageFile);
@@ -70,15 +74,19 @@ public class AwsS3Service {
         log.info("파일 삭제 실패");
     }
 
-    private Optional<File> convert(MultipartFile multipartFile) throws IOException {
-        File convertFile = new File(multipartFile.getOriginalFilename());
-        if (convertFile.createNewFile()) {
-            try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
-                fos.write(multipartFile.getBytes());
+    private Optional<File> convert(MultipartFile multipartFile) {
+        try {
+            File convertFile = new File(multipartFile.getOriginalFilename());
+            if (convertFile.createNewFile()) {
+                try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
+                    fos.write(multipartFile.getBytes());
+                }
+                return Optional.of(convertFile);
             }
-            return Optional.of(convertFile);
+            return Optional.empty();
+        } catch (IOException e) {
+            throw new CustomException(FILE_CONVERT_FAILED);
         }
-        return Optional.empty();
     }
 
     // find image from s3
