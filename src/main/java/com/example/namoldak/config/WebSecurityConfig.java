@@ -4,6 +4,7 @@ import com.example.namoldak.util.jwt.JwtAuthFilter;
 import com.example.namoldak.util.GlobalResponse.SecurityExceptionFilter;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,8 +20,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
 // 기능 : Spring Security 사용에 필요한 설정
 @Configuration
+@Slf4j
 @RequiredArgsConstructor
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -34,26 +37,29 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF 설정
-        http.csrf().disable();
+        try {
+            // CSRF 설정
+            http.csrf().disable();
 
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.httpBasic().disable()
-                .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/posts/myPost").authenticated()
-                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers("/ws-stomp").permitAll()
-                .antMatchers("/signal/**").permitAll()
-                .antMatchers("/signal").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(new JwtAuthFilter(jwtUtil),
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new SecurityExceptionFilter(), JwtAuthFilter.class);
-        http.cors();
-
+            http.httpBasic().disable()
+                    .authorizeRequests()
+                    .antMatchers("/auth/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/posts/myPost").authenticated()
+                    .antMatchers(HttpMethod.GET, "/**").permitAll()
+                    .antMatchers("/ws-stomp").permitAll()
+                    .antMatchers("/signal/**").permitAll()
+                    .antMatchers("/signal").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                    .addFilterBefore(new JwtAuthFilter(jwtUtil),
+                            UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(new SecurityExceptionFilter(), JwtAuthFilter.class);
+            http.cors();
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
         return http.build();
     }
 

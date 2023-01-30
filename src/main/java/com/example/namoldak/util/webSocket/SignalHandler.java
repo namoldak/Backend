@@ -10,12 +10,14 @@ import com.example.namoldak.service.RepositoryService;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.websocket.SessionException;
@@ -188,6 +190,8 @@ public class SignalHandler extends TextWebSocketHandler {
             synchronized (session){
                 session.sendMessage(new TextMessage(json));
             }
+//            ConcurrentWebSocketSessionDecorator cws = new ConcurrentWebSocketSessionDecorator(session, 20000, 2048*2024);
+//            cws.sendMessage(new TextMessage(json));
         } catch (IOException e) {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }

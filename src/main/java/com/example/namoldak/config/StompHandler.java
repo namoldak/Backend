@@ -1,6 +1,10 @@
 package com.example.namoldak.config;
 
+import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -13,7 +17,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Component
 public class StompHandler implements ChannelInterceptor {
+    private RateLimiter rateLimiter = RateLimiter.create(2.0);
 
+//    @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         //메시지의 페이로드 및 헤더에서 인스턴스를 만듬
@@ -28,6 +34,11 @@ public class StompHandler implements ChannelInterceptor {
 //
 //            System.out.println("accessToken = " + accessToken);
 //        }
-        return message;
+        if (rateLimiter.tryAcquire()) {
+            log.info("============ 정상 출력됨");
+            return message;
+        } else {
+            return null;
+        }
     }
 }
