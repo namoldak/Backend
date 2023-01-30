@@ -103,6 +103,7 @@ public class GameService {
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
         startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
+        startSet.put("startAlert", "총 라운드는 4라운드닭! 초록색으로 하이라이트된 사람이 발언권자이고, 발언권자 외에는 마이크 기능이 제한되므로 채팅으로 답변을 해주면 된닭!");
 
         GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId)); // 현재 게임방 id
