@@ -53,6 +53,9 @@ dependencies {
 
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // Guava Rate Limiter
+    implementation("com.google.guava:guava:31.1-jre")
 }
 
 //tasks.named('test') {
