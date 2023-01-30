@@ -13,6 +13,7 @@ import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.util.s3.AwsS3Service;
+import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,8 +88,12 @@ public class MemberService {
     }
 
     @Transactional
-    public MyDataResponseDto myData(Member member) {
-        return new MyDataResponseDto(member);
+    public MyDataResponseDto myData(UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+            throw new CustomException(StatusCode.BAD_REQUEST_TOKEN);
+        } else {
+            return new MyDataResponseDto(userDetails.getMember());
+        }
     }
 
     // 회원탈퇴

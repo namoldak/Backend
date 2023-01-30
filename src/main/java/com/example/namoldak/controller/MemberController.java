@@ -87,6 +87,6 @@ public class MemberController {
     // 내 정보 조회하기
     @GetMapping("/auth/myData")
     public ResponseEntity<MyDataResponseDto> myData(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseUtil.response(memberService.myData(userDetails.getMember()));
+        return ResponseUtil.response(memberService.myData(userDetails));
     }
 }
