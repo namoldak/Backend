@@ -32,8 +32,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     Claims info = jwtUtil.getUserInfoFromToken(token);
                     setAuthentication(info.getSubject());
                 }
-            } else {
-                throw new CustomException(StatusCode.BAD_REQUEST_TOKEN);
             }
             // 다음 필터로 넘어간다
             filterChain.doFilter(request, response);
