@@ -263,7 +263,7 @@ public class GameService {
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
-        // Redis DB에서 게임 셋팅 삭제
+        // DB에서 게임 셋팅 삭제
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
