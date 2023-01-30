@@ -135,7 +135,7 @@ public class GameRoomService {
         Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomIdLock(roomId);
 
         // 방의 상태가 false면 게임이 시작 중이거나 가득 찬 상태이기 때문에 출입이 불가능
-        if (enterGameRoom.get().isStatus()){
+        if (!enterGameRoom.get().isStatus()) {
             // 뒤로 넘어가면 안 되니까 return으로 호다닥 끝내버림
             throw new CustomException(ALREADY_PLAYING);
         }
@@ -144,7 +144,7 @@ public class GameRoomService {
         List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByGameRoomOptional(enterGameRoom);
 
         // 만약 방에 4명이 넘어가면
-        if (gameRoomAttendeeList.size() > 3){
+        if (gameRoomAttendeeList.size() > 3) {
             // 입장 안 된다고 입구컷
             throw new CustomException(CANT_ENTER);
         }
@@ -154,11 +154,11 @@ public class GameRoomService {
         repositoryService.saveMember(member);
 
         // for문으로 리스트에서 gameRoomMember 하나씩 빼주기
-        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList){
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
             // gameRoomMember에서 얻은 유저 아이디로 Member 객체 저장
             Optional<Member> member1 = repositoryService.findMemberById(gameRoomAttendee.getMember().getId());
             // 현재 들어가려는 유저의 ID와 게임에 들어가있는 멤버의 ID가 똑같으면 입구컷 해버림
-            if (member.getId().equals(member1.get().getId())){
+            if (member.getId().equals(member1.get().getId())) {
 //                return new PrivateResponseBody(StatusCode.MEMBER_DUPLICATED, "이미 입장해있닭!!");
                 throw new CustomException(MEMBER_DUPLICATED);
             }
@@ -193,7 +193,6 @@ public class GameRoomService {
         roomInfo.put("owner", enterGameRoom.get().getOwner());
         roomInfo.put("status", String.valueOf(enterGameRoom.get().isStatus()));
 
-//        return new PrivateResponseBody<>(StatusCode.OK, roomInfo);
         return roomInfo;
     }
 
@@ -272,7 +271,7 @@ public class GameRoomService {
         }
 
         // 게임이 시잓된 상태에서 나갔을 경우
-        if (enterGameRoom.isStatus()){
+        if (!enterGameRoom.isStatus()){
                 // 게임을 끝내버림
                 gameService.forcedEndGame(roomId, member.getNickname());
         }
