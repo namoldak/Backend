@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.FILE_UPLOAD_FAILED;
+
 // 기능 : 포스트 CRUD 서비스
 @Slf4j
 @Service
@@ -32,7 +34,7 @@ public class PostService {
 
     // 포스트 생성
     @Transactional
-    public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+    public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) {
         Post post = new Post(postRequestDto, member);
         repositoryService.savePost(post);
 //        postRepository.save(post);
@@ -105,7 +107,7 @@ public class PostService {
 
     // 포스트 수정
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) throws IOException {
+    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) {
         Post post = repositoryService.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
@@ -113,24 +115,19 @@ public class PostService {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
 
-        try {
-            post.update(postRequestDto);
+        post.update(postRequestDto);
 
-            if (multipartFilelist != null) {
-                List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
-                for (ImageFile File : imageFileList) {
-                    String path = File.getPath();
-                    String filename = path.substring(49);
-                    awsS3Service.deleteFile(filename);
-                }
-                imageFileRepository.deleteAll(imageFileList);
-
-                awsS3Service.upload(multipartFilelist, "static", post, member);
+        if (multipartFilelist != null) {
+            List<ImageFile> imageFileList = imageFileRepository.findAllByPost(post);
+            for (ImageFile File : imageFileList) {
+                String path = File.getPath();
+                String filename = path.substring(49);
+                awsS3Service.deleteFile(filename);
             }
-        } catch (IOException e) {
-            throw new CustomException(StatusCode.FILE_UPLOAD_FAILED);
-        }
+            imageFileRepository.deleteAll(imageFileList);
 
+            awsS3Service.upload(multipartFilelist, "static", post, member);
+        }
         return new PostResponseDto(post);
     }
 

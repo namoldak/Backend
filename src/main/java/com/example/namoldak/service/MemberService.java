@@ -6,12 +6,14 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
+import com.example.namoldak.dto.ResponseDto.MyDataResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
 import com.example.namoldak.util.s3.AwsS3Service;
+import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,6 +85,15 @@ public class MemberService {
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
         return repositoryService.MemberDuplicateByNickname(nickname);
+    }
+
+    @Transactional
+    public MyDataResponseDto myData(UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+            throw new CustomException(StatusCode.BAD_REQUEST_TOKEN);
+        } else {
+            return new MyDataResponseDto(userDetails.getMember());
+        }
     }
 
     // 회원탈퇴

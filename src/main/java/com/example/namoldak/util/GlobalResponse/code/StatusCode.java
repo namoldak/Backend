@@ -48,6 +48,8 @@ public enum StatusCode {
     NOT_EXIST_ROOMS(HttpStatus.BAD_REQUEST,"132","조건에 맞는 방이 존재하지 않습니다."),
     SPOTLIGHT_ERR(HttpStatus.BAD_REQUEST,"133","스포트라이트 처리에서 예외가 발생했습니다."),
     SIGNATURE_EXCEPTION(HttpStatus.BAD_REQUEST,"134","JWT 서명에 문제가 발생했습니다."),
+    JWT_EXCEPTION(HttpStatus.BAD_REQUEST,"135","JWT 예외 응답 처리에 오류가 발생했습니다."),
+    JSON_PROCESS_FAILED(HttpStatus.BAD_REQUEST,"136","JSON 처리에서 오류가 발생했습니다."),
 
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"404","댓글이 존재하지 않습니다."),
@@ -60,6 +62,7 @@ public enum StatusCode {
     GAME_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "게임 스타트 셋을 찾을 수 없습니다."),
     FILE_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "404", "파일 업로드 실패"),
     FILE_DELETE_FAILED(HttpStatus.NOT_FOUND, "404", "파일 삭제 실패"),
+    FILE_CONVERT_FAILED(HttpStatus.NOT_FOUND, "404", "파일 전환 실패"),
 
 
     //TODO ========================= 성공 응답 코드 ===============================

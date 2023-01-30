@@ -32,7 +32,7 @@ public class PostController {
     @PostMapping (value = "/posts/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<PostResponseDto> addPost(@RequestPart(value = "data") PostRequestDto postRequestDto,
                                                    @RequestPart(value = "file",required = false) List<MultipartFile> multipartFilelist,
-                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(postService.addPost(postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 
@@ -62,7 +62,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
                                                         @RequestPart(value = "data") PostRequestDto postRequestDto,
                                                         @RequestPart(value = "file", required = false) List<MultipartFile> multipartFilelist,
-                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(postService.updatePost(id, postRequestDto, multipartFilelist, userDetails.getMember()));
     }
 

@@ -25,7 +25,7 @@ public class GameController {
     // 게임 시작
     @MessageMapping("/game/{roomId}/start")
     public ResponseEntity<GlobalResponseDto> gameStart(@DestinationVariable Long roomId,
-                                                       GameDto gameDto) throws JsonProcessingException {
+                                                       GameDto gameDto) {
         gameService.gameStart(roomId, gameDto);
         return ResponseUtil.response(StatusCode.GAME_START);
     }
@@ -48,7 +48,7 @@ public class GameController {
     // 정답
     @MessageMapping("/game/{roomId}/answer")
     public void gameAnswer(@DestinationVariable Long roomId,
-                           @RequestBody GameDto gameDto) throws JsonProcessingException {
+                           @RequestBody GameDto gameDto) {
         gameService.gameAnswer(roomId, gameDto);
     }
 

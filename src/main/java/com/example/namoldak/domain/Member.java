@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "MEMBER")
 @Getter
 @NoArgsConstructor
-public class Member {
+public class Member extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
