@@ -154,6 +154,9 @@ public class PostService {
         }
 
         int totalPage = posts.getTotalPages();
+        if (totalPage == 0) {
+            throw new CustomException(StatusCode.KEYWORD_NOT_FOUND);
+        }
         return new PostResponseListDto(totalPage, postResponseDto);
     }
 }
