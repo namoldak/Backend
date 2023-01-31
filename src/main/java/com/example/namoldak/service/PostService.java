@@ -77,7 +77,7 @@ public class PostService {
         }
         int totalPage = postList.getTotalPages();
         int postCnt = posts.size();
-        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
+        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList, member.getNickname());
     }
 
     // 포스트 상세 조회
