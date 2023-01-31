@@ -8,13 +8,13 @@ import java.util.List;
 public class PostResponseListDto{
     private int totalPage;
     private int postCnt;
-    private String nickname;
+    private boolean myPost;
     private List<PostResponseDto> postResponseDtoList;
 
-    public PostResponseListDto(int totalPage, int postCnt, List<PostResponseDto> postResponseDtoList, String nickname) {
+    public PostResponseListDto(int totalPage, int postCnt, List<PostResponseDto> postResponseDtoList, boolean myPost) {
         this.totalPage           = totalPage;
         this.postCnt             = postCnt;
-        this.nickname            = nickname;
+        this.myPost            = myPost;
         this.postResponseDtoList = postResponseDtoList;
     }
 
