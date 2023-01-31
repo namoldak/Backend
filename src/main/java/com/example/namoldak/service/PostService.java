@@ -64,7 +64,7 @@ public class PostService {
         int totalPage = postList.getTotalPages();
 
         int postCnt = posts.size();
-        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList, false);
+        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
     }
 
     // 내가쓴피드백 전체 조회
@@ -78,7 +78,7 @@ public class PostService {
         }
         int totalPage = postList.getTotalPages();
         int postCnt = posts.size();
-        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList, true);
+        return new PostResponseListDto(totalPage, postCnt, postResponseDtoList);
     }
 
     // 포스트 상세 조회
