@@ -10,19 +10,17 @@ import com.example.namoldak.service.RepositoryService;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.websocket.SessionException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.CHAT_ROOM_NOT_FOUND;
 
@@ -187,7 +185,7 @@ public class SignalHandler extends TextWebSocketHandler {
     private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
         try {
             String json = objectMapper.writeValueAsString(message);
-            synchronized (session){
+            synchronized (session) {
                 session.sendMessage(new TextMessage(json));
             }
 //            ConcurrentWebSocketSessionDecorator cws = new ConcurrentWebSocketSessionDecorator(session, 20000, 2048*2024);
@@ -196,5 +194,34 @@ public class SignalHandler extends TextWebSocketHandler {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }
     }
+
+    // 메세지 발송
+//    private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
+//        int expected = 20;
+//        AtomicInteger atomic = new AtomicInteger(10);
+//        try {
+//            String json = objectMapper.writeValueAsString(message);
+//                session.sendMessage(new TextMessage(json));
+//                atomic.set(20);
+//                if (!atomic.compareAndSet(expected, 100)) {
+//                    session.sendMessage(new TextMessage(json));
+//                }
+//        } catch (IOException e) {
+//            log.info("============== 발생한 에러 메세지: {}", e.getMessage());
+//        }
+//    }
+
+//    private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
+//        CompletableFuture.runAsync(() -> {
+//            try {
+//                String json = objectMapper.writeValueAsString(message);
+////                synchronized (session){
+//                    session.sendMessage(new TextMessage(json));
+////                }
+//            } catch (IOException e) {
+//                log.info("============== Error message: {}", e.getMessage());
+//            }
+//        });
+//    }
 }
 
