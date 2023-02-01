@@ -103,7 +103,7 @@ public class GameService {
         startSet.put("category", gameStartSet.getCategory()); // 카테고리
         startSet.put("keyword", repositoryService.getMapFromStr(gameStartSet.getKeywordToMember())); // 키워드
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
-        startSet.put("startAlert", "총 4라운드닭! 초록색으로 하이라이트된 사람만 말할 수 있고 다른 사람들은 마이크 기능이 제한되니까 채팅으로 알려주면 된닭!");
+        startSet.put("startAlert", "총 8라운드닭! 초록색으로 하이라이트된 사람만 말할 수 있고 다른 사람들은 마이크 기능이 제한되니까 채팅으로 알려주면 된닭!");
 
         GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId)); // 현재 게임방 id
@@ -178,7 +178,7 @@ public class GameService {
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
 
-            if (gameStartSet.getRound() < 1) {
+            if (gameStartSet.getRound() < 7) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -186,7 +186,7 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 1) {
+            } else if (gameStartSet.getRound() == 7) {
                 // 메세지 알림 = 여기 말할 이야기
                 GameMessage<String> gameMessage = new GameMessage<>();
                 gameMessage.setRoomId(Long.toString(roomId));               // 현재 게임룸 id

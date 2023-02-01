@@ -55,7 +55,7 @@ public enum StatusCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"404","댓글이 존재하지 않습니다."),
     SEARCH_POST_ERROR(HttpStatus.BAD_REQUEST,"141","검색 결과에 맞는 게시글이 존재하지 않습니다."),
     ACCESS_DENIED(HttpStatus.NOT_ACCEPTABLE, "403", "접근이 불가능합니다."),
-    INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , dladlsgur3334@gmail.com 으로 연락 부탁드립니다."),
+    INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생 , namoldak@gmail.com 으로 연락 부탁드립니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 게시글이 없습니다."),
     KEYWORD_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "검색 결과가 없습니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "해당 챗룸 정보가 없습니다."),
