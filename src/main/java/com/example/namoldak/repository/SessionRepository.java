@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // 기능 : 웹소켓에 필요한 세션 정보를 저장, 관리 (싱글톤)
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class SessionRepository {
     private static SessionRepository sessionRepository;
     // 세션 저장 1) clientsInRoom : 방 Id를 key 값으로 하여 방마다 가지고 있는 Client들의 session Id 와 session 객체를 저장
-    private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new HashMap<>();
+    private final Map<Long, Map<String, WebSocketSession>> clientsInRoom = new ConcurrentHashMap<>();
     // 세션 저장 2) roomIdToSession : 참가자들 각각의 데이터로 session 객체를 key 값으로 하여 해당 객체가 어느방에 속해있는지를 저장
     private final Map<WebSocketSession, Long> roomIdToSession = new HashMap<>();
     // 세션 저장 3) nicknamesInRoom : 참가자들의 세션 Id와 닉네임을 저장

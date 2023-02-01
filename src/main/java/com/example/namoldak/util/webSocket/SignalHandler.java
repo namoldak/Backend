@@ -17,10 +17,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.CHAT_ROOM_NOT_FOUND;
 
@@ -114,9 +112,6 @@ public class SignalHandler extends TextWebSocketHandler {
 
                         if (oacClientList.containsKey(message.getReceiver())) {
                             WebSocketSession ws = oacClientList.get(message.getReceiver());
-                            if(!ws.isOpen()){
-                                log.info("========================================== 끊겼나?");
-                            }
                             sendMessage(ws,
                                     new WebSocketResponseMessage().builder()
                                             .type(message.getType())
@@ -129,7 +124,6 @@ public class SignalHandler extends TextWebSocketHandler {
                                             .candidate(message.getCandidate())
                                             .sdp(message.getSdp())
                                             .build());
-                            log.info("3. =================================================== {}", message.getType());
                         }
                     } else {
                         throw new CustomException(CHAT_ROOM_NOT_FOUND);
@@ -149,7 +143,6 @@ public class SignalHandler extends TextWebSocketHandler {
     // 웹소켓 연결이 끊어지면 실행되는 메소드
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
-        log.info("========================================= 도대체 왜 끊기는 거임 ㅆ");
         String nickname = sessionRepository.getNicknameInRoom(session.getId());
         // 끊어진 세션이 어느방에 있었는지 조회
         Long roomId = sessionRepository.getRoomId(session);
@@ -182,46 +175,12 @@ public class SignalHandler extends TextWebSocketHandler {
     }
 
     // 메세지 발송
-    private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
+    private synchronized void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
         try {
             String json = objectMapper.writeValueAsString(message);
-            synchronized (session) {
-                session.sendMessage(new TextMessage(json));
-            }
-//            ConcurrentWebSocketSessionDecorator cws = new ConcurrentWebSocketSessionDecorator(session, 20000, 2048*2024);
-//            cws.sendMessage(new TextMessage(json));
+            session.sendMessage(new TextMessage(json));
         } catch (IOException e) {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }
     }
-
-    // 메세지 발송
-//    private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
-//        int expected = 20;
-//        AtomicInteger atomic = new AtomicInteger(10);
-//        try {
-//            String json = objectMapper.writeValueAsString(message);
-//                session.sendMessage(new TextMessage(json));
-//                atomic.set(20);
-//                if (!atomic.compareAndSet(expected, 100)) {
-//                    session.sendMessage(new TextMessage(json));
-//                }
-//        } catch (IOException e) {
-//            log.info("============== 발생한 에러 메세지: {}", e.getMessage());
-//        }
-//    }
-
-//    private void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
-//        CompletableFuture.runAsync(() -> {
-//            try {
-//                String json = objectMapper.writeValueAsString(message);
-////                synchronized (session){
-//                    session.sendMessage(new TextMessage(json));
-////                }
-//            } catch (IOException e) {
-//                log.info("============== Error message: {}", e.getMessage());
-//            }
-//        });
-//    }
 }
-
