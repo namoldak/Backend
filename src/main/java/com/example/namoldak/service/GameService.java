@@ -178,7 +178,7 @@ public class GameService {
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
 
-            if (gameStartSet.getRound() < 1) {
+            if (gameStartSet.getRound() < 7) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -186,7 +186,7 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 1) {
+            } else if (gameStartSet.getRound() == 7) {
                 // 메세지 알림 = 여기 말할 이야기
                 GameMessage<String> gameMessage = new GameMessage<>();
                 gameMessage.setRoomId(Long.toString(roomId));               // 현재 게임룸 id
