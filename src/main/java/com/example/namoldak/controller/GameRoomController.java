@@ -50,14 +50,21 @@ public class GameRoomController {
     // 게임룸 입장
     @PostMapping("/rooms/{roomId}")
     public ResponseEntity<Map<String, String>> enterGame(@PathVariable Long roomId,
-                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(gameRoomService.enterGame(roomId, userDetails.getMember()));
+    }
+
+    // 게임룸 입장 검증
+    @PostMapping("/rooms/{roomId}/verify")
+    public void enterVerify(@PathVariable Long roomId,
+                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        gameRoomService.enterVerify(roomId, userDetails);
     }
 
     // 게임룸 나가기
     @DeleteMapping("/rooms/{roomId}/exit")
     public ResponseEntity<GlobalResponseDto> roomExit(@PathVariable Long roomId,
-                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
         gameRoomService.roomExit(roomId, userDetails.getMember());
         return ResponseUtil.response(StatusCode.EXIT_SUCCESS);
     }
