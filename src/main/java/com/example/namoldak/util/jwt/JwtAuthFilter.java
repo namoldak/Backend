@@ -1,10 +1,11 @@
 package com.example.namoldak.util.jwt;
 
-import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
-import io.jsonwebtoken.Claims;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,28 +23,45 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain){
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String accessToken = jwtUtil.getHeaderToken(request, "Access");
+        String refreshToken = jwtUtil.getHeaderToken(request, "Refresh");
 
-        try {
-            String token = jwtUtil.resolveToken(request);
-            if (token != null) {
-                if (jwtUtil.validateToken(token)) {
-                    // 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
-                    Claims info = jwtUtil.getUserInfoFromToken(token);
-                    setAuthentication(info.getSubject());
-                }
+        if (accessToken != null) {
+            if (!jwtUtil.validateToken(accessToken)) {
+                jwtExceptionHandler(response, "AccessToken Expired", HttpStatus.UNAUTHORIZED);
+                return;
             }
-            // 다음 필터로 넘어간다
-            filterChain.doFilter(request, response);
-        } catch (IOException | ServletException e) {
-            log.info("====================== doFilterInternal에서 처리한 에러 : {}", e.getMessage());
+            setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
+
+        } else if (refreshToken != null) {
+            if (!jwtUtil.refreshTokenValidation(refreshToken)) {
+                jwtExceptionHandler(response, "RefreshToken Expired", HttpStatus.UNAUTHORIZED);
+                return;
+            }
+            // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
+            setAuthentication(jwtUtil.getUserInfoFromToken(refreshToken));
         }
+        // 4. 다음 필터로 넘어간다
+        filterChain.doFilter(request, response);
     }
 
-    public void setAuthentication(String loginId) {
+    public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(loginId);
+        Authentication authentication = jwtUtil.createAuthentication(email);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public void jwtExceptionHandler(HttpServletResponse response, String message, HttpStatus statusCode) {
+        response.setStatus(statusCode.value());
+        response.setContentType("application/json; charset=UTF-8");
+        try {
+            String json = new ObjectMapper().writeValueAsString(new GlobalResponseDto<>(StatusCode.BAD_REQUEST_TOKEN));
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }

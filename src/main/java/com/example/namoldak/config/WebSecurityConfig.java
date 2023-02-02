@@ -20,6 +20,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
+
 
 // 기능 : Spring Security 사용에 필요한 설정
 @Configuration
@@ -71,11 +73,13 @@ public class WebSecurityConfig {
         config.addAllowedOrigin("https://namoldak.com.s3.ap-northeast-2.amazonaws.com");
         config.addAllowedOrigin("https://namoldak.com");
         config.addAllowedOrigin("https://d3j37rx7mer6cg.cloudfront.net");
-        config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
+        config.addExposedHeader(JwtUtil.ACCESS_TOKEN);
+        config.addExposedHeader(JwtUtil.REFRESH_TOKEN);
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-        config.addAllowedHeader("Authorization");
+        config.setAllowedOriginPatterns(Collections.singletonList("*"));
         config.setAllowCredentials(true);
+//        config.setMaxAge(24*60*60L); // 쿠키 만료 시간 : 24시간
         config.validateAllowCredentials();
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
