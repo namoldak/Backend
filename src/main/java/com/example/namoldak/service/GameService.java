@@ -261,7 +261,7 @@ public class GameService {
         } else {
             gameMessage.setContent(nickname + " 님이 방에서 탈주해서 강제 종료되었닭!!");
         }
-        gameMessage.setType(GameMessage.MessageType.ENDGAME);
+        gameMessage.setType(GameMessage.MessageType.FORCEDENDGAME);
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 
         // DB에서 게임 셋팅 삭제
@@ -323,10 +323,10 @@ public class GameService {
         }
 
         // 발송할 메세지 데이터 저장
-        GameMessage<VictoryDto> gameMessage = new GameMessage<>();
+        GameMessage<String> gameMessage = new GameMessage<>();
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setSender("양계장 주인");
-        gameMessage.setContent(victoryDto);
+        gameMessage.setContent(gameStartSet.getKeywordToMember());
         gameMessage.setType(GameMessage.MessageType.ENDGAME);
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
 

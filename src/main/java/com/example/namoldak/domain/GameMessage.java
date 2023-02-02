@@ -21,7 +21,7 @@ public class GameMessage<T> {
 
     public enum MessageType {
         JOIN, OWNER, ENTER, RULE, READY, START, KEYWORD, SPOTLIGHT,
-        FAIL, SKIP, SUCCESS, WINNER, ENDGAME,
+        FAIL, SKIP, SUCCESS, WINNER, ENDGAME, FORCEDENDGAME,
         LEAVE, NEWOWNER, END, REWARD, STUPID
     }
 }
