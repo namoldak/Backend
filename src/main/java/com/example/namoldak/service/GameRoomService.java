@@ -218,7 +218,7 @@ public class GameRoomService {
 
         // cnt가 1이 아닐 경우 뭔가가 오류가 있기 때문에 들어갈 수 없다고 에러 메세지 띄워줌
         if (cnt != 1) {
-            throw new CustomException(CANT_ENTER);
+            throw new CustomException(BAD_REQUEST);
         }
     }
 
