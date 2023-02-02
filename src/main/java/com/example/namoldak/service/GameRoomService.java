@@ -7,6 +7,7 @@ import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -194,6 +195,31 @@ public class GameRoomService {
         roomInfo.put("status", String.valueOf(enterGameRoom.get().isStatus()));
 
         return roomInfo;
+    }
+
+    public void enterVerify(Long roomId, UserDetailsImpl userDetails) {
+        // 비회원일 경우 에러 메세지 보내기
+        if (userDetails == null) {
+            throw new CustomException(INVALID_TOKEN);
+        }
+
+        // 검증을 위한 카운트 미리 선언
+        int cnt = 0;
+
+        // 해당 방의 모든 참가자들 리스트로 저장
+        List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByRoomId(roomId);
+
+        // 참가자의 닉네임과 접속한 사람의 닉네임이 동일하면 cnt 1개씩 올림
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
+            if (userDetails.getMember().getNickname().equals(gameRoomAttendee.getMemberNickname())){
+                cnt++;
+            }
+        }
+
+        // cnt가 1이 아닐 경우 뭔가가 오류가 있기 때문에 들어갈 수 없다고 에러 메세지 띄워줌
+        if (cnt != 1) {
+            throw new CustomException(CANT_ENTER);
+        }
     }
 
     // 게임룸 키워드 조회
