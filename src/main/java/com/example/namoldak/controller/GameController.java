@@ -42,7 +42,6 @@ public class GameController {
     // 발언권 부여
     @MessageMapping("/game/{roomId}/spotlight")
     public void spotlight(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @DestinationVariable Long roomId) {
         log.info("스포트라이트 - 게임방 아이디 : {}", roomId);
         gameService.spotlight(roomId);
