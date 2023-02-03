@@ -5,6 +5,7 @@ import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.MyDataResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
+import com.example.namoldak.dto.ResponseDto.ResponseDto;
 import com.example.namoldak.service.KakaoService;
 import com.example.namoldak.service.MemberService;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
@@ -58,12 +59,12 @@ public class MemberController {
     // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
     public ResponseEntity<String> kakaoLogin(@RequestParam String code,
-                                        HttpServletResponse response) {
+                                             HttpServletResponse response) throws JsonProcessingException {
         // code: 카카오 서버로부터 받은 인가 코드
         List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
 
         // Cookie 생성 및 직접 브라우저에 Set
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값
+        Cookie cookie = new Cookie(JwtUtil.ACCESS_TOKEN, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값  //앞부분이 키값, 뒷부분이 value값
         cookie.setPath("/");
         response.addCookie(cookie);
         return ResponseUtil.response(kakaoReturnValue.get(1));
@@ -72,7 +73,7 @@ public class MemberController {
     // 회원탈퇴
     @DeleteMapping("/auth/deleteMember")
     public ResponseEntity<GlobalResponseDto> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                          @RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
+                                                          @RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
         memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
         return ResponseUtil.response(DELETE_MEMBER_OK);
     }
@@ -88,5 +89,17 @@ public class MemberController {
     @GetMapping("/auth/myData")
     public ResponseEntity<MyDataResponseDto> myData(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(memberService.myData(userDetails));
+    }
+
+    // 로그아웃
+    @PostMapping("/auth/logout")
+    public ResponseEntity<GlobalResponseDto> logout(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return memberService.logout(userDetails.getMember().getEmail());
+    }
+
+    // 토큰 재발행
+    @PostMapping("/auth/issue/token")
+    public ResponseDto<String> issuedToken(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletResponse response){
+        return memberService.issuedToken(userDetails.getMember().getEmail(), response);
     }
 }
