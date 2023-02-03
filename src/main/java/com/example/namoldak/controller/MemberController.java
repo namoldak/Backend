@@ -89,4 +89,10 @@ public class MemberController {
     public ResponseEntity<MyDataResponseDto> myData(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseUtil.response(memberService.myData(userDetails));
     }
+
+    @PostMapping("/auth/leave")
+    public ResponseEntity<GlobalResponseDto> leave(Long id) {
+        memberService.leave(id);
+        return ResponseUtil.response(DELETE_MEMBER_OK);
+    }
 }

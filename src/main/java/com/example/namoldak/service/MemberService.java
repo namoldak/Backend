@@ -100,35 +100,7 @@ public class MemberService {
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
             // 코멘트 여부 확인
-            if(commentRepository.existsByMember(member)){
-                commentRepository.deleteAllByMember(member);
-            }
-            // 게임룸 참여 여부 확인
-            if(gameRoomAttendeeRepository.existsByMember(member)){
-                gameRoomAttendeeRepository.deleteAllByMember(member);
-            }
-            // 이미지파일 여부 확인
-            if(imageFileRepository.existsByMember(member)){
-
-                List<ImageFile> imageFileList = imageFileRepository.findAllByMember(member);
-                for (ImageFile imageFile : imageFileList) {
-                    String path = imageFile.getPath();
-                    String filename = path.substring(49);
-                    awsS3Service.deleteFile(filename);
-                }
-
-                imageFileRepository.deleteAllByMember(member);
-            }
-            // 글 여부 확인
-            if(postRepository.existsByMember(member)){
-                postRepository.deleteAllByMember(member);
-            }
-            // 리워드 여부 확인
-            if(rewardReposiroty.existsByMember(member)){
-                rewardReposiroty.deleteAllByMember(member);
-            }
-            // 회원 삭제
-            repositoryService.deleteMember(member);
+            removeMemberInfo(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
@@ -146,5 +118,44 @@ public class MemberService {
         }else {
             throw new CustomException(StatusCode.LOGIN_MATCH_FAIL);
         }
+    }
+
+    public void leave(Long id) {
+        Member member = repositoryService.findMemberByKakaoId(id).orElseThrow(
+                ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
+        );
+        removeMemberInfo(member);
+    }
+
+    public void removeMemberInfo(Member member) {
+        if(commentRepository.existsByMember(member)){
+            commentRepository.deleteAllByMember(member);
+        }
+        // 게임룸 참여 여부 확인
+        if(gameRoomAttendeeRepository.existsByMember(member)){
+            gameRoomAttendeeRepository.deleteAllByMember(member);
+        }
+        // 이미지파일 여부 확인
+        if(imageFileRepository.existsByMember(member)){
+
+            List<ImageFile> imageFileList = imageFileRepository.findAllByMember(member);
+            for (ImageFile imageFile : imageFileList) {
+                String path = imageFile.getPath();
+                String filename = path.substring(49);
+                awsS3Service.deleteFile(filename);
+            }
+
+            imageFileRepository.deleteAllByMember(member);
+        }
+        // 글 여부 확인
+        if(postRepository.existsByMember(member)){
+            postRepository.deleteAllByMember(member);
+        }
+        // 리워드 여부 확인
+        if(rewardReposiroty.existsByMember(member)){
+            rewardReposiroty.deleteAllByMember(member);
+        }
+        // 회원 삭제
+        repositoryService.deleteMember(member);
     }
 }

@@ -5,12 +5,14 @@ import com.example.namoldak.service.GameService;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.example.namoldak.util.security.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +42,7 @@ public class GameController {
     // 발언권 부여
     @MessageMapping("/game/{roomId}/spotlight")
     public void spotlight(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @DestinationVariable Long roomId) {
         log.info("스포트라이트 - 게임방 아이디 : {}", roomId);
         gameService.spotlight(roomId);
