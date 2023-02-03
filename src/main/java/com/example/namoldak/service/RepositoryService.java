@@ -4,6 +4,7 @@ import com.example.namoldak.domain.*;
 import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
+import com.example.namoldak.util.s3.AwsS3Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,8 @@ public class RepositoryService {
     private final KeywordRepository keywordRepository;
     private final GameStartSetRepository gameStartSetRepository;
     private final RewardReposiroty rewardReposiroty;
+    private final ImageFileRepository imageFileRepository;
+    private final AwsS3Service awsS3Service;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -179,6 +182,39 @@ public class RepositoryService {
         memberRepository.save(member);
     }
 
+    // 회원탈퇴하며 모든 정보를 정리하기
+    public void removeMemberInfo(Member member) {
+        if(commentRepository.existsByMember(member)){
+            commentRepository.deleteAllByMember(member);
+        }
+        // 게임룸 참여 여부 확인
+        if(gameRoomAttendeeRepository.existsByMember(member)){
+            gameRoomAttendeeRepository.deleteAllByMember(member);
+        }
+        // 이미지파일 여부 확인
+        if(imageFileRepository.existsByMember(member)){
+
+            List<ImageFile> imageFileList = imageFileRepository.findAllByMember(member);
+            for (ImageFile imageFile : imageFileList) {
+                String path = imageFile.getPath();
+                String filename = path.substring(49);
+                awsS3Service.deleteFile(filename);
+            }
+
+            imageFileRepository.deleteAllByMember(member);
+        }
+        // 글 여부 확인
+        if(postRepository.existsByMember(member)){
+            postRepository.deleteAllByMember(member);
+        }
+        // 리워드 여부 확인
+        if(rewardReposiroty.existsByMember(member)){
+            rewardReposiroty.deleteAllByMember(member);
+        }
+        // 회원 삭제
+        deleteMember(member);
+    }
+
     //////////////TODO GameRoom 관련
     // 게임룸 Id로 객체 찾아오기
     public Optional<GameRoom> findGameRoomByRoomId(Long roomId) {
@@ -297,4 +333,6 @@ public class RepositoryService {
         List<Reward> rewardList = rewardReposiroty.findByMember(member);
         return rewardList;
     }
+
+
 }

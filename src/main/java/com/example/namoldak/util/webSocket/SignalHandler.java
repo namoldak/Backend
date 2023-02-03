@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.*;
@@ -178,7 +179,15 @@ public class SignalHandler extends TextWebSocketHandler {
     private synchronized void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
         try {
             String json = objectMapper.writeValueAsString(message);
+
+            TextMessage test = new TextMessage(json);
+            log.info("================= json length {} ", json.length());
+            log.info("================= TextMessage length {} ", test.asBytes().length);
+
+//            ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 100 * 10000, 3* 512 * 1024);
             session.sendMessage(new TextMessage(json));
+
+//            decorator.sendMessage(new TextMessage(json));
         } catch (IOException e) {
             log.info("============== 발생한 에러 메세지: {}", e.getMessage());
         }
