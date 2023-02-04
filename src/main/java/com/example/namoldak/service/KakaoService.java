@@ -1,6 +1,7 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
+import com.example.namoldak.domain.RefreshToken;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -26,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
@@ -56,14 +58,14 @@ public class KakaoService {
         // 5. response Header에 JWT 토큰 추가
         KakaoTokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail(), kakaoAccessToken);
 
-//        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
-//
-//        if (refreshToken.isPresent()) {
-//            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
-//        } else {
-//            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),tokenDto.getRefreshToken());
-//            refreshTokenService.saveRefreshToken(newToken);
-//        }
+        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
+
+        if (refreshToken.isPresent()) {
+            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(refreshToken.get().getRefreshToken()));
+        } else {
+            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),jwtUtil.createToken(kakaoUser.getEmail(), "Refresh"));
+            refreshTokenService.saveRefreshToken(newToken);
+        }
 
         setHeader(response, tokenDto);
 
