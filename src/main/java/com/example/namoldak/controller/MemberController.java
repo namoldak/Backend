@@ -67,7 +67,7 @@ public class MemberController {
         Cookie cookie = new Cookie(JwtUtil.ACCESS_TOKEN, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값  //앞부분이 키값, 뒷부분이 value값
         cookie.setPath("/");
         response.addCookie(cookie);
-        return ResponseUtil.response(kakaoReturnValue.get(2));
+        return ResponseUtil.response(kakaoReturnValue.get(1));
     }
 
     // 회원탈퇴

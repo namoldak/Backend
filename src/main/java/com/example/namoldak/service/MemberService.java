@@ -78,8 +78,7 @@ public class MemberService {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
 
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail()));
-// user email 값을 포함한 토큰 생성 후 tokenDto 에 저장
+        // user email 값을 포함한 토큰 생성 후 tokenDto 에 저장
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
@@ -178,7 +177,7 @@ public class MemberService {
 
     private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+//        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
     // 로그아웃
