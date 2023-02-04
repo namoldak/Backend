@@ -71,6 +71,13 @@ public class MemberController {
         return ResponseUtil.response(DELETE_MEMBER_OK);
     }
 
+    // 카카오 회원 탈퇴
+    @DeleteMapping("/auth/deleteKakaoMember")
+    public ResponseEntity<GlobalResponseDto> deleteKakaoMember(@RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
+        kakaoService.deleteKakaoMember(deleteMemberRequestDto.getNickname());
+        return ResponseUtil.response(DELETE_MEMBER_OK);
+    }
+
     // 닉네임 변경
     @PutMapping("/auth/changeNickname")
     public ResponseEntity<PrivateResponseBody> changeNickname(@RequestBody SignupRequestDto signupRequestDto,
@@ -94,11 +101,5 @@ public class MemberController {
     @PostMapping("/auth/issue/token")
     public ResponseDto<String> issuedToken(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletResponse response){
         return memberService.issuedToken(userDetails.getMember().getEmail(), response);
-    }
-
-    @PostMapping("/auth/leave")
-    public ResponseEntity<GlobalResponseDto> leave(Long id) {
-        kakaoService.deleteMember(id);
-        return ResponseUtil.response(DELETE_MEMBER_OK);
     }
 }

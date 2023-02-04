@@ -82,7 +82,8 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
-        body.add("redirect_uri", "https://namoldak.com/login");
+//        body.add("redirect_uri", "https://namoldak.com/login");
+        body.add("redirect_uri", "http://localhost:3000/login");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -188,8 +189,8 @@ public class KakaoService {
     }
 
     // 회원탈퇴
-    public void deleteMember(Long id) {
-        Member member = repositoryService.findMemberByKakaoId(id).orElseThrow(
+    public void deleteKakaoMember(String nickname) {
+        Member member = repositoryService.findMemberByNickname(nickname).orElseThrow(
                 ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
         );
         repositoryService.removeMemberInfo(member);
