@@ -46,11 +46,11 @@ public class MemberService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        if (!repositoryService.MemberDuplicateByEmail(email)) {
+        if (repositoryService.MemberDuplicateByEmail(email)) {
             throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
-        if (!repositoryService.MemberDuplicateByNickname(nickname)) {
+        if (repositoryService.MemberDuplicateByNickname(nickname)) {
             throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 
@@ -76,7 +76,7 @@ public class MemberService {
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
 
 
-        if (repositoryService.existMemberByEmail(member.getEmail())) {
+        if (refreshTokenService.existByEmail(member.getEmail())) {
             RefreshToken refreshToken = refreshTokenService.findByEmail(member.getEmail());
             refreshTokenService.saveRefreshToken(refreshToken.updateToken(refreshToken.getRefreshToken()));
         } else {
@@ -92,13 +92,13 @@ public class MemberService {
     // 이메일 중복 확인
     @Transactional(readOnly = true)
     public boolean emailCheck(String email){
-        return repositoryService.MemberDuplicateByEmail(email);
+        return !repositoryService.MemberDuplicateByEmail(email);
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
-        return repositoryService.MemberDuplicateByNickname(nickname);
+        return !repositoryService.MemberDuplicateByNickname(nickname);
     }
 
     @Transactional
@@ -146,7 +146,7 @@ public class MemberService {
     // 로그아웃
     public ResponseEntity<GlobalResponseDto> logout(String email) {
         // 해당 유저의 refreshtoken 이 없을 경우
-        if(refreshTokenService.findByEmail(email) == null){
+        if(!refreshTokenService.existByEmail(email)){
             throw new CustomException(StatusCode.INVALID_TOKEN);
         }
         // 자신의 refreshtoken 만 삭제 가능

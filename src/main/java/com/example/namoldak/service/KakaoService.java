@@ -56,7 +56,7 @@ public class KakaoService {
         // 5. response Header에 JWT 토큰 추가
         KakaoTokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail(), kakaoAccessToken);
 
-        if(repositoryService.existMemberByEmail(kakaoUser.getEmail())){
+        if(refreshTokenService.existByEmail(kakaoUser.getEmail())){
             RefreshToken refreshToken = refreshTokenService.findByEmail(kakaoUser.getEmail());
             refreshTokenService.saveRefreshToken(refreshToken.updateToken(refreshToken.getRefreshToken()));
         } else {
