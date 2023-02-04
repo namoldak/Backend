@@ -79,7 +79,7 @@ public class KakaoService {
 
         List<String> kakaoReturnValue = new ArrayList<>();
 //        kakaoReturnValue.add(createToken);
-        kakaoReturnValue.add(tokenDto.getRefreshToken());
+//        kakaoReturnValue.add(tokenDto.getRefreshToken());
         kakaoReturnValue.add(tokenDto.getAccessToken());
         kakaoReturnValue.add(kakaoUser.getNickname());
 
