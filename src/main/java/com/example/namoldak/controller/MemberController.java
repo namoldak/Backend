@@ -60,14 +60,6 @@ public class MemberController {
     @GetMapping("/auth/kakao/callback")
     public ResponseEntity<String> kakaoLogin(@RequestParam String code,
                                              HttpServletResponse response) {
-        // code: 카카오 서버로부터 받은 인가 코드
-//        List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
-
-//        // Cookie 생성 및 직접 브라우저에 Set
-//        Cookie cookie = new Cookie(JwtUtil.ACCESS_TOKEN, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값  //앞부분이 키값, 뒷부분이 value값
-//        cookie.setPath("/");
-//        response.addCookie(cookie);
-//        return ResponseUtil.response(kakaoReturnValue.get(2));
         return ResponseUtil.response(kakaoService.kakaoLogin(code, response));
     }
 

@@ -53,42 +53,14 @@ public class KakaoService {
         // 3. 필요시에 회원가입
         Member kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
-        // 4. JWT 토큰 반환 (방법2)
-//        String createToken = jwtUtil.createToken(kakaoUser.getEmail());
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
-        //JWT토큰 만들어서 클라이언트에 보낸 다음에 클라이언트에서 직접 쿠키를 저장하는 방식으로 구현가능 (방법1)
-        //서버에서 바로 그냥 쿠키 객체를 만들어서 토큰에 직접 넣어서 반환하는 방법도 있음 (방법2)
-        //몇번 방식을 쓸 것인지는 react 쪽과 협의 필요!
-
         // 4. 강제 로그인 처리
         Authentication authentication = forceLogin(kakaoUser);
 
         // 5. response Header에 JWT 토큰 추가
         KakaoTokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail(), kakaoAccessToken);
 
-        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
+        setHeader(response, tokenDto);
 
-        if (refreshToken.isPresent()) {
-            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
-        } else {
-            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),tokenDto.getRefreshToken());
-            refreshTokenService.saveRefreshToken(newToken);
-        }
-
-        log.info("===================================== tokenDto : {} ", tokenDto);
-        log.info("===================================== kakaoToken : {}", tokenDto.getKakaoAccessToken());
-
-        boolean sendOK = setHeader(response, tokenDto);
-        log.info("===================================== 보냈니? : {} ", sendOK);
-//
-//        List<String> kakaoReturnValue = new ArrayList<>();
-////        kakaoReturnValue.add(createToken);
-//        kakaoReturnValue.add(tokenDto.getRefreshToken());
-//        kakaoReturnValue.add(tokenDto.getAccessToken());
-//        kakaoReturnValue.add(kakaoUser.getNickname());
-
-        // 리턴값으로 프론트에서 요청한 토큰과 유저닉네임을 같이 반환
-//        return kakaoReturnValue;
         return kakaoUser.getNickname();
     }
 
