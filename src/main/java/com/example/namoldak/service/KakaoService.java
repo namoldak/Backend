@@ -28,7 +28,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
@@ -66,10 +65,9 @@ public class KakaoService {
         // 5. response Header에 JWT 토큰 추가
         TokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail());
 
-        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
-
-        if (refreshToken.isPresent()) {
-            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
+        if(repositoryService.existMemberByEmail(kakaoUser.getEmail())){
+            RefreshToken refreshToken = refreshTokenService.findByEmail(kakaoUser.getEmail());
+            refreshTokenService.saveRefreshToken(refreshToken.updateToken(tokenDto.getRefreshToken()));
         } else {
             RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),tokenDto.getRefreshToken());
             refreshTokenService.saveRefreshToken(newToken);
@@ -152,16 +150,12 @@ public class KakaoService {
     private Member registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
-        Member kakaoUser = repositoryService.findMemberByKakaoId(kakaoId)
-                .orElse(null);
-        if (kakaoUser == null) {
+        Member kakaoUser;
+        if (!repositoryService.existMemberByKakaoId(kakaoId)) {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
             String kakaoEmail = kakaoUserInfo.getEmail();
-            Member sameEmailUser = repositoryService.findMemberByEmail(kakaoEmail).orElse(null);
-            if (sameEmailUser != null) {
-                kakaoUser = sameEmailUser;
-                // 기존 회원정보에 카카오 Id 추가
-                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
+            if(repositoryService.existMemberByEmail(kakaoEmail)) {
+                kakaoUser = repositoryService.findMemberByEmail(kakaoEmail);
             } else {
                 // 신규 회원가입
                 // password: random UUID
@@ -174,6 +168,8 @@ public class KakaoService {
                 kakaoUser = new Member(email, encodedPassword, kakaoId, kakaoUserInfo.getNickname());
             }
             repositoryService.saveMember(kakaoUser);
+        } else {
+            kakaoUser = repositoryService.findMemberByKakaoId(kakaoId);
         }
         return kakaoUser;
     }

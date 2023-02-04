@@ -41,7 +41,6 @@ public class MemberService {
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
     private final RewardReposiroty rewardReposiroty;
     private final AwsS3Service awsS3Service;
-
     private final RefreshTokenService refreshTokenService;
 
 
@@ -70,9 +69,7 @@ public class MemberService {
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
 
-        Member member = repositoryService.findMemberByEmail(email).orElseThrow(
-                () -> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
-        );
+        Member member = repositoryService.findMemberByEmail(email);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(StatusCode.BAD_PASSWORD);
@@ -83,10 +80,11 @@ public class MemberService {
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
-        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(member.getEmail()));
 
-        if (refreshToken.isPresent()) {
-            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
+
+        if (repositoryService.existMemberByEmail(member.getEmail())) {
+            RefreshToken refreshToken = refreshTokenService.findByEmail(member.getEmail());
+            refreshTokenService.saveRefreshToken(refreshToken.updateToken(tokenDto.getRefreshToken()));
         } else {
             RefreshToken newToken = new RefreshToken(signupRequestDto.getEmail(),tokenDto.getRefreshToken());
             refreshTokenService.saveRefreshToken(newToken);
@@ -159,9 +157,7 @@ public class MemberService {
     // 닉네임 변경
     @Transactional
     public PrivateResponseBody changeNickname(SignupRequestDto signupRequestDto, Member member) {
-        Member member1 = repositoryService.findMemberById(member.getId()).orElseThrow(
-                ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
-        );
+        Member member1 = repositoryService.findMemberById(member.getId());
         if(member.getId().equals(member1.getId())){
             member1.update(signupRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");

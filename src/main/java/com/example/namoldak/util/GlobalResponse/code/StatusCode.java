@@ -23,7 +23,7 @@ public enum StatusCode {
     BAD_PASSWORD(HttpStatus.BAD_REQUEST, "400", "비밀번호가 일치하지 않습니다"),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "403", "로그인 후 사용이 가능합니다"),
     NO_AUTH_MEMBER(HttpStatus.BAD_REQUEST, "403", "작성자 정보와 일치하지 않습니다."),
-    LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "존재하지 않는 유저 정보입니다."),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "110", "회원을 찾을 수 없습니다."),
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "비밀번호가 일치하지 않습니다."),
     LOGIN_WRONG_SIGNATURE_JWT_TOKEN(HttpStatus.BAD_REQUEST, "112", "잘못된 JWT 서명입니다."),
     LOGIN_EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "401", "만료된 JWT 토큰입니다."),
@@ -51,6 +51,7 @@ public enum StatusCode {
     SIGNATURE_EXCEPTION(HttpStatus.BAD_REQUEST, "134", "JWT 서명에 문제가 발생했습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST, "135", "JWT 예외 응답 처리에 오류가 발생했습니다."),
     JSON_PROCESS_FAILED(HttpStatus.BAD_REQUEST, "136", "JSON 처리에서 오류가 발생했습니다."),
+    NOT_FOUND_REFRESHTOKEN(HttpStatus.BAD_REQUEST, "137", "Refresh Token을 찾을 수 없습니다."),
 
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "404", "댓글이 존재하지 않습니다."),
@@ -65,6 +66,7 @@ public enum StatusCode {
     FILE_UPLOAD_FAILED(HttpStatus.NOT_FOUND, "404", "파일 업로드 실패"),
     FILE_DELETE_FAILED(HttpStatus.NOT_FOUND, "404", "파일 삭제 실패"),
     FILE_CONVERT_FAILED(HttpStatus.NOT_FOUND, "404", "파일 전환 실패"),
+    NOT_FOUND_ATTENDEE(HttpStatus.NOT_FOUND, "404", "게임 참가자를 찾을 수 없습니다."),
 
     //TODO ========================= 성공 응답 코드 ===============================
 

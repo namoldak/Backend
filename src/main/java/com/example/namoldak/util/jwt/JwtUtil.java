@@ -86,15 +86,19 @@ public class JwtUtil {
     }
 
     // refreshToken 토큰 검증
-    public Boolean refreshTokenValidation(String token) {
+    public boolean refreshTokenValidation(String token) {
 
         // 1차 토큰 검증
-        if (!validateToken(token)) return false;
+        if (!validateToken(token)){
+            return false;
+        }
 
+        String email = getUserInfoFromToken(token);
         // DB에 저장한 토큰 비교
-        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(getUserInfoFromToken(token)));
-
-        return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
+        if(refreshTokenService.existByEmail(email)){
+            return token.equals(refreshTokenService.findRefreshTokenByEmail(email));
+        }
+        return false;
     }
 
     // 토큰에서 loginId 가져오는 기능

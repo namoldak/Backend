@@ -18,8 +18,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(LOGIN_MATCH_FAIL));
+        Member member = memberRepository.findByEmail(email).orElseThrow(
+                () -> new CustomException(LOGIN_MATCH_FAIL)
+        );
         return new UserDetailsImpl(member, member.getEmail());
     }
 }

@@ -165,11 +165,11 @@ public class SignalHandler extends TextWebSocketHandler {
                             .receiver(oneClient.getKey())
                             .build());
         }
-        Optional<Member> member = repositoryService.findMemberByNickname(nickname);
+        Member member = repositoryService.findMemberByNickname(nickname);
         List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByRoomId(roomId);
         for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
             if(nickname.equals(gameRoomAttendee.getMemberNickname())){
-                gameRoomService.roomExit(roomId, member.get());
+                gameRoomService.roomExit(roomId, member);
             }
         }
     }
