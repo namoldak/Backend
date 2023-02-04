@@ -1,7 +1,6 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
-import com.example.namoldak.domain.RefreshToken;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
@@ -27,7 +26,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
@@ -42,7 +40,6 @@ public class KakaoService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-//    public List<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
     public String kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String kakaoAccessToken = getToken(code);
@@ -59,6 +56,15 @@ public class KakaoService {
         // 5. response Header에 JWT 토큰 추가
         KakaoTokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail(), kakaoAccessToken);
 
+//        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
+//
+//        if (refreshToken.isPresent()) {
+//            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
+//        } else {
+//            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),tokenDto.getRefreshToken());
+//            refreshTokenService.saveRefreshToken(newToken);
+//        }
+
         setHeader(response, tokenDto);
 
         return kakaoUser.getNickname();
@@ -74,8 +80,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
-//        body.add("redirect_uri", "https://namoldak.com/login");
-        body.add("redirect_uri", "http://localhost:3000/login");
+        body.add("redirect_uri", "https://namoldak.com/login");
         body.add("code", code);
 
         // HTTP 요청 보내기
