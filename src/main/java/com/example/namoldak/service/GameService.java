@@ -32,9 +32,7 @@ public class GameService {
     public void gameStart(Long roomId, GameDto gameDto) {
 
         // 현재 입장한 게임방의 정보를 가져옴
-        GameRoom gameRoom = repositoryService.findGameRoomByRoomId(roomId).orElseThrow(
-                () -> new CustomException(StatusCode.NOT_FOUND_ROOM)
-        );
+        GameRoom gameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 게임 시작은 방장만이 할 수 있음
         if (!gameDto.getNickname().equals(gameRoom.getOwner())) {
@@ -64,7 +62,6 @@ public class GameService {
 
         Map<String, String> keywordToMember = new HashMap<>();
 
-        List<Optional<Member>> memberList = new ArrayList<>();
         // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
         List<String> memberNicknameList = new ArrayList<>();
 
@@ -90,9 +87,7 @@ public class GameService {
         // StartSet 저장
         repositoryService.saveGameStartSet(gameStartSet);
 
-        GameStartSet searchOneGameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
-                ()-> new CustomException(GAME_SET_NOT_FOUND)
-        );
+        GameStartSet searchOneGameStartSet = repositoryService.findGameStartSetByRoomId(roomId);
         log.info("카테고리 : " + searchOneGameStartSet.getCategory());
         for (String memberNick : memberNicknameList) {
             log.info("키워드 : " + keywordToMember.get(memberNick));
@@ -135,12 +130,10 @@ public class GameService {
     @Transactional
     public void spotlight(Long roomId) {
 
-        GameRoom playRoom = repositoryService.findGameRoomByRoomId(roomId).get();
+        GameRoom playRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 해당 게임룸의 게임셋을 조회
-        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
-                ()-> new CustomException(GAME_SET_NOT_FOUND)
-        );
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId);
 
         // 게임이 진행이 불가한 상태라면 초기화 시켜야 함
         if (playRoom.isStatus()) { // false : 게임이 진행 중, true : 게임 시작 전
@@ -157,9 +150,7 @@ public class GameService {
         if (gameStartSet.getSpotNum() < memberListInGame.size()) {
 
             // 현재 스포트라이트 받는 멤버
-            Member spotMember = repositoryService.findMemberById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId()).orElseThrow(
-                    () -> new CustomException(SPOTLIGHT_ERR)
-            );
+            Member spotMember = repositoryService.findMemberById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId());
 
             // 메세지 알림
             GameMessage<String> gameMessage = new GameMessage<>();
@@ -178,7 +169,7 @@ public class GameService {
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
 
-            if (gameStartSet.getRound() < 7) {
+            if (gameStartSet.getRound() < 1) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -186,7 +177,7 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 7) {
+            } else if (gameStartSet.getRound() == 1) {
                 // 메세지 알림 = 여기 말할 이야기
                 GameMessage<String> gameMessage = new GameMessage<>();
                 gameMessage.setRoomId(Long.toString(roomId));               // 현재 게임룸 id
@@ -210,9 +201,7 @@ public class GameService {
         String answer = gameDto.getAnswer().replaceAll(" ", "");
 
         // gameStartSet 불러오기
-        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
-                ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
-        );
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId);
 
         GameMessage<String> gameMessage = new GameMessage<>();
 
@@ -249,7 +238,7 @@ public class GameService {
     public void forcedEndGame(Long roomId, String nickname){
 
         // 현재 게임방 정보 불러오기
-        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
+        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 발송할 메세지 데이터 저장
         GameMessage<String> gameMessage = new GameMessage<>();
@@ -268,7 +257,7 @@ public class GameService {
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().setStatus(true);
+        enterGameRoom.setStatus(true);
     }
 
     // 게임 정상 종료
@@ -278,27 +267,25 @@ public class GameService {
         VictoryDto victoryDto = new VictoryDto();
 
         // 방 게임셋 정보 불러오기
-        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId).orElseThrow(
-                ()-> new CustomException(StatusCode.GAME_SET_NOT_FOUND)
-        );
+        GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId);
 
         // 현재 게임룸 데이터 불러오기
-        Optional<GameRoom> enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
+        GameRoom enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
         // 불러온 게임룸으로 들어간 GameRoomMember들 구하기
-        List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByGameRoomOptional(enterGameRoom);
+        List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByGameRoom(enterGameRoom);
 
         // 닉네임을 구하기 위해서 멤버 객체를 담을 리스트 선언
         List<Member> memberList = new ArrayList<>();
 
         // for문으로 하나씩 빼서 DB 조회 후 List에 넣어주기
         for (GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList){
-            Optional<Member> member = repositoryService.findMemberById(gameRoomAttendee.getMember().getId());
+            Member member = repositoryService.findMemberById(gameRoomAttendee.getMember().getId());
             // 멤버 총 게임 횟수 증가
-            member.get().updateTotalGame(1L);
-            repositoryService.saveMember(member.get());
-            memberList.add(member.get());
-            rewardService.createTotalGameReward(member.get());
+            member.updateTotalGame(1L);
+            repositoryService.saveMember(member);
+            memberList.add(member);
+            rewardService.createTotalGameReward(member);
         }
         Long startTime = gameStartSet.getGameStartTime();
         Long currentTime = System.currentTimeMillis();
@@ -334,7 +321,7 @@ public class GameService {
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
-        enterGameRoom.get().setStatus(true);
+        enterGameRoom.setStatus(true);
     }
 
 }

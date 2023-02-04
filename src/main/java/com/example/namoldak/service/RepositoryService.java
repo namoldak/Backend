@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -134,42 +134,50 @@ public class RepositoryService {
     //////////////TODO Member 관련
     // Email로 데이터 검증
     public boolean MemberDuplicateByEmail(String email){
-        if (memberRepository.findByEmail(email).isPresent()) {
-        return false; } else {
-            return true;
-        }
+        return memberRepository.existsByEmail(email);
     }
 
     // Nickname으로 데이터 검증
     public boolean MemberDuplicateByNickname(String nickname){
-        if (memberRepository.findByNickname(nickname).isPresent()) {
-        return false; } else {
-            return true;
-        }
+        return memberRepository.existsByNickname(nickname);
     }
 
     // 닉네임으로 Member 객체 갖고오기
-    public Optional<Member> findMemberByNickname(String nickname) {
-        Optional<Member> member = memberRepository.findByNickname(nickname);
-        return member;
+    public Member findMemberByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_MEMBER)
+        );
     }
 
     // 이메일로 Member 객체 찾아오기
-    public Optional<Member> findMemberByEmail(String email){
-        Optional<Member> member = memberRepository.findByEmail(email);
-        return member;
+    public Member findMemberByEmail(String email){
+        return memberRepository.findByEmail(email).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_MEMBER)
+        );
+    }
+
+    // 이메일로 Member 객체 찾아오기
+    public boolean existMemberByEmail(String email){
+        return memberRepository.existsByEmail(email);
     }
 
     // 카카오 아이디로 Member 객체 찾아오기
-    public Optional<Member> findMemberByKakaoId(Long kakaoId){
-        Optional<Member> member = memberRepository.findByKakaoId(kakaoId);
-        return member;
+    public Member findMemberByKakaoId(Long kakaoId){
+        return memberRepository.findByKakaoId(kakaoId).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_MEMBER)
+        );
+    }
+
+    // 카카오 아이디로 존재여부
+    public boolean existMemberByKakaoId(Long kakaoId){
+        return memberRepository.existsByKakaoId(kakaoId);
     }
 
     // 멤버 ID로 Member 객체 찾아오기
-    public Optional<Member> findMemberById(Long memberId){
-        Optional<Member> member = memberRepository.findById(memberId);
-        return member;
+    public Member findMemberById(Long memberId){
+        return memberRepository.findById(memberId).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_MEMBER)
+        );
     }
 
     // 멤버 객체로 데이터 삭제하기
@@ -217,13 +225,15 @@ public class RepositoryService {
 
     //////////////TODO GameRoom 관련
     // 게임룸 Id로 객체 찾아오기
-    public Optional<GameRoom> findGameRoomByRoomId(Long roomId) {
-        Optional<GameRoom> gameRoom = gameRoomRepository.findByGameRoomId(roomId);
-        return gameRoom;
+    public GameRoom findGameRoomByRoomId(Long roomId) {
+        return gameRoomRepository.findByGameRoomId(roomId).orElseThrow(
+                ()-> new CustomException(NOT_EXIST_ROOMS)
+        );
     }
-    public Optional<GameRoom> findGameRoomByRoomIdLock(Long roomId) {
-        Optional<GameRoom> gameRoom = gameRoomRepository.findByGameRoomId2(roomId);
-        return gameRoom;
+    public GameRoom findGameRoomByRoomIdLock(Long roomId) {
+        return gameRoomRepository.findByGameRoomId2(roomId).orElseThrow(
+                ()-> new CustomException(NOT_EXIST_ROOMS)
+        );
     }
 
     // 페이징 처리해서 모든 게임방 갖고 오기
@@ -257,7 +267,9 @@ public class RepositoryService {
     //////////////TODO GameRoomAttendee 관련
     // 멤버 객체로 참가자 정보 조회
     public GameRoomAttendee findAttendeeByMember(Member member) {
-        GameRoomAttendee gameRoomAttendee = gameRoomAttendeeRepository.findByMember(member);
+        GameRoomAttendee gameRoomAttendee = gameRoomAttendeeRepository.findByMember(member).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_ATTENDEE)
+        );
         return gameRoomAttendee;
     }
     // 게임룸 객체로 참가자 찾아오기
@@ -270,16 +282,11 @@ public class RepositoryService {
         return gameRoomAttendeeRepository.findByGameRoom_GameRoomId(roomId);
     }
 
-    // 게임룸 객체로 참가자 찾아오기 (GameRoom 객체가 Optional로 감싸져있는 경우)
-    public List<GameRoomAttendee> findAttendeeByGameRoomOptional(Optional<GameRoom> gameRoom) {
-        List<GameRoomAttendee> gameRoomAttendeeList = gameRoomAttendeeRepository.findByGameRoom(gameRoom);
-        return gameRoomAttendeeList;
-    }
-
     // 멤버 Id로 참가자 객체 가져오기
-    public Optional<GameRoomAttendee> findAttendeeByMemberId(Long memberId) {
-        Optional<GameRoomAttendee> gameRoomAttendee = gameRoomAttendeeRepository.findById(memberId);
-        return gameRoomAttendee;
+    public GameRoomAttendee findAttendeeByMemberId(Long memberId) {
+        return gameRoomAttendeeRepository.findById(memberId).orElseThrow(
+                ()-> new CustomException(NOT_FOUND_ATTENDEE)
+        );
     }
 
     // 참가자 저장
@@ -288,7 +295,6 @@ public class RepositoryService {
     }
 
     // 참가자 삭제
-
     public void deleteGameRoomAttendee(GameRoomAttendee gameRoomAttendee) {
         gameRoomAttendeeRepository.delete(gameRoomAttendee);
     }
@@ -313,9 +319,10 @@ public class RepositoryService {
     }
 
     // RoomId로 GameStartSet 객체 찾아오기
-    public Optional<GameStartSet> findGameStartSetByRoomId(Long roomId) {
-        Optional<GameStartSet> gameStartSet = gameStartSetRepository.findByRoomId(roomId);
-        return gameStartSet;
+    public GameStartSet findGameStartSetByRoomId(Long roomId) {
+        return gameStartSetRepository.findByRoomId(roomId).orElseThrow(
+                ()-> new CustomException(GAME_SET_NOT_FOUND)
+        );
     }
 
     // GameStartSet 객체로 DB에서 삭제하기

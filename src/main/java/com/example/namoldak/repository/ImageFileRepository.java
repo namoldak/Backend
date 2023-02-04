@@ -18,7 +18,6 @@ public interface ImageFileRepository extends JpaRepository<ImageFile, Long> {
     void deleteAllByMember(Member member);
     @Transactional
     void deleteAllByPost(Post post);
-
     boolean existsByMember(Member member);
 
 

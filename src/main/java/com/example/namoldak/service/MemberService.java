@@ -46,11 +46,11 @@ public class MemberService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        if (!repositoryService.MemberDuplicateByEmail(email)) {
+        if (repositoryService.MemberDuplicateByEmail(email)) {
             throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
-        if (!repositoryService.MemberDuplicateByNickname(nickname)) {
+        if (repositoryService.MemberDuplicateByNickname(nickname)) {
             throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 
@@ -64,9 +64,7 @@ public class MemberService {
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
 
-        Member member = repositoryService.findMemberByEmail(email).orElseThrow(
-                () -> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
-        );
+        Member member = repositoryService.findMemberByEmail(email);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(StatusCode.BAD_PASSWORD);
@@ -76,10 +74,11 @@ public class MemberService {
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
-        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(member.getEmail()));
 
-        if (refreshToken.isPresent()) {
-            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(refreshToken.get().getRefreshToken()));
+
+        if (refreshTokenService.existByEmail(member.getEmail())) {
+            RefreshToken refreshToken = refreshTokenService.findByEmail(member.getEmail());
+            refreshTokenService.saveRefreshToken(refreshToken.updateToken(refreshToken.getRefreshToken()));
         } else {
             RefreshToken newToken = new RefreshToken(member.getEmail(),jwtUtil.createToken(member.getEmail(), "Refresh"));
             refreshTokenService.saveRefreshToken(newToken);
@@ -93,13 +92,13 @@ public class MemberService {
     // 이메일 중복 확인
     @Transactional(readOnly = true)
     public boolean emailCheck(String email){
-        return repositoryService.MemberDuplicateByEmail(email);
+        return !repositoryService.MemberDuplicateByEmail(email);
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
-        return repositoryService.MemberDuplicateByNickname(nickname);
+        return !repositoryService.MemberDuplicateByNickname(nickname);
     }
 
     @Transactional
@@ -124,9 +123,7 @@ public class MemberService {
     // 닉네임 변경
     @Transactional
     public PrivateResponseBody changeNickname(SignupRequestDto signupRequestDto, Member member) {
-        Member member1 = repositoryService.findMemberById(member.getId()).orElseThrow(
-                ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
-        );
+        Member member1 = repositoryService.findMemberById(member.getId());
         if(member.getId().equals(member1.getId())){
             member1.update(signupRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");
@@ -149,7 +146,7 @@ public class MemberService {
     // 로그아웃
     public ResponseEntity<GlobalResponseDto> logout(String email) {
         // 해당 유저의 refreshtoken 이 없을 경우
-        if(refreshTokenService.findByEmail(email) == null){
+        if(!refreshTokenService.existByEmail(email)){
             throw new CustomException(StatusCode.INVALID_TOKEN);
         }
         // 자신의 refreshtoken 만 삭제 가능
