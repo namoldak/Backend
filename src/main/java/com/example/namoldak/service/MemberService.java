@@ -15,6 +15,7 @@ import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
+import com.example.namoldak.util.jwt.KakaoTokenDto;
 import com.example.namoldak.util.jwt.TokenDto;
 import com.example.namoldak.util.s3.AwsS3Service;
 import com.example.namoldak.util.security.UserDetailsImpl;
@@ -35,12 +36,6 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
-    private final CommentRepository commentRepository;
-    private final ImageFileRepository imageFileRepository;
-    private final PostRepository postRepository;
-    private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
-    private final RewardReposiroty rewardReposiroty;
-    private final AwsS3Service awsS3Service;
     private final RefreshTokenService refreshTokenService;
 
 
@@ -75,8 +70,7 @@ public class MemberService {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
 
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getEmail()));
-// user email 값을 포함한 토큰 생성 후 tokenDto 에 저장
+        // user email 값을 포함한 토큰 생성 후 tokenDto 에 저장
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
@@ -84,9 +78,9 @@ public class MemberService {
 
         if (repositoryService.existMemberByEmail(member.getEmail())) {
             RefreshToken refreshToken = refreshTokenService.findByEmail(member.getEmail());
-            refreshTokenService.saveRefreshToken(refreshToken.updateToken(tokenDto.getRefreshToken()));
+            refreshTokenService.saveRefreshToken(refreshToken.updateToken(refreshToken.getRefreshToken()));
         } else {
-            RefreshToken newToken = new RefreshToken(signupRequestDto.getEmail(),tokenDto.getRefreshToken());
+            RefreshToken newToken = new RefreshToken(member.getEmail(),jwtUtil.createToken(member.getEmail(), "Refresh"));
             refreshTokenService.saveRefreshToken(newToken);
         }
 
@@ -120,35 +114,7 @@ public class MemberService {
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
             // 코멘트 여부 확인
-            if(commentRepository.existsByMember(member)){
-                commentRepository.deleteAllByMember(member);
-            }
-            // 게임룸 참여 여부 확인
-            if(gameRoomAttendeeRepository.existsByMember(member)){
-                gameRoomAttendeeRepository.deleteAllByMember(member);
-            }
-            // 이미지파일 여부 확인
-            if(imageFileRepository.existsByMember(member)){
-
-                List<ImageFile> imageFileList = imageFileRepository.findAllByMember(member);
-                for (ImageFile imageFile : imageFileList) {
-                    String path = imageFile.getPath();
-                    String filename = path.substring(49);
-                    awsS3Service.deleteFile(filename);
-                }
-
-                imageFileRepository.deleteAllByMember(member);
-            }
-            // 글 여부 확인
-            if(postRepository.existsByMember(member)){
-                postRepository.deleteAllByMember(member);
-            }
-            // 리워드 여부 확인
-            if(rewardReposiroty.existsByMember(member)){
-                rewardReposiroty.deleteAllByMember(member);
-            }
-            // 회원 삭제
-            repositoryService.deleteMember(member);
+            repositoryService.removeMemberInfo(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
@@ -174,7 +140,7 @@ public class MemberService {
 
     private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+//        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
     // 로그아웃

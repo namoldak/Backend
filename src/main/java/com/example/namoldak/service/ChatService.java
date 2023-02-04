@@ -17,7 +17,6 @@ public class ChatService{
     private final SimpMessageSendingOperations sendingOperations;
     private RateLimiter rateLimiter = RateLimiter.create(4.0);
 
-
     public void meesage(ChatMessage message) {
         if (rateLimiter.tryAcquire()) {
             ChatMessage exportMessage;

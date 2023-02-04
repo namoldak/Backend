@@ -29,10 +29,11 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 public class JwtUtil {
     private final RefreshTokenService refreshTokenService;
     private final UserDetailsServiceImpl userDetailsService;
-    private static final long ACCESS_TIME =  2 * 60 * 60 * 1000L; // ACCESS_TIME = 2시간
+    private static final long ACCESS_TIME =  30 * 60 * 1000L; // ACCESS_TIME = 30분
     private static final long REFRESH_TIME =  7 * 24 * 60 * 60 * 1000L;  // REFRESH_TIME = 7일
     public static final String ACCESS_TOKEN = "AccessToken";
     public static final String REFRESH_TOKEN = "RefreshToken";
+    public static final String KAKAO_TOKEN = "KakaoToken";  // 연결끊기용으로 사용할 카카오 엑세스 토큰
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
@@ -51,7 +52,12 @@ public class JwtUtil {
 
     // 토큰 생성
     public TokenDto createAllToken(String email) {
-        return new TokenDto(createToken(email, "Access"), createToken(email, "Refresh"));
+        return new TokenDto(createToken(email, "Access"));
+    }
+
+    // 토큰 생성
+    public KakaoTokenDto createAllToken(String email, String kakaoAccessToken) {
+        return new KakaoTokenDto(createToken(email, "Access"), kakaoAccessToken);
     }
 
     public String createToken(String email, String type) {
