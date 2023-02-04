@@ -75,15 +75,15 @@ public class MemberService {
         // user email 값을 포함한 토큰 생성 후 tokenDto 에 저장
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
-//        // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
-//        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(member.getEmail()));
-//
-//        if (refreshToken.isPresent()) {
-//            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
-//        } else {
-//            RefreshToken newToken = new RefreshToken(signupRequestDto.getEmail(),tokenDto.getRefreshToken());
-//            refreshTokenService.saveRefreshToken(newToken);
-//        }
+        // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
+        Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(member.getEmail()));
+
+        if (refreshToken.isPresent()) {
+            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(refreshToken.get().getRefreshToken()));
+        } else {
+            RefreshToken newToken = new RefreshToken(member.getEmail(),jwtUtil.createToken(member.getEmail(), "Refresh"));
+            refreshTokenService.saveRefreshToken(newToken);
+        }
 
         setHeader(response, tokenDto);
 
