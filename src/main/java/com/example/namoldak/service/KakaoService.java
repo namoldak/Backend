@@ -4,8 +4,9 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.RefreshToken;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
+import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
-import com.example.namoldak.util.jwt.TokenDto;
+import com.example.namoldak.util.jwt.KakaoTokenDto;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,8 +27,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,52 +42,38 @@ public class KakaoService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-    public List<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public String kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getToken(code);
+        String kakaoAccessToken = getToken(code);
 
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
+        KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(kakaoAccessToken);
 
         // 3. 필요시에 회원가입
         Member kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-
-        // 4. JWT 토큰 반환 (방법2)
-//        String createToken = jwtUtil.createToken(kakaoUser.getEmail());
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
-        //JWT토큰 만들어서 클라이언트에 보낸 다음에 클라이언트에서 직접 쿠키를 저장하는 방식으로 구현가능 (방법1)
-        //서버에서 바로 그냥 쿠키 객체를 만들어서 토큰에 직접 넣어서 반환하는 방법도 있음 (방법2)
-        //몇번 방식을 쓸 것인지는 react 쪽과 협의 필요!
 
         // 4. 강제 로그인 처리
         Authentication authentication = forceLogin(kakaoUser);
 
         // 5. response Header에 JWT 토큰 추가
-        TokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail());
+        KakaoTokenDto tokenDto = jwtUtil.createAllToken(kakaoUserInfo.getEmail(), kakaoAccessToken);
 
         Optional<RefreshToken> refreshToken = Optional.ofNullable(refreshTokenService.findByEmail(kakaoUser.getEmail()));
 
         if (refreshToken.isPresent()) {
-            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
+            refreshTokenService.saveRefreshToken(refreshToken.get().updateToken(refreshToken.get().getRefreshToken()));
         } else {
-            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),tokenDto.getRefreshToken());
+            RefreshToken newToken = new RefreshToken(kakaoUserInfo.getEmail(),jwtUtil.createToken(kakaoUser.getEmail(), "Refresh"));
             refreshTokenService.saveRefreshToken(newToken);
         }
 
         setHeader(response, tokenDto);
 
-        List<String> kakaoReturnValue = new ArrayList<>();
-//        kakaoReturnValue.add(createToken);
-//        kakaoReturnValue.add(tokenDto.getRefreshToken());
-        kakaoReturnValue.add(tokenDto.getAccessToken());
-        kakaoReturnValue.add(kakaoUser.getNickname());
-
-        // 리턴값으로 프론트에서 요청한 토큰과 유저닉네임을 같이 반환
-        return kakaoReturnValue;
+        return kakaoUser.getNickname();
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
-    private String getToken(String code) throws JsonProcessingException {
+    private String getToken(String code) {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -97,7 +82,8 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
-        body.add("redirect_uri", "https://namoldak.com/login");
+//        body.add("redirect_uri", "https://namoldak.com/login");
+        body.add("redirect_uri", "http://localhost:3000/login");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -111,15 +97,20 @@ public class KakaoService {
                 String.class
         );
 
-        // HTTP 응답 (JSON) -> 액세스 토큰 파싱
-        String responseBody = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("access_token").asText();
+        try {
+            // HTTP 응답 (JSON) -> 액세스 토큰 파싱
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            return jsonNode.get("access_token").asText();
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
+
     }
 
     // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+    private KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -135,17 +126,21 @@ public class KakaoService {
                 String.class
         );
 
-        String responseBody = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties")
-                .get("nickname").asText();
-        String email = jsonNode.get("kakao_account")
-                .get("email").asText();
+        try {
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            Long id = jsonNode.get("id").asLong();
+            String nickname = jsonNode.get("properties")
+                    .get("nickname").asText();
+            String email = jsonNode.get("kakao_account")
+                    .get("email").asText();
 
-        log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
-        return new KakaoUserInfoDto(id, nickname, email);
+            log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
+            return new KakaoUserInfoDto(id, nickname, email);
+        } catch (JsonProcessingException e) {
+            throw new CustomException(JSON_PROCESS_FAILED);
+        }
     }
 
     // 3. 필요시에 회원가입
@@ -187,10 +182,18 @@ public class KakaoService {
     }
 
     // 5. response Header에 JWT 토큰 추가
-    private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
+    private boolean setHeader(HttpServletResponse response, KakaoTokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+        response.addHeader(JwtUtil.KAKAO_TOKEN, tokenDto.getKakaoAccessToken());
+        return true;
+    }
 
+    // 회원탈퇴
+    public void deleteKakaoMember(String nickname) {
+        Member member = repositoryService.findMemberByNickname(nickname).orElseThrow(
+                ()-> new CustomException(StatusCode.LOGIN_MATCH_FAIL)
+        );
+        repositoryService.removeMemberInfo(member);
     }
 }
 

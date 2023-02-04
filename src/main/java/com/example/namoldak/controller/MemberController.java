@@ -59,15 +59,8 @@ public class MemberController {
     // 카카오 로그인
     @GetMapping("/auth/kakao/callback")
     public ResponseEntity<String> kakaoLogin(@RequestParam String code,
-                                             HttpServletResponse response) throws JsonProcessingException {
-        // code: 카카오 서버로부터 받은 인가 코드
-        List<String> kakaoReturnValue = kakaoService.kakaoLogin(code, response);
-
-        // Cookie 생성 및 직접 브라우저에 Set
-        Cookie cookie = new Cookie(JwtUtil.ACCESS_TOKEN, kakaoReturnValue.get(0).substring(7));  //앞부분이 키값, 뒷부분이 value값  //앞부분이 키값, 뒷부분이 value값
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        return ResponseUtil.response(kakaoReturnValue.get(1));
+                                             HttpServletResponse response) {
+        return ResponseUtil.response(kakaoService.kakaoLogin(code, response));
     }
 
     // 회원탈퇴
@@ -75,6 +68,13 @@ public class MemberController {
     public ResponseEntity<GlobalResponseDto> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                           @RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
         memberService.deleteMember(userDetails.getMember(), deleteMemberRequestDto);
+        return ResponseUtil.response(DELETE_MEMBER_OK);
+    }
+
+    // 카카오 회원 탈퇴
+    @DeleteMapping("/auth/deleteKakaoMember")
+    public ResponseEntity<GlobalResponseDto> deleteKakaoMember(@RequestBody DeleteMemberRequestDto deleteMemberRequestDto) {
+        kakaoService.deleteKakaoMember(deleteMemberRequestDto.getNickname());
         return ResponseUtil.response(DELETE_MEMBER_OK);
     }
 
