@@ -56,7 +56,8 @@
 ## 📽 시연 영상
 <div align=center>
 
-![나몰닭gif16초](https://user-images.githubusercontent.com/117756400/216956662-5a0793e8-ab46-44b2-99bc-7c2c7d3f92e6.gif)
+![800px](https://user-images.githubusercontent.com/111271565/217049760-c3694076-b5be-41c5-9951-f148aee3bb92.gif)
+
 </div>
 
 <br /> <br />
