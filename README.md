@@ -16,9 +16,9 @@
 <br /> <br />
 
 ## 🔗 나만 모른 닭 서비스 및 노션
-[🐔나만 모른 닭 바로가기🐔](https://namoldak.com)
-<br />
-[🐔나만 모른 닭 노션🐔](https://colossal-chokeberry-fec.notion.site/39515b59c604426494e905a62410ce3b)
+### [🐔나만 모른 닭 바로가기🐔](https://namoldak.com)
+### [🐔팀 노션🐔](https://www.notion.so/ad96dfad0856455c922e9d0f756a7f60)
+### [🐔브로슈어🐔](https://colossal-chokeberry-fec.notion.site/39515b59c604426494e905a62410ce3b)
 
 <br /> <br />
 
@@ -41,24 +41,13 @@
 
 <br /> <br />
 
-## 🛠 기술 스택
-
-### Backend Tech Stack  
-<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">  <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white">  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">  <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white">  <img src="https://img.shields.io/badge/spring security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <br /> <img src="https://img.shields.io/badge/websocket-FFCD00?style=for-the-badge&logo=websocket&logoColor=white">  <img src="https://img.shields.io/badge/WebRTC-333333?style=for-the-badge&logo=WebRTC&logoColor=white">  <img src="https://img.shields.io/badge/SockJS-3B5526?style=for-the-badge&logo=sockjs&logoColor=white">  <img src="https://img.shields.io/badge/stomp-41454A?style=for-the-badge&logo=stomp&logoColor=white">
-<br /> <br />
-
-### Infrastructure  
-<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">  <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"> <br /> <img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">  <img src="https://img.shields.io/badge/amazon s3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">  <img src="https://img.shields.io/badge/amazon rds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white">  <img src="https://img.shields.io/badge/amazon cloudfront-FF4F8B?style=for-the-badge&logo=amazonaws&logoColor=white">  <img src="https://img.shields.io/badge/amazon route53-7D929E?style=for-the-badge&logo=amazonaws&logoColor=white"> <br /> <img src="https://img.shields.io/badge/aws codedeploy-FF9E9F?style=for-the-badge&logo=amazonaws&logoColor=white">  <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
-<br /> <br />
-  
-### Team Collaboration Tool  
-<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">  <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">  <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
-<br />
-
-<br /><br />
-
 ## ⚙️ 서비스 아키텍쳐
 ![나몰닭-아키텍쳐2](https://user-images.githubusercontent.com/117756400/216894689-8921deef-c813-42ca-a8f2-6e58f34fd4b8.jpg)
+
+<br /> <br />
+
+## 🖌 ERD
+![나몰닭ERD최종](https://user-images.githubusercontent.com/117756400/217140050-a08e38e5-9714-474f-b3ca-c62f65d1fb06.png)
 
 <br /> <br />
 
@@ -182,11 +171,27 @@
 
 ## ⌛ 시간이 더 있었다면 도전했을 기술들
 - 대용량 트래픽 처리
-- 새로고침 없이 실시간 방 리스트 업데이트
+- 새로고침 없이 실시간 방 리스트 업데이트를 위한 SSE
 - 추가적인 소셜 로그인(네이버, 구글)
 - docker를 활용한 서버 scale-out
 - 무중단 배포
 <br /> <br />
+  
+## 🛠 기술 스택
+
+### Backend Tech Stack  
+<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">  <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white">  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">  <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white">  <img src="https://img.shields.io/badge/spring security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"> <br /> <img src="https://img.shields.io/badge/websocket-FFCD00?style=for-the-badge&logo=websocket&logoColor=white">  <img src="https://img.shields.io/badge/WebRTC-333333?style=for-the-badge&logo=WebRTC&logoColor=white">  <img src="https://img.shields.io/badge/SockJS-3B5526?style=for-the-badge&logo=sockjs&logoColor=white">  <img src="https://img.shields.io/badge/stomp-41454A?style=for-the-badge&logo=stomp&logoColor=white">
+<br /> <br />
+
+### Infrastructure  
+<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">  <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"> <br /> <img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">  <img src="https://img.shields.io/badge/amazon s3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">  <img src="https://img.shields.io/badge/amazon rds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white">  <img src="https://img.shields.io/badge/amazon cloudfront-FF4F8B?style=for-the-badge&logo=amazonaws&logoColor=white">  <img src="https://img.shields.io/badge/amazon route53-7D929E?style=for-the-badge&logo=amazonaws&logoColor=white"> <br /> <img src="https://img.shields.io/badge/aws codedeploy-FF9E9F?style=for-the-badge&logo=amazonaws&logoColor=white">  <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
+<br /> <br />
+  
+### Team Collaboration Tool  
+<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">  <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">  <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+<br />
+
+<br /><br />
 
 ## 🧑🏻‍💻 개발 기간 & 조원
 ✔️ 2022.12.30 - 2022.02.09
