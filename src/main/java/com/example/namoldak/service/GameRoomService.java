@@ -12,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
@@ -26,7 +24,6 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 @Service
 public class GameRoomService {
     // 의존성 주입
-    private final SimpMessageSendingOperations messagingTemplate;
     private final GameService gameService;
     private final RepositoryService repositoryService;
     private final SessionRepository sessionRepository = SessionRepository.getInstance();
@@ -171,20 +168,11 @@ public class GameRoomService {
         repositoryService.saveGameRoomAttendee(gameRoomAttendee);
 
         Map<String, Object> contentSet = new HashMap<>();
-
-        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(String.valueOf(roomId));
-        gameMessage.setSenderId(String.valueOf(member.getId()));
-        gameMessage.setSender(member.getNickname());
-
         contentSet.put("owner", enterGameRoom.getOwner());
         contentSet.put("memberCnt", gameRoomAttendeeList.size());
-        contentSet.put("enterComment", gameMessage.getRoomId() + "번 방에" + gameMessage.getSenderId() + "님이 입장하셨습니닭!");
+        contentSet.put("enterComment", roomId + "번 방에" + String.valueOf(member.getId()) + "님이 입장하셨습니닭!");
 
-        gameMessage.setContent(contentSet);
-        gameMessage.setType(GameMessage.MessageType.ENTER);
-
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        gameService.sendGameMessage(roomId, GameMessage.MessageType.ENTER, contentSet, null, member.getNickname());
 
         // 해시맵으로 데이터 정리해서 보여주기
         Map<String, String> roomInfo = new HashMap<>();
@@ -302,21 +290,11 @@ public class GameRoomService {
 
         // 방을 나갈 경우의 알림 문구와 나간 이후의 방 인원 수를 저장하기 위한 해시맵
         Map<String, Object> contentSet = new HashMap<>();
+        contentSet.put("memberCnt", existGameRoomAttendee.size());
+        contentSet.put("alert", member.getNickname() + " 님이 방을 나가셨습니닭!");
 
         // 누가 나갔는지 알려줄 메세지 정보 세팅
-        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
-        gameMessage.setSenderId(Long.toString(member.getId()));
-        gameMessage.setSender(member.getNickname());
-
-        contentSet.put("memberCnt", existGameRoomAttendee.size());
-        contentSet.put("alert", gameMessage.getSender() + " 님이 방을 나가셨습니닭!");
-
-        gameMessage.setContent(contentSet);
-        gameMessage.setType(GameMessage.MessageType.LEAVE);
-
-        // 해당 주소에 있는 사람들에게 게임 메세지 모두 발송
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        gameService.sendGameMessage(roomId, GameMessage.MessageType.LEAVE, contentSet, null, member.getNickname());
         log.info("============== 이거는 그냥 나가기 로직임");
 
         // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
@@ -327,14 +305,9 @@ public class GameRoomService {
             GameRoomAttendee nextOwner = repositoryService.findAttendeeByMemberId(nextOwnerId);
             // 들어간 방에 Owner 업데이트
             enterGameRoom.setOwner(nextOwner.getMember().getNickname());
-            // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
-            GameMessage<String> alertOwner = new GameMessage<>();
-            alertOwner.setRoomId(Long.toString(enterGameRoom.getGameRoomId()));
-            alertOwner.setSenderId(Long.toString(nextOwner.getMember().getId()));
-            alertOwner.setSender(nextOwner.getMember().getNickname());
-            alertOwner.setType(GameMessage.MessageType.NEWOWNER);
 
-            messagingTemplate.convertAndSend("/sub/gameRoom" + roomId, alertOwner);
+            // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
+            gameService.sendGameMessage(roomId, GameMessage.MessageType.NEWOWNER, null, null, nextOwner.getMember().getNickname());
         }
     }
 

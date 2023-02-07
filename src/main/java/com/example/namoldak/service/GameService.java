@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
@@ -85,7 +84,7 @@ public class GameService {
     public void gameSkip(GameDto gameDto, Long roomId) {
 
         String msg = gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.";
-        sendGameMessage(roomId, GameMessage.MessageType.SKIP, msg, gameDto.getNickname(), null);
+        sendGameMessage(roomId, GameMessage.MessageType.SKIP, msg, null, gameDto.getNickname());
     }
 
 
@@ -102,7 +101,6 @@ public class GameService {
             gameStartSet.setRound(0);
             gameStartSet.setSpotNum(0);
             repositoryService.saveGameStartSet(gameStartSet);
-
         }
 
         // 유저들 정보 조회
@@ -124,8 +122,7 @@ public class GameService {
 
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
-
-            if (gameStartSet.getRound() < 7) {
+            if (gameStartSet.getRound() < 1) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -133,7 +130,7 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 7) {
+            } else if (gameStartSet.getRound() == 1) {
                 // 메세지 알림
                 String msg = "너흰 전부 바보닭!!!";
                 sendGameMessage(roomId, GameMessage.MessageType.STUPID, msg, null, null);
@@ -162,12 +159,10 @@ public class GameService {
             // 메세지 알림
             String msg = gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답입니닭!";
             sendGameMessage(roomId, GameMessage.MessageType.SUCCESS, msg, gameDto.getNickname(), null);
-
         } else {
             // 메세지 알림
             String msg = gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!";
             sendGameMessage(roomId, GameMessage.MessageType.FAIL, msg, gameDto.getNickname(), null);
-
         }
     }
 
@@ -256,6 +251,7 @@ public class GameService {
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setType(type);
         gameMessage.setSender(senderName);
+//        gameMessage.setSenderId(sendId);
         gameMessage.setContent(Content);
         gameMessage.setNickname(nickname);
 
@@ -300,5 +296,4 @@ public class GameService {
 
         return memberNicknameList;
     }
-
 }
