@@ -5,7 +5,6 @@ import com.example.namoldak.dto.RequestDto.GameDto;
 import com.example.namoldak.dto.ResponseDto.VictoryDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
-import static com.example.namoldak.util.GlobalResponse.code.StatusCode.GAME_SET_NOT_FOUND;
 
 // 기능 : 게임 진행 서비스
 @Slf4j
@@ -46,33 +44,12 @@ public class GameService {
 
         // 랜덤으로 뽑은 키워드의 카테고리
         String category = Category.getRandom().name();
-
         // 같은 카테고리를 가진 키워드 리스트 만들기
-        List<Keyword> keywordList;
-
-        if (gameRoomAttendees.size() == 4) {
-            // 참여 멤버가 4명 이라면, 랜덤으로 키워드 4장이 담긴 리스트를 만들어 준다.
-            keywordList = repositoryService.findTop4KeywordByCategory(category);
-        } else if (gameRoomAttendees.size() == 3) {
-            // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
-            keywordList = repositoryService.findTop3KeywordByCategory(category);
-        } else {
-            throw new CustomException(NOT_ENOUGH_MEMBER);
-        }
-
-        Map<String, String> keywordToMember = new HashMap<>();
-
+        List<Keyword> keywordList = getRandomKeyword(gameRoomAttendees.size(), category);
         // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
-        List<String> memberNicknameList = new ArrayList<>();
-
-        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendees) {
-            memberNicknameList.add(gameRoomAttendee.getMemberNickname());
-        }
-
+        List<String> memberNicknameList = getNicknameList(gameRoomAttendees);
         //게임룸 멤버한테 키워드 배당
-        for (int i = 0; i < gameRoomAttendees.size(); i++) {
-            keywordToMember.put(memberNicknameList.get(i), keywordList.get(i).getWord());
-        }
+        Map<String, String> keywordToMember = matchKeywordToMember(keywordList, memberNicknameList);
 
         GameStartSet gameStartSet = GameStartSet.builder()
                 .roomId(roomId)
@@ -100,30 +77,15 @@ public class GameService {
         startSet.put("memberList", memberNicknameList); // 방에 존재하는 모든 유저들
         startSet.put("startAlert", "총 8라운드닭! 초록색으로 하이라이트된 사람만 말할 수 있고 다른 사람들은 마이크 기능이 제한되니까 채팅으로 알려주면 된닭!");
 
-        GameMessage<Map<String, Object>> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(roomId)); // 현재 게임방 id
-        gameMessage.setSenderId(""); // 준비된 유저의 id
-        gameMessage.setSender("양계장 주인"); // 준비된 유저의 닉네임
-        gameMessage.setContent(startSet); // 준비됐다는 내용
-        gameMessage.setType(GameMessage.MessageType.START); // 메세지 타입
-
-        // 게임 시작 알림을 방에 구독이 된 유저들에게 알려줌
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        sendGameMessage(roomId, GameMessage.MessageType.START, startSet, null, null);
     }
 
     // 건너뛰기
     @Transactional
     public void gameSkip(GameDto gameDto, Long roomId) {
 
-        // stomp로 메세지 전달
-        GameMessage<String> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(roomId)); // 현재 방 id
-        gameMessage.setSender(gameDto.getNickname()); // 로그인한 유저의 닉네임
-        gameMessage.setContent(gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.");
-        gameMessage.setType(GameMessage.MessageType.SKIP);
-
-        // 방 안의 구독자 모두가 메세지 받음
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        String msg = gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.";
+        sendGameMessage(roomId, GameMessage.MessageType.SKIP, msg, gameDto.getNickname(), null);
     }
 
 
@@ -153,14 +115,8 @@ public class GameService {
             Member spotMember = repositoryService.findMemberById(memberListInGame.get(gameStartSet.getSpotNum()).getMember().getId());
 
             // 메세지 알림
-            GameMessage<String> gameMessage = new GameMessage<>();
-            gameMessage.setRoomId(Long.toString(roomId));                   // 현재 게임룸 id
-            gameMessage.setSenderId(String.valueOf(spotMember.getId()));        // 스포트라이트 멤버 id
-            gameMessage.setSender(spotMember.getNickname());                    // 스포트라이트 멤버 닉네임
-            gameMessage.setContent(gameMessage.getSender() + "님의 차례입니닭!");  // 메세지
-            gameMessage.setType(GameMessage.MessageType.SPOTLIGHT);
-
-            messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+            String msg = spotMember.getNickname() + "님의 차례입니닭!";
+            sendGameMessage(roomId, GameMessage.MessageType.SPOTLIGHT, msg, spotMember.getNickname(), spotMember.getNickname());
 
             // 다음 차례로!
             gameStartSet.setSpotNum(gameStartSet.getSpotNum() +1);
@@ -178,16 +134,9 @@ public class GameService {
 
                 // 0번부터 시작이다
             } else if (gameStartSet.getRound() == 7) {
-                // 메세지 알림 = 여기 말할 이야기
-                GameMessage<String> gameMessage = new GameMessage<>();
-                gameMessage.setRoomId(Long.toString(roomId));               // 현재 게임룸 id
-                gameMessage.setSenderId("");
-                gameMessage.setSender("양계장 주인");
-                gameMessage.setContent("너흰 전부 바보닭!!!");
-                gameMessage.setType(GameMessage.MessageType.STUPID);
-
-                messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
-                log.info("============== 잘 나오니?" + roomId);
+                // 메세지 알림
+                String msg = "너흰 전부 바보닭!!!";
+                sendGameMessage(roomId, GameMessage.MessageType.STUPID, msg, null, null);
 
                 forcedEndGame(roomId, null);
             }
@@ -203,8 +152,6 @@ public class GameService {
         // gameStartSet 불러오기
         GameStartSet gameStartSet = repositoryService.findGameStartSetByRoomId(roomId);
 
-        GameMessage<String> gameMessage = new GameMessage<>();
-
         // 정답을 맞추면 게임 끝
         if (repositoryService.getMapFromStr(gameStartSet.getKeywordToMember()).get(gameDto.getNickname()).equals(answer)){
 
@@ -212,24 +159,15 @@ public class GameService {
             gameStartSet.setWinner(gameDto.getNickname());
             repositoryService.saveGameStartSet(gameStartSet);
 
-            // stomp로 메세지 전달
-            gameMessage.setRoomId(Long.toString(roomId));
-            gameMessage.setSender("양계장 주인");
-            gameMessage.setContent(gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답입니닭!");
-            gameMessage.setNickname(gameDto.getNickname());
-            gameMessage.setType(GameMessage.MessageType.SUCCESS);
+            // 메세지 알림
+            String msg = gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답입니닭!";
+            sendGameMessage(roomId, GameMessage.MessageType.SUCCESS, msg, gameDto.getNickname(), null);
 
-            // 방 안의 구독자 모두가 메세지 받음
-            messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
         } else {
-            // stomp로 메세지 전달
-            gameMessage.setRoomId(Long.toString(roomId));
-            gameMessage.setSender("양계장 주인");
-            gameMessage.setContent(gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!");
-            gameMessage.setNickname(gameDto.getNickname());
-            gameMessage.setType(GameMessage.MessageType.FAIL);
+            // 메세지 알림
+            String msg = gameDto.getNickname() + "님이 작성하신" + answer + "은(는) 정답이 아닙니닭!";
+            sendGameMessage(roomId, GameMessage.MessageType.FAIL, msg, gameDto.getNickname(), null);
 
-            messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
         }
     }
 
@@ -240,18 +178,9 @@ public class GameService {
         // 현재 게임방 정보 불러오기
         GameRoom enterGameRoom = repositoryService.findGameRoomByRoomId(roomId);
 
-        // 발송할 메세지 데이터 저장
-        GameMessage<String> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(roomId));
-        gameMessage.setSenderId("");
-        gameMessage.setSender("양계장 주인");
-        if (nickname == null) {
-            gameMessage.setContent("게임이 종료되었닭!!");
-        } else {
-            gameMessage.setContent(nickname + " 님이 방에서 탈주해서 강제 종료되었닭!!");
-        }
-        gameMessage.setType(GameMessage.MessageType.FORCEDENDGAME);
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        // 메세지 알림
+        String msg = nickname == null ? "게임이 종료되었닭!!" : nickname + " 님이 방에서 탈주해서 강제 종료되었닭!!";
+        sendGameMessage(roomId, GameMessage.MessageType.FORCEDENDGAME, msg, null, null);
 
         // DB에서 게임 셋팅 삭제
         repositoryService.deleteGameStartSetByRoomId(roomId);
@@ -309,19 +238,67 @@ public class GameService {
             }
         }
 
-        // 발송할 메세지 데이터 저장
-        GameMessage<String> gameMessage = new GameMessage<>();
-        gameMessage.setRoomId(Long.toString(roomId));
-        gameMessage.setSender("양계장 주인");
-        gameMessage.setContent(gameStartSet.getKeywordToMember());
-        gameMessage.setType(GameMessage.MessageType.ENDGAME);
-        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+        // 메세지 알림
+        sendGameMessage(roomId, GameMessage.MessageType.ENDGAME, gameStartSet.getKeywordToMember(), null, null);
 
         // DB에서 게임 셋팅 삭제
         repositoryService.deleteGameStartSetByRoomId(roomId);
 
         // 현재 방 상태 정보를 true로 변경
         enterGameRoom.setStatus(true);
+    }
+
+    public <T> void sendGameMessage(Long roomId, GameMessage.MessageType type, T Content, String nickname, String sender) {
+
+        String senderName = sender == null ? "양계장 주인" : sender;
+
+        GameMessage<T> gameMessage = new GameMessage<>();
+        gameMessage.setRoomId(Long.toString(roomId));
+        gameMessage.setType(type);
+        gameMessage.setSender(senderName);
+        gameMessage.setContent(Content);
+        gameMessage.setNickname(nickname);
+
+        messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
+    }
+
+    public List<Keyword> getRandomKeyword(int size, String category) {
+        // 같은 카테고리를 가진 키워드 리스트 만들기
+        List<Keyword> keywordList;
+
+        if (size == 4) {
+            // 참여 멤버가 4명 이라면, 랜덤으로 키워드 4장이 담긴 리스트를 만들어 준다.
+            keywordList = repositoryService.findTop4KeywordByCategory(category);
+        } else if (size == 3) {
+            // 참여 멤버가 3명 이라면, 랜덤으로 키워드 3장이 담긴 리스트를 만들어 준다.
+            keywordList = repositoryService.findTop3KeywordByCategory(category);
+        } else {
+            throw new CustomException(NOT_ENOUGH_MEMBER);
+        }
+
+        return keywordList;
+    }
+
+    public Map<String, String> matchKeywordToMember(List<Keyword> keywordList, List<String> memberNicknameList) {
+        Map<String, String> keywordToMember = new HashMap<>();
+
+        //게임룸 멤버한테 키워드 배당
+        for (int i = 0; i < keywordList.size(); i++) {
+            keywordToMember.put(memberNicknameList.get(i), keywordList.get(i).getWord());
+        }
+
+        return keywordToMember;
+    }
+
+    public List<String> getNicknameList(List<GameRoomAttendee> gameRoomAttendees) {
+        // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
+        List<String> memberNicknameList = new ArrayList<>();
+
+        for (GameRoomAttendee gameRoomAttendee : gameRoomAttendees) {
+            memberNicknameList.add(gameRoomAttendee.getMemberNickname());
+        }
+
+        return memberNicknameList;
     }
 
 }
