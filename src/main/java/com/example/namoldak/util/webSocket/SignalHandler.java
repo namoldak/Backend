@@ -5,8 +5,9 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.dto.RequestDto.WebSocketMessage;
 import com.example.namoldak.dto.ResponseDto.WebSocketResponseMessage;
+import com.example.namoldak.domainModel.GameQuery;
 import com.example.namoldak.service.GameRoomService;
-import com.example.namoldak.service.RepositoryService;
+import com.example.namoldak.domainModel.MemberQuery;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.*;
@@ -30,8 +30,6 @@ public class SignalHandler extends TextWebSocketHandler {
 
     @Autowired
     private GameRoomService gameRoomService;
-    @Autowired
-    private RepositoryService repositoryService;
     private final SessionRepository sessionRepository = SessionRepository.getInstance();  // 세션 데이터 저장소
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String MSG_TYPE_JOIN_ROOM = "join_room";
@@ -166,13 +164,7 @@ public class SignalHandler extends TextWebSocketHandler {
                             .receiver(oneClient.getKey())
                             .build());
         }
-        Member member = repositoryService.findMemberByNickname(nickname);
-        List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByRoomId(roomId);
-        for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
-            if(nickname.equals(gameRoomAttendee.getMemberNickname())){
-                gameRoomService.roomExit(roomId, member);
-            }
-        }
+        gameRoomService.exitGameRoomAboutSession(nickname, roomId);
     }
 
     // 메세지 발송

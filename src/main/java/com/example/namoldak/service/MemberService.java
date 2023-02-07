@@ -1,23 +1,21 @@
 package com.example.namoldak.service;
 
-import com.example.namoldak.domain.ImageFile;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.RefreshToken;
+import com.example.namoldak.domainModel.MemberCommand;
+import com.example.namoldak.domainModel.MemberQuery;
 import com.example.namoldak.dto.RequestDto.DeleteMemberRequestDto;
 import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import com.example.namoldak.dto.ResponseDto.MemberResponseDto;
 import com.example.namoldak.dto.ResponseDto.MyDataResponseDto;
 import com.example.namoldak.dto.ResponseDto.PrivateResponseBody;
 import com.example.namoldak.dto.ResponseDto.ResponseDto;
-import com.example.namoldak.repository.*;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
 import com.example.namoldak.util.GlobalResponse.ResponseUtil;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.jwt.JwtUtil;
-import com.example.namoldak.util.jwt.KakaoTokenDto;
 import com.example.namoldak.util.jwt.TokenDto;
-import com.example.namoldak.util.s3.AwsS3Service;
 import com.example.namoldak.util.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -37,6 +33,8 @@ public class MemberService {
     private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final MemberQuery memberQuery;
+    private final MemberCommand memberCommand;
 
 
     // 회원가입
@@ -46,16 +44,16 @@ public class MemberService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        if (repositoryService.MemberDuplicateByEmail(email)) {
+        if (memberQuery.MemberDuplicateByEmail(email)) {
             throw new CustomException(StatusCode.EXIST_EMAIL);
         }
 
-        if (repositoryService.MemberDuplicateByNickname(nickname)) {
+        if (memberQuery.MemberDuplicateByNickname(nickname)) {
             throw new CustomException(StatusCode.EXIST_NICKNAME);
         }
 
         Member member = new Member(email, nickname, password);
-        repositoryService.saveMember(member);
+        memberCommand.saveMember(member);
     }
 
     // 로그인
@@ -64,7 +62,7 @@ public class MemberService {
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
 
-        Member member = repositoryService.findMemberByEmail(email);
+        Member member = memberQuery.findMemberByEmail(email);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(StatusCode.BAD_PASSWORD);
@@ -92,13 +90,13 @@ public class MemberService {
     // 이메일 중복 확인
     @Transactional(readOnly = true)
     public boolean emailCheck(String email){
-        return !repositoryService.MemberDuplicateByEmail(email);
+        return !memberQuery.MemberDuplicateByEmail(email);
     }
 
     // 닉네임 중복 확인
     @Transactional(readOnly = true)
     public boolean nicknameCheck(String nickname){
-        return !repositoryService.MemberDuplicateByNickname(nickname);
+        return !memberQuery.MemberDuplicateByNickname(nickname);
     }
 
     @Transactional
@@ -114,7 +112,7 @@ public class MemberService {
     public void deleteMember(Member member, DeleteMemberRequestDto deleteMemberRequestDto) {
         if (passwordEncoder.matches(deleteMemberRequestDto.getPassword(), member.getPassword())){
             // 코멘트 여부 확인
-            repositoryService.removeMemberInfo(member);
+            memberCommand.removeMemberInfo(member);
         } else {
             throw new CustomException(StatusCode.BAD_PASSWORD);
         }
@@ -123,7 +121,7 @@ public class MemberService {
     // 닉네임 변경
     @Transactional
     public PrivateResponseBody changeNickname(SignupRequestDto signupRequestDto, Member member) {
-        Member member1 = repositoryService.findMemberById(member.getId());
+        Member member1 = memberQuery.findMemberById(member.getId());
         if(member.getId().equals(member1.getId())){
             member1.update(signupRequestDto);
             return new PrivateResponseBody<>(StatusCode.OK,"닉네임 변경 완료");

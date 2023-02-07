@@ -2,6 +2,8 @@ package com.example.namoldak.service;
 
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.RefreshToken;
+import com.example.namoldak.domainModel.MemberCommand;
+import com.example.namoldak.domainModel.MemberQuery;
 import com.example.namoldak.dto.RequestDto.KakaoUserInfoDto;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.jwt.JwtUtil;
@@ -37,6 +39,8 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROC
 public class KakaoService {
     private final PasswordEncoder passwordEncoder;
     private final RepositoryService repositoryService;
+    private final MemberQuery memberQuery;
+    private final MemberCommand memberCommand;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
@@ -144,11 +148,11 @@ public class KakaoService {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
         Member kakaoUser;
-        if (!repositoryService.existMemberByKakaoId(kakaoId)) {
+        if (!memberQuery.existMemberByKakaoId(kakaoId)) {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
             String kakaoEmail = kakaoUserInfo.getEmail();
-            if(repositoryService.existMemberByEmail(kakaoEmail)) {
-                kakaoUser = repositoryService.findMemberByEmail(kakaoEmail);
+            if(memberQuery.existMemberByEmail(kakaoEmail)) {
+                kakaoUser = memberQuery.findMemberByEmail(kakaoEmail);
             } else {
                 // 신규 회원가입
                 // password: random UUID
@@ -160,9 +164,9 @@ public class KakaoService {
 
                 kakaoUser = new Member(email, encodedPassword, kakaoId, kakaoUserInfo.getNickname());
             }
-            repositoryService.saveMember(kakaoUser);
+            memberCommand.saveMember(kakaoUser);
         } else {
-            kakaoUser = repositoryService.findMemberByKakaoId(kakaoId);
+            kakaoUser = memberQuery.findMemberByKakaoId(kakaoId);
         }
         return kakaoUser;
     }
@@ -184,8 +188,8 @@ public class KakaoService {
 
     // 회원탈퇴
     public void deleteKakaoMember(String nickname) {
-        Member member = repositoryService.findMemberByNickname(nickname);
-        repositoryService.removeMemberInfo(member);
+        Member member = memberQuery.findMemberByNickname(nickname);
+        memberCommand.removeMemberInfo(member);
     }
 }
 
