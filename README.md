@@ -2,7 +2,7 @@
 
 <br /> <br />
 
-## 🐔 나만 모른 닭
+# 🐔 나만 모른 닭
 <div align=center>
 
 ***내 머리에 있는 거 뭐야? 나만 몰라?***  
@@ -22,15 +22,6 @@
 
 <br /> <br />
 
-## 📽 시연 영상
-<div align=center>
-
-![800px](https://user-images.githubusercontent.com/111271565/217049760-c3694076-b5be-41c5-9951-f148aee3bb92.gif)
-
-</div>
-
-<br /> <br />
-
 ## 📢 주요 서비스 기능
 <ul>
 <li> 런닝맨에 나온 양세찬 게임(aka. call my name game)을 온라인에서도 즐길 수 있게 웹으로 구현하였습니닭🐔 </li>
@@ -41,17 +32,33 @@
 
 <br /> <br />
 
+## 📽 시연 영상
+<div align=center>
+
+![800px](https://user-images.githubusercontent.com/111271565/217049760-c3694076-b5be-41c5-9951-f148aee3bb92.gif)
+
+</div>
+
+<br /> <br />
+
 ## ⚙️ 서비스 아키텍쳐
 ![나몰닭-아키텍쳐2](https://user-images.githubusercontent.com/117756400/216894689-8921deef-c813-42ca-a8f2-6e58f34fd4b8.jpg)
 
 <br /> <br />
 
 ## 🖌 ERD
+<details>
+<summary>ERD</summary>
+<div markdown="1">
+<br />
+
 ![나몰닭ERD최종](https://user-images.githubusercontent.com/117756400/217140050-a08e38e5-9714-474f-b3ca-c62f65d1fb06.png)
+</div>
+</details>
 
 <br /> <br />
 
-## 🪄 핵심 기술
+## 📌 핵심 기술
 - 실시간 채팅을 위한 Web Socket
   - 화상 및 음성 채팅을 위한 WebRTC
   - 다양한 브라우저 환경을 지원하기 위한 SockJS
@@ -150,22 +157,32 @@
 
 <br /> <br />
 
-## 🗨️ User Feedback
-1. 닉네임 변경
-    - 기존에 닉네임을 cookie 에 담아 관리하고 있었는데 닉네임 변경 api를 호출하고 변경된 닉네임을 주기로 함  
-2. 카메라 기본 상태 off로 설정
-    - 각각의 유저 정보를 객체로서 저장하여 요소로 가지는 배열에 유저 객체를 처음 할당할 때 카메라 On/Off를 설정하는 프로퍼티의 값을 true에서 false로 변경 
-3. 게임 종료 시 키워드 알림
-    - 컴포넌트 최상단 scope에 키워드를 저장할 let 변수 선언 후 게임 시작 시 서버로부터 받아온 키워드 데이터를 해당 변수에 할당하여 게임종료시 해당 변수 사용하여 키워드 화면에 출력  
-4. 커뮤니티 페이지 카테고리 설정 방식 변경
-    - 카테고리의 경우 [자유게시판]과 [내가 쓴 피드백]은 drop down으로, [내가 쓴 게시판]의 경우엔 버튼으로 따로 구성되어있어서 불편하다는 피드백을 받음  
-    - 모든 카테고리를 drop down으로 변경  
-5. 카카오톡 회원탈퇴 (서비스 연결 끊기)
-    - 카카오 로그인 시 백엔드 서버에서 전달하는 토큰에 카카오 access token을 추가하고, 카카오톡 연결 끊기 api로 해당 토큰을 전송하여 서비스 연결 끊기 요청  
-6. 버튼 중복 클릭 방지
-    - debounce와 동일한 기능을 하는 커스텀 훅을 만들어서 버튼을 여러 번 눌렀을 때 특정 시간(0.3초)동안 액션이 없는 경우 함수가 호출되도록 변경  
-7. 게임 플레이 시 효과음
-    - howler.js 라이브러리를 사용하여 삽입한 src가 플레이되는 커스텀 훅을 만들어서 게임 중 효과음이 나오도록 변경  
+## 🗨️ 유저 피드백
+<details>
+<summary>유저 피드백</summary>
+<div markdown="1">
+<br />
+
+  1. 닉네임 변경
+      - 기존에 닉네임을 cookie 에 담아 관리하고 있었는데 닉네임 변경 api를 호출하고 변경된 닉네임을 주기로 함  
+  2. 카메라 기본 상태 off로 설정
+      - 각각의 유저 정보를 객체로서 저장하여 요소로 가지는 배열에 유저 객체를 처음 할당할 때 카메라 On/Off를 설정하는 프로퍼티의 값을 true에서 false로 변경 
+  3. 게임 종료 시 키워드 알림
+     - 컴포넌트 최상단 scope에 키워드를 저장할 let 변수 선언 후 게임 시작 시 서버로부터 받아온 키워드 데이터를 해당 변수에 할당하여 게임종료시 해당 변수 사용하여 키워드 화면에 출력  
+  4. 커뮤니티 페이지 카테고리 설정 방식 변경
+     - 카테고리의 경우 [자유게시판]과 [내가 쓴 피드백]은 drop down으로, [내가 쓴 게시판]의 경우엔 버튼으로 따로 구성되어있어서 불편하다는 피드백을 받음  
+     - 모든 카테고리를 drop down으로 변경  
+  5. 카카오톡 회원탈퇴 (서비스 연결 끊기)
+     - 카카오 로그인 시 백엔드 서버에서 전달하는 토큰에 카카오 access token을 추가하고, 카카오톡 연결 끊기 api로 해당 토큰을 전송하여 서비스 연결 끊기 요청  
+  6. 버튼 중복 클릭 방지
+      - debounce와 동일한 기능을 하는 커스텀 훅을 만들어서 버튼을 여러 번 눌렀을 때 특정 시간(0.3초)동안 액션이 없는 경우 함수가 호출되도록 변경  
+  7. 게임 플레이 시 효과음
+      - howler.js 라이브러리를 사용하여 삽입한 src가 플레이되는 커스텀 훅을 만들어서 게임 중 효과음이 나오도록 변경  
+  8. 카카오 로그인 이용시 게임룸 입장이 안되고 ‘만료된 JWT 토큰입니다 ’ 라는 메세지와 함께 튕기는 오류
+      - 카카오 로그인시 이메일 허용을 하지 않은 유저들에게 발생한 문제
+      - kakao developers 애플리케이션 - 카카오로그인 - 동의항목 에서 email 설정을 필수선택으로 수정
+</div>
+</details>
 
 <br /> <br />
 
@@ -188,7 +205,7 @@
 <br /> <br />
   
 ### Team Collaboration Tool  
-<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">  <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">  <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">  <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">  <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">  <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">  <img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white">  <img src="https://img.shields.io/badge/intellij idea-000000?style=for-the-badge&logo=intellijidea&logoColor=white">
 <br />
 
 <br /><br />
