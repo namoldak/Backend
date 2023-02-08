@@ -24,7 +24,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CommentService {
-    private final RepositoryService repositoryService;
     private final PostQuery postQuery;
     private final PostCommand postCommand;
     private final CommentRepository commentRepository;

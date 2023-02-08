@@ -6,10 +6,11 @@ import com.example.namoldak.repository.*;
 import com.example.namoldak.util.s3.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MemberCommand {
     private final MemberRepository memberRepository;

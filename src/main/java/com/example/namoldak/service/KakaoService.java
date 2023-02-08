@@ -38,7 +38,6 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROC
 @RequiredArgsConstructor
 public class KakaoService {
     private final PasswordEncoder passwordEncoder;
-    private final RepositoryService repositoryService;
     private final MemberQuery memberQuery;
     private final MemberCommand memberCommand;
     private final JwtUtil jwtUtil;

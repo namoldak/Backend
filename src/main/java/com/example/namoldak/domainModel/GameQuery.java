@@ -7,13 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_EXIST_ROOMS;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GameQuery {
 
@@ -75,7 +76,7 @@ public class GameQuery {
 
     // 멤버 Id로 참가자 객체 가져오기
     public GameRoomAttendee findAttendeeByMemberId(Long memberId) {
-        return gameRoomAttendeeRepository.findById(memberId).orElseThrow(
+        return gameRoomAttendeeRepository.findByMember_Id(memberId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ATTENDEE)
         );
     }

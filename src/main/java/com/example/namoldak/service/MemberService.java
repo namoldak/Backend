@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class MemberService {
     private final PasswordEncoder passwordEncoder;
-    private final RepositoryService repositoryService;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final MemberQuery memberQuery;

@@ -18,6 +18,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 
@@ -141,20 +142,23 @@ public class SignalHandler extends TextWebSocketHandler {
 
     // 웹소켓 연결이 끊어지면 실행되는 메소드
     @Override
+    @Transactional
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) {
         String nickname = sessionRepository.getNicknameInRoom(session.getId());
         // 끊어진 세션이 어느방에 있었는지 조회
         Long roomId = sessionRepository.getRoomId(session);
 
-        // 1) 방 참가자들 세션 정보들 사이에서 삭제
+        // 1) 게임방에서 나가는 멤버 정보 정리 / 방장이 나가면 방장도 바꿈
+        gameRoomService.exitGameRoomAboutSession(nickname, roomId);
+
+        // 2) 방 참가자들 세션 정보들 사이에서 삭제
         sessionRepository.deleteClient(roomId, session);
 
-        // 2) 별도 해당 참가자 세션 정보도 삭제
+        // 3) 별도 해당 참가자 세션 정보도 삭제
         sessionRepository.deleteRoomIdToSession(session);
 
-        // 3) 별도 해당 닉네임 리스트에서도 삭제
+        // 4) 별도 해당 닉네임 리스트에서도 삭제
         sessionRepository.deleteNicknameInRoom(session.getId());
-
         // 본인 제외 모두에게 전달
         for(Map.Entry<String, WebSocketSession> oneClient : sessionRepository.getClientList(roomId).entrySet()){
             sendMessage(oneClient.getValue(),
@@ -164,7 +168,6 @@ public class SignalHandler extends TextWebSocketHandler {
                             .receiver(oneClient.getKey())
                             .build());
         }
-        gameRoomService.exitGameRoomAboutSession(nickname, roomId);
     }
 
     // 메세지 발송

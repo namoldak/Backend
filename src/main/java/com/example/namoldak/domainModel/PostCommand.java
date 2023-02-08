@@ -6,10 +6,11 @@ import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class PostCommand {
     private final PostRepository postRepository;

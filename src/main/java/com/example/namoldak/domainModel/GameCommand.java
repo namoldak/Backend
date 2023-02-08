@@ -7,10 +7,11 @@ import com.example.namoldak.repository.GameStartSetRepository;
 import com.example.namoldak.repository.RewardReposiroty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GameCommand {
 

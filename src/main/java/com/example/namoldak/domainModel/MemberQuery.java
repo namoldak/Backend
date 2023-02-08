@@ -5,10 +5,11 @@ import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_FOUND_MEMBER;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MemberQuery {
     private final MemberRepository memberRepository;

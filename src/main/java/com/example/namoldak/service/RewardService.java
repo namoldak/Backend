@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RewardService {
-    private final RepositoryService repositoryService;
     private final GameCommand gameCommand;
     private final GameQuery gameQuery;
 
