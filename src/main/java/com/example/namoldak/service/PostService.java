@@ -1,10 +1,11 @@
 package com.example.namoldak.service;
 
 import com.example.namoldak.domain.*;
+import com.example.namoldak.domainModel.PostCommand;
+import com.example.namoldak.domainModel.PostQuery;
 import com.example.namoldak.dto.RequestDto.PostRequestDto;
 import com.example.namoldak.dto.ResponseDto.*;
 import com.example.namoldak.repository.ImageFileRepository;
-import com.example.namoldak.repository.PostRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.example.namoldak.util.s3.AwsS3Service;
@@ -15,28 +16,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.namoldak.util.GlobalResponse.code.StatusCode.FILE_UPLOAD_FAILED;
 
 // 기능 : 포스트 CRUD 서비스
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final PostRepository postRepository;
+    private final PostQuery postQuery;
+    private final PostCommand postCommand;
     private final AwsS3Service awsS3Service;
     private final ImageFileRepository imageFileRepository;
-    private final RepositoryService repositoryService;
 
 
     // 포스트 생성
     @Transactional
     public PostResponseDto addPost(PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) {
         Post post = new Post(postRequestDto, member);
-        repositoryService.savePost(post);
+        postCommand.savePost(post);
 
         if (multipartFilelist != null) {
             awsS3Service.upload(multipartFilelist, "static", post, member);
@@ -54,8 +53,8 @@ public class PostService {
 
 //     자유게시판 전체 조회
     public PostResponseListDto getFreeBoard(Pageable pageable, String category) {
-        Page<Post> postList = repositoryService.findAllByCategory(pageable, category);
-        List<Post> posts = repositoryService.findAllByCategory(category);
+        Page<Post> postList = postQuery.findAllByCategory(pageable, category);
+        List<Post> posts = postQuery.findAllByCategory(category);
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -69,8 +68,8 @@ public class PostService {
 
     // 내가쓴피드백 전체 조회
     public PostResponseListDto getMyPost(Pageable pageable, Member member, String category) {
-        Page<Post> postList = repositoryService.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
-        List<Post> posts = repositoryService.findAllByMemberAndCategory(member, category); // memberid
+        Page<Post> postList = postQuery.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
+        List<Post> posts = postQuery.findAllByMemberAndCategory(member, category); // memberid
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
@@ -84,7 +83,7 @@ public class PostService {
     // 포스트 상세 조회
     @Transactional(readOnly = true)
     public List<PostResponseDto> getOnePost(Long id) {
-        Post post = repositoryService.findPostById(id);
+        Post post = postQuery.findPostById(id);
         List<PostResponseDto> result = new ArrayList<>();
 
         List<String> imageFileList = new ArrayList<>();
@@ -99,7 +98,7 @@ public class PostService {
     // 포스트 수정
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, List<MultipartFile> multipartFilelist, Member member) {
-        Post post = repositoryService.findPostById(id);
+        Post post = postQuery.findPostById(id);
         if (member.getId().equals(post.getMember().getId())) {
             post.update(postRequestDto);
         } else {
@@ -125,7 +124,7 @@ public class PostService {
     // 포스트 삭제
     @Transactional
     public void deletePost(Long id, Member member) {
-        Post post = repositoryService.findPostById(id);
+        Post post = postQuery.findPostById(id);
         if (post.getMember().getId().equals(member.getId())) {
             try {
 
@@ -138,7 +137,7 @@ public class PostService {
 
                 imageFileRepository.deleteAllByPost(post); // 게시글에 해당하는 이미지 파일 삭제
 
-                repositoryService.deletePost(id);
+                postCommand.deletePost(id);
             } catch (CustomException e) {
                 throw new CustomException(StatusCode.FILE_DELETE_FAILED);
             }
@@ -147,7 +146,7 @@ public class PostService {
 
     // 게시글 키워드 검색
     public PostResponseListDto searchPosts(Pageable pageable, String category, String keyword) {
-        Page<Post> posts = repositoryService.findByKeyword(pageable, category, keyword);
+        Page<Post> posts = postQuery.findByKeyword(pageable, category, keyword);
 
         List<PostResponseDto> postResponseDto = new ArrayList<>();
         for (Post post : posts) {

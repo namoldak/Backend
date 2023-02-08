@@ -3,6 +3,8 @@ package com.example.namoldak.service;
 import com.example.namoldak.domain.Comment;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.domain.Post;
+import com.example.namoldak.domainModel.PostCommand;
+import com.example.namoldak.domainModel.PostQuery;
 import com.example.namoldak.dto.RequestDto.CommentRequestDto;
 import com.example.namoldak.dto.ResponseDto.CommentResponseDto;
 import com.example.namoldak.dto.ResponseDto.CommentResponseListDto;
@@ -22,7 +24,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CommentService {
-    private final RepositoryService repositoryService;
+    private final PostQuery postQuery;
+    private final PostCommand postCommand;
     private final CommentRepository commentRepository;
 
     // 댓글 전체 불러오기
@@ -40,23 +43,23 @@ public class CommentService {
     // 댓글 작성
     public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, Member member) {
         // 매개변수로 받아온 포스트 Id를 활용해서 Post 객체 저장
-        Post post = repositoryService.findPostById(postId);
+        Post post = postQuery.findPostById(postId);
         // Comment 생성자로 객체 생성 후 반환
         Comment comment = new Comment(commentRequestDto, member, post);
         // 코멘트 저장
-        repositoryService.saveComment(comment);
+        postCommand.saveComment(comment);
         // 객체를 dto에 담아
         return new CommentResponseDto(comment);
     }
 
     // 대댓글 작성
     public CommentResponseDto createReply(Long postId, Long commentId, CommentRequestDto commentRequestDto, Member member) {
-        Post post = repositoryService.findPostById(postId);
+        Post post = postQuery.findPostById(postId);
 
-        Comment comment = repositoryService.findCommentById(commentId);
+        Comment comment = postQuery.findCommentById(commentId);
 
         Comment reply = new Comment(commentRequestDto, member, post, comment);
-        repositoryService.saveComment(reply);
+        postCommand.saveComment(reply);
         return new CommentResponseDto(reply);
     }
 
@@ -64,7 +67,7 @@ public class CommentService {
     @Transactional
     public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, Member member) {
         // 매개변수로 받아온 코멘트 Id를 활용해서 Comment 객체 저장
-        Comment comment = repositoryService.findCommentById(commentId);
+        Comment comment = postQuery.findCommentById(commentId);
 
         // 매개변수로 받아온 닉네임과 코멘트의 작성자가 동일하지 않다면 예외 처리
         if (!member.getNickname().equals(comment.getNickname())) {
@@ -81,14 +84,14 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId, Member member) {
         // 매개변수로 받아온 코멘트 Id를 활용해서 Comment 객체 저장
-        Comment comment = repositoryService.findCommentById(commentId);
+        Comment comment = postQuery.findCommentById(commentId);
 
         // 매개변수로 받아온 닉네임과 코멘트의 작성자가 동일하지 않다면 예외 처리
         if (!member.getNickname().equals(comment.getNickname())) {
             throw new CustomException(StatusCode.NO_AUTH_MEMBER);
         }
         // 코멘트 삭제
-        repositoryService.deleteComment(comment);
+        postCommand.deleteComment(comment);
     }
 }
 
