@@ -251,7 +251,6 @@ public class GameService {
         gameMessage.setRoomId(Long.toString(roomId));
         gameMessage.setType(type);
         gameMessage.setSender(senderName);
-//        gameMessage.setSenderId(sendId);
         gameMessage.setContent(Content);
         gameMessage.setNickname(nickname);
 

@@ -166,6 +166,7 @@ public class SignalHandler extends TextWebSocketHandler {
                             .receiver(oneClient.getKey())
                             .build());
         }
+        log.info("============================== >>>>>> {}", "빡종");
         Member member = repositoryService.findMemberByNickname(nickname);
         List<GameRoomAttendee> gameRoomAttendeeList = repositoryService.findAttendeeByRoomId(roomId);
         for(GameRoomAttendee gameRoomAttendee : gameRoomAttendeeList) {
