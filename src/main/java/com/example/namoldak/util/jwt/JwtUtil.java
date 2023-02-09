@@ -57,7 +57,7 @@ public class JwtUtil {
 
     // 토큰 생성
     public KakaoTokenDto createAllToken(String email, String kakaoAccessToken) {
-        return new KakaoTokenDto(createToken(email, "Access"), kakaoAccessToken);
+        return new KakaoTokenDto(createToken(email, "Access"),createToken(email, "Refresh"), kakaoAccessToken);
     }
 
     public String createToken(String email, String type) {
