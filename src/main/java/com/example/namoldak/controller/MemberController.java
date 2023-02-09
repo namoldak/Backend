@@ -98,7 +98,7 @@ public class MemberController {
     }
 
     // 토큰 재발행
-    @PostMapping("/auth/issue/token")
+    @GetMapping("/auth/issue/token")
     public ResponseDto<String> issuedToken(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletResponse response){
         return memberService.issuedToken(userDetails.getMember().getEmail(), response);
     }

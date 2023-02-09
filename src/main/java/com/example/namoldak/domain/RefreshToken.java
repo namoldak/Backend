@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisHash;
 @Getter
 @Setter
 @NoArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 7 * 24 * 60 * 60L ) // 초단위 = 7일
+@RedisHash(value = "refreshToken", timeToLive = 7 * 24 * 60 * 60L ) //  = 7일
 public class RefreshToken {
     @Id
     private String email;

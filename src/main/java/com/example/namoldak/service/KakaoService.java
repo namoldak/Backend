@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,6 +43,9 @@ public class KakaoService {
     private final MemberCommand memberCommand;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+
+    @Value("${kakao.oauth2.client.id}")
+    String client_id;
 
     public String kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -81,7 +85,7 @@ public class KakaoService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "8e8f2cd2d31d1ee1c2d676f16d9430a0"); // REST API키
+        body.add("client_id", client_id); // REST API키
         body.add("redirect_uri", "https://namoldak.com/login");
         body.add("code", code);
 
