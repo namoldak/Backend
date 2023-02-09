@@ -137,7 +137,7 @@ public class MemberService {
 
     private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
-//        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
+        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
     // 로그아웃

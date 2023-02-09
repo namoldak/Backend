@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
             setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
-
         } else if (refreshToken != null) {
             if (!jwtUtil.refreshTokenValidation(refreshToken)) {
                 jwtExceptionHandler(response, "RefreshToken Expired", HttpStatus.UNAUTHORIZED);

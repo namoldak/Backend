@@ -52,7 +52,7 @@ public class JwtUtil {
 
     // 토큰 생성
     public TokenDto createAllToken(String email) {
-        return new TokenDto(createToken(email, "Access"));
+        return new TokenDto(createToken(email, "Access"), createToken(email, "Refresh"));
     }
 
     // 토큰 생성

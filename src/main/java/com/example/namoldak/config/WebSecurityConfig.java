@@ -75,6 +75,7 @@ public class WebSecurityConfig {
         config.addAllowedOrigin("https://d3j37rx7mer6cg.cloudfront.net");
         // addExposedHeader : 프론트에서 헤더의 해당 값에 접근할 수 있게 허락해주는 옵션
         config.addExposedHeader(JwtUtil.ACCESS_TOKEN);
+        config.addExposedHeader(JwtUtil.REFRESH_TOKEN);
         config.addExposedHeader(JwtUtil.KAKAO_TOKEN);
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
