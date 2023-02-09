@@ -185,6 +185,7 @@ public class KakaoService {
     // 5. response Header에 JWT 토큰 추가
     private boolean setHeader(HttpServletResponse response, KakaoTokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
+        response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
         response.addHeader(JwtUtil.KAKAO_TOKEN, tokenDto.getKakaoAccessToken());
         return true;
     }
