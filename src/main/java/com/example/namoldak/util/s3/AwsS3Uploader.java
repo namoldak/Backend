@@ -28,7 +28,7 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.FILE_CONV
 @RequiredArgsConstructor
 @Component
 @Service
-public class AwsS3Service {
+public class AwsS3Uploader {
 
     private final AmazonS3Client amazonS3Client;
     private final ImageFileRepository imageFileRepository;
@@ -87,11 +87,6 @@ public class AwsS3Service {
         } catch (IOException e) {
             throw new CustomException(FILE_CONVERT_FAILED);
         }
-    }
-
-    // find image from s3
-    public String getThumbnailPath(String path) {
-        return amazonS3Client.getUrl(bucket, path).toString();
     }
 
     //remove s3 object

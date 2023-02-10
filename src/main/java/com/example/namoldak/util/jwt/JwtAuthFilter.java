@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,25 +26,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = jwtUtil.getHeaderToken(request, "Access");
         String refreshToken = jwtUtil.getHeaderToken(request, "Refresh");
-        log.info("=============================refresh {}", refreshToken);
-        log.info("=============================access {}", accessToken);
-
 
         if (accessToken != null) {
+            // accessToken 검증
             if (!jwtUtil.validateToken(accessToken)) {
                 jwtExceptionHandler(response, "AccessToken Expired", HttpStatus.UNAUTHORIZED);
                 return;
             }
             setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
         } else if (refreshToken != null) {
+            // refreshToken 검증
             if (!jwtUtil.refreshTokenValidation(refreshToken)) {
                 jwtExceptionHandler(response, "RefreshToken Expired", HttpStatus.UNAUTHORIZED);
                 return;
             }
-            // 3. 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
+            // 토큰이 유효하다면 토큰에서 정보를 가져와 Authentication 에 세팅
             setAuthentication(jwtUtil.getUserInfoFromToken(refreshToken));
         }
-        // 4. 다음 필터로 넘어간다
+        // 다음 필터로 넘어간다
         filterChain.doFilter(request, response);
     }
 

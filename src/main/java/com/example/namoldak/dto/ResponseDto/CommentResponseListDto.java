@@ -1,11 +1,9 @@
 package com.example.namoldak.dto.ResponseDto;
 
-import com.example.namoldak.domain.Comment;
 import lombok.Getter;
-
-import java.util.ArrayList;
 import java.util.List;
 
+// 기능 : 댓글 List 응답 Dto
 @Getter
 public class CommentResponseListDto {
 

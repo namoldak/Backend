@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
-
-// 포스트 관련 CRUD 컨트롤러
+// 기능: 포스트 관련 CRUD 컨트롤러
 @RequiredArgsConstructor
 @RestController
 public class PostController {

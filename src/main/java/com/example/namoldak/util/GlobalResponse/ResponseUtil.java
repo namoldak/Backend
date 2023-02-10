@@ -4,7 +4,7 @@ import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-// 기능 : 최종 응답이 리턴
+// 기능 : 최종 응답이 반환
 public class ResponseUtil {
 
     // 메세지 응답 (No Data)

@@ -1,7 +1,6 @@
 package com.example.namoldak.controller;
 
 import com.example.namoldak.dto.RequestDto.GameRoomRequestDto;
-import com.example.namoldak.dto.ResponseDto.GameRoomResponseDto;
 import com.example.namoldak.dto.ResponseDto.GameRoomResponseListDto;
 import com.example.namoldak.service.GameRoomService;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
@@ -16,9 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 // 기능 : 게임룸 관련 CRUD 컨트롤

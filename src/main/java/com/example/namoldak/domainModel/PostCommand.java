@@ -5,11 +5,11 @@ import com.example.namoldak.domain.Post;
 import com.example.namoldak.repository.CommentRepository;
 import com.example.namoldak.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// 기능 : 포스트 도메인 관련 DB CUD 관리
 @Service
 @RequiredArgsConstructor
 public class PostCommand {

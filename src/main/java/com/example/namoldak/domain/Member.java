@@ -4,8 +4,6 @@ import com.example.namoldak.dto.RequestDto.SignupRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 // 기능 : 유저 정보 Entity
 @Entity
@@ -61,11 +59,6 @@ public class Member extends Timestamped{
         this.password  = password;
         this.kakaoId   = kakaoId;
         this.nickname  = kakaoNickname;
-    }
-
-    public Member kakaoIdUpdate(Long kakaoId){
-        this.kakaoId = kakaoId;
-        return this;
     }
 
     public void update(SignupRequestDto signupRequestDto) {

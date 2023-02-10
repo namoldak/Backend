@@ -3,13 +3,12 @@ package com.example.namoldak.domainModel;
 import com.example.namoldak.domain.ImageFile;
 import com.example.namoldak.domain.Member;
 import com.example.namoldak.repository.*;
-import com.example.namoldak.util.s3.AwsS3Service;
+import com.example.namoldak.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
+// 기능 : 회원 도메인 관련 DB CUD 관리
 @Service
 @RequiredArgsConstructor
 public class MemberCommand {
@@ -18,7 +17,7 @@ public class MemberCommand {
     private final PostRepository postRepository;
     private final ImageFileRepository imageFileRepository;
     private final GameRoomAttendeeRepository gameRoomAttendeeRepository;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3Uploader awsS3Uploader;
     private final RewardReposiroty rewardReposiroty;
 
     // 멤버 객체로 데이터 삭제하기
@@ -47,7 +46,7 @@ public class MemberCommand {
             for (ImageFile imageFile : imageFileList) {
                 String path = imageFile.getPath();
                 String filename = path.substring(49);
-                awsS3Service.deleteFile(filename);
+                awsS3Uploader.deleteFile(filename);
             }
 
             imageFileRepository.deleteAllByMember(member);

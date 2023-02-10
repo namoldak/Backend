@@ -1,19 +1,21 @@
 package com.example.namoldak.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
 
+// 기능 : 게임에 필요한 세트 설정
 @Getter
 @Entity
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class GameStartSet{
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long gameSetId;
 
     @Column(nullable = false)
@@ -37,24 +39,6 @@ public class GameStartSet{
     @Column
     private Long gameStartTime;
 
-    public GameStartSet(Long gameSetId,
-                        Long roomId,
-                         String category,
-                         String keywordToMember,
-                         Integer round,
-                         Integer spotNum,
-                         String winner,
-                         Long gameStartTime) {
-        this.gameSetId       = gameSetId;
-        this.roomId          = roomId;
-        this.category        = category;
-        this.keywordToMember = keywordToMember;
-        this.round           = round;
-        this.spotNum         = spotNum;
-        this.winner          = winner;
-        this.gameStartTime   = gameStartTime;
-    }
-
     public void setSpotNum(Integer num) {
         this.spotNum = num;
     }
@@ -65,11 +49,5 @@ public class GameStartSet{
 
     public void setWinner(String winner) {
         this.winner = winner;
-    }
-
-    public GameStartSet update(GameStartSet gameStartSet){
-        this.round      = gameStartSet.getRound();
-        this.winner     = gameStartSet.getWinner();
-        return gameStartSet;
     }
 }

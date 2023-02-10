@@ -3,6 +3,7 @@ package com.example.namoldak.util.jwt;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 기능 : 일반 form 가입 회원용 토큰 Dto
 @Getter
 @NoArgsConstructor
 public class TokenDto {

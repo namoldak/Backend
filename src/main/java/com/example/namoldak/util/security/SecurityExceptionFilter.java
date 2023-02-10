@@ -1,4 +1,4 @@
-package com.example.namoldak.util.GlobalResponse;
+package com.example.namoldak.util.security;
 
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.GlobalResponseDto;
@@ -6,15 +6,13 @@ import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JWT_EXCEPTION;
-
+// 기능 : Security에서 발생하는 예외를 별도 처리
 @Slf4j
 public class SecurityExceptionFilter extends OncePerRequestFilter {
     @Override

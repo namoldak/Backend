@@ -8,7 +8,7 @@ import com.example.namoldak.dto.ResponseDto.*;
 import com.example.namoldak.repository.ImageFileRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
-import com.example.namoldak.util.s3.AwsS3Service;
+import com.example.namoldak.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import java.util.List;
 public class PostService {
     private final PostQuery postQuery;
     private final PostCommand postCommand;
-    private final AwsS3Service awsS3Service;
+    private final AwsS3Uploader awsS3Uploader;
     private final ImageFileRepository imageFileRepository;
 
 
@@ -38,7 +38,7 @@ public class PostService {
         postCommand.savePost(post);
 
         if (multipartFilelist != null) {
-            awsS3Service.upload(multipartFilelist, "static", post, member);
+            awsS3Uploader.upload(multipartFilelist, "static", post, member);
         }
 
         List<ImageFile> imageFiles = imageFileRepository.findAllByPost(post);
@@ -51,7 +51,7 @@ public class PostService {
         return postResponseDto;
     }
 
-//     자유게시판 전체 조회
+    // 자유게시판 전체 조회
     public PostResponseListDto getFreeBoard(Pageable pageable, String category) {
         Page<Post> postList = postQuery.findAllByCategory(pageable, category);
         List<Post> posts = postQuery.findAllByCategory(category);
@@ -112,11 +112,11 @@ public class PostService {
             for (ImageFile File : imageFileList) {
                 String path = File.getPath();
                 String filename = path.substring(49);
-                awsS3Service.deleteFile(filename);
+                awsS3Uploader.deleteFile(filename);
             }
             imageFileRepository.deleteAll(imageFileList);
 
-            awsS3Service.upload(multipartFilelist, "static", post, member);
+            awsS3Uploader.upload(multipartFilelist, "static", post, member);
         }
         return new PostResponseDto(post);
     }
@@ -132,7 +132,7 @@ public class PostService {
                 for (ImageFile imageFile : imageFileList) {
                     String path = imageFile.getPath();
                     String filename = path.substring(49);
-                    awsS3Service.deleteFile(filename);
+                    awsS3Uploader.deleteFile(filename);
                 }
 
                 imageFileRepository.deleteAllByPost(post); // 게시글에 해당하는 이미지 파일 삭제

@@ -91,7 +91,6 @@ public class GameService {
     // 건너뛰기
     @Transactional
     public void gameSkip(GameDto gameDto, Long roomId) {
-
         String msg = gameDto.getNickname() + "님이 건너뛰기를 선택하셨습니다.";
         sendGameMessage(roomId, GameMessage.MessageType.SKIP, msg, null, gameDto.getNickname());
     }
@@ -252,6 +251,7 @@ public class GameService {
         enterGameRoom.setStatus(true);
     }
 
+    // 게임 운영자 메세지 전송
     public <T> void sendGameMessage(Long roomId, GameMessage.MessageType type, T Content, String nickname, String sender) {
 
         String senderName = sender == null ? "양계장 주인" : sender;
@@ -266,6 +266,7 @@ public class GameService {
         messagingTemplate.convertAndSend("/sub/gameRoom/" + roomId, gameMessage);
     }
 
+    // 키워드 생성
     public List<Keyword> getRandomKeyword(int size, String category) {
         // 같은 카테고리를 가진 키워드 리스트 만들기
         List<Keyword> keywordList;
@@ -283,6 +284,7 @@ public class GameService {
         return keywordList;
     }
 
+    // 키워드와 참가자 매칭
     public Map<String, String> matchKeywordToMember(List<Keyword> keywordList, List<String> memberNicknameList) {
         Map<String, String> keywordToMember = new HashMap<>();
 
@@ -294,6 +296,7 @@ public class GameService {
         return keywordToMember;
     }
 
+    // 방의 참가자들 닉네임
     public List<String> getNicknameList(List<GameRoomAttendee> gameRoomAttendees) {
         // 웹소켓으로 방에 참가한 인원 리스트 전달을 위한 리스트 (닉네임만 필요하기에 닉네임만 담음)
         List<String> memberNicknameList = new ArrayList<>();

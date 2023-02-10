@@ -1,7 +1,6 @@
 package com.example.namoldak.util.GlobalResponse;
 
 import com.example.namoldak.util.GlobalResponse.code.StatusCode;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 // 기능 : 실행 예외에 ErrorCode필드 추가해 커스텀

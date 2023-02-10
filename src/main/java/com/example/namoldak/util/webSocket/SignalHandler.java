@@ -1,13 +1,9 @@
 package com.example.namoldak.util.webSocket;
 
-import com.example.namoldak.domain.GameRoomAttendee;
-import com.example.namoldak.domain.Member;
 import com.example.namoldak.repository.SessionRepository;
 import com.example.namoldak.dto.RequestDto.WebSocketMessage;
 import com.example.namoldak.dto.ResponseDto.WebSocketResponseMessage;
-import com.example.namoldak.domainModel.GameQuery;
 import com.example.namoldak.service.GameRoomService;
-import com.example.namoldak.domainModel.MemberQuery;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +18,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 
-import static com.example.namoldak.util.GlobalResponse.code.StatusCode.CHAT_ROOM_NOT_FOUND;
+import static com.example.namoldak.util.GlobalResponse.code.StatusCode.SESSION_ROOM_NOT_FOUND;
 
 // 기능 : WebRTC를 위한 시그널링 서버 부분으로 요청타입에 따라 분기 처리
 @Slf4j
@@ -82,6 +78,7 @@ public class SignalHandler extends TextWebSocketHandler {
                         }
                     }
 
+                    // 방안 참가자들 닉네임 List
                     Map<String, String> exportNicknameList = new HashMap<>();
                     for (Map.Entry<String, WebSocketSession> entry : joinClientList.entrySet()) {
                         if (entry.getValue() != session) {
@@ -126,12 +123,11 @@ public class SignalHandler extends TextWebSocketHandler {
                                             .build());
                         }
                     } else {
-                        throw new CustomException(CHAT_ROOM_NOT_FOUND);
+                        throw new CustomException(SESSION_ROOM_NOT_FOUND);
                     }
                     break;
 
                 default:
-
                     log.info("======================================== DEFAULT");
                     log.info("============== 들어온 타입 : " + message.getType());
             }

@@ -13,8 +13,9 @@ import javax.persistence.*;
 @Entity
 @Builder
 public class GameRoom extends Timestamped{
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long gameRoomId;
 
     @Column(nullable = false)

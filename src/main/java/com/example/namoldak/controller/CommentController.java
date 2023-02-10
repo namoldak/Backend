@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+// 기능 : 댓글 컨트롤러
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor

@@ -6,14 +6,12 @@ import com.example.namoldak.util.GlobalResponse.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_EXIST_ROOMS;
 
+// 기능 : 게임 도메인 관련 DB Read 관리
 @Service
 @RequiredArgsConstructor
 public class GameQuery {
@@ -54,7 +52,6 @@ public class GameQuery {
         List<GameRoom> gameRoomList = gameRoomRepository.findAll();
         return gameRoomList;
     }
-
 
     //////////////TODO GameRoomAttendee 관련
     // 멤버 객체로 참가자 정보 조회

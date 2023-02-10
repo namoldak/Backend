@@ -30,7 +30,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
-
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.JSON_PROCESS_FAILED;
 
 // 기능 : OAuth.2.0 카카오 로그인
