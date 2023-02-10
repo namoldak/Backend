@@ -53,5 +53,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
                 .setAllowedOrigins("http://localhost:3000", "https://namoldak.com")
                 .withSockJS(); // allow all origins
     }
-
 }

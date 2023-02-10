@@ -71,8 +71,6 @@ public class MemberService {
         TokenDto tokenDto = jwtUtil.createAllToken(signupRequestDto.getEmail());
 
         // user email 값에 해당하는 refreshToken 을 DB에서 가져옴
-
-
         if (refreshTokenService.existByEmail(member.getEmail())) {
             RefreshToken refreshToken = refreshTokenService.findByEmail(member.getEmail());
             refreshTokenService.saveRefreshToken(refreshToken.updateToken(refreshToken.getRefreshToken()));
@@ -135,6 +133,7 @@ public class MemberService {
         return ResponseDto.success("토큰재발행 성공");
     }
 
+    // 헤더에 토큰 달기
     private void setHeader(HttpServletResponse response, TokenDto tokenDto) {
         response.addHeader(JwtUtil.ACCESS_TOKEN, tokenDto.getAccessToken());
         response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());

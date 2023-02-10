@@ -29,7 +29,7 @@ public class Post extends Timestamped {
     @Column
     private String category;                                                  // 카테고리
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)               // 연관된 이미지 파일 정보, cascade로 함께 삭제되도록 설정
     private List<ImageFile> imageFileList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)               // 연관된 post가 삭제되면 함께 삭제되도록 cascade 설정

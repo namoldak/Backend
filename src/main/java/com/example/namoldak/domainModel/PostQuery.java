@@ -10,11 +10,10 @@ import com.example.namoldak.util.GlobalResponse.code.StatusCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
+// 기능 : 포스트 도메인 관련 DB Read 관리
 @Service
 @RequiredArgsConstructor
 public class PostQuery {
@@ -22,12 +21,6 @@ public class PostQuery {
     private final CommentRepository commentRepository;
 
     //////////////TODO 포스트 관련
-    // 모든 포스트 찾아오기
-    public List<Post> findAll() {
-        List<Post> posts = postRepository.findAll();
-        return posts;
-    }
-
     // 포스트 ID로 포스트 찾아오기
     public Post findPostById(Long postId){
         Post post = postRepository.findById(postId).orElseThrow(
@@ -42,20 +35,24 @@ public class PostQuery {
         return posts;
     }
 
+    // 유저 본인이 쓴 피드백만 불러오기
     public List<Post> findAllByMemberAndCategory(Member member, String category) {
         List<Post> posts = postRepository.findAllByMemberAndCategory(member, category);
         return posts;
     }
+
     // 페이징 처리한 자유게시판 불러오기
     public Page<Post> findAllByCategory(Pageable pageable, String category){
         Page<Post> postList = postRepository.findAllByCategory(pageable, category);
         return postList;
     }
+
     // 페이징 처리한 내가쓴피드백 불러오기
     public Page<Post> findAllByMemberAndCategoryOrderByCreatedAtDesc(Pageable pageable, Member member, String category){
         Page<Post> postList = postRepository.findAllByMemberAndCategoryOrderByCreatedAtDesc(pageable, member, category);
         return postList;
     }
+
     // 게시글 키워드 검색
     public Page<Post> findByKeyword(Pageable pageable, String category, String keyword) {
         Page<Post> posts = postRepository.findAllByCategoryContainingAndTitleContaining(pageable, category, keyword);
@@ -70,11 +67,4 @@ public class PostQuery {
         );
         return comment;
     }
-
-    // 포스트 객체로 모든 댓글 리스트형으로 찾아오기
-    public List<Comment> findAllCommentByPost(Post post){
-        List<Comment> comments = commentRepository.findByPost(post);
-        return comments;
-    }
-
 }

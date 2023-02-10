@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+// 기능 : 댓글 서비스
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -75,10 +76,8 @@ public class CommentService {
         }
         // 코멘트 업데이트
         comment.update(commentRequestDto);
-//        commentRepository.save(); //@Transactional 없으면 save 해야함
         return new CommentResponseDto(comment);
     }
-
 
     // 댓글, 대댓글 삭제
     @Transactional

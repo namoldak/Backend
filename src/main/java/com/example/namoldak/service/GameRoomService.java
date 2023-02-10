@@ -92,11 +92,6 @@ public class GameRoomService {
     @Transactional
     public Map<String, String> makeGameRoom(Member member, GameRoomRequestDto gameRoomRequestDto) {
 
-//        // 현재 계정이 이미 방장으로 설정된 방이 있다면 예외 처리
-//        if (gameRoomRepository.findByOwner(member.getNickname()).isPresent()) {
-//            throw new CustomException(StatusCode.MEMBER_DUPLICATED);
-//        }
-
         // 게임방 만든 횟수 추가
         member.updateMakeRoom(1L);
         memberCommand.saveMember(member);
@@ -128,7 +123,6 @@ public class GameRoomService {
         roomInfo.put("owner", gameRoom.getOwner());
         roomInfo.put("status", String.valueOf(gameRoom.isStatus()));
 
-//        return new ResponseEntity<>(new PrivateResponseBody<>(StatusCode.OK, roomInfo), HttpStatus.OK);
         return roomInfo;
     }
 
@@ -179,6 +173,7 @@ public class GameRoomService {
         contentSet.put("memberCnt", gameRoomAttendeeList.size());
         contentSet.put("enterComment", roomId + "번 방에" + String.valueOf(member.getId()) + "님이 입장하셨습니닭!");
 
+        // 게임 메세지 전송
         gameService.sendGameMessage(roomId, GameMessage.MessageType.ENTER, contentSet, null, member.getNickname());
 
         // 해시맵으로 데이터 정리해서 보여주기
@@ -192,6 +187,7 @@ public class GameRoomService {
         return roomInfo;
     }
 
+    // 비정상 게임룸 접속자 방지
     public void enterVerify(Long roomId, UserDetailsImpl userDetails) {
         // 비회원일 경우 에러 메세지 보내기
         if (userDetails == null) {
@@ -264,6 +260,7 @@ public class GameRoomService {
         return new GameRoomResponseListDto(totalPage, gameRoomList);
     }
 
+    // 방 나가기
     @Transactional
     public void roomExit(Long roomId, Member member) {
         // 나가려고 하는 방 정보 DB에서 불러오기
@@ -302,26 +299,17 @@ public class GameRoomService {
 
         // 누가 나갔는지 알려줄 메세지 정보 세팅
         gameService.sendGameMessage(roomId, GameMessage.MessageType.LEAVE, contentSet, null, member.getNickname());
-        log.info("============== 이거는 그냥 나가기 로직임");
 
         // 만약에 나간 사람이 그 방의 방장이고 남은 인원이 0명이 아닐 경우에
         if (member.getNickname().equals(enterGameRoom.getOwner()) && !existGameRoomAttendee.isEmpty()){
             // 남은 사람들의 수 만큼 랜덤으로 돌려서 나온 멤버 ID
             String nextOwner = existGameRoomAttendee.get((int) (Math.random() * existGameRoomAttendee.size())).getMemberNickname();
-
-//            Long nextOwnerId = existGameRoomAttendee.get((int) (Math.random() * existGameRoomAttendee.size())).getMember().getId();
-//            // nextOwnerId로 GameRoomMember 정보 저장
-//            GameRoomAttendee nextOwner = gameQuery.findAttendeeByMemberId(nextOwnerId);
-
-            // 들어간 방에 Owner 업데이트
             enterGameRoom.setOwner(nextOwner);
-//            enterGameRoom.setOwner(nextOwner.getMemberNickname());
-            // 변경된 방장 정보를 방에 있는 모든 사람에게 메세지로 알림
-//            gameService.sendGameMessage(roomId, GameMessage.MessageType.NEWOWNER, null, null, nextOwner.getMemberNickname());
             gameService.sendGameMessage(roomId, GameMessage.MessageType.NEWOWNER, null, null, nextOwner);
         }
     }
 
+    // 방장 정보 조회
     public Map<String, String> ownerInfo(Long roomId) {
         // 전달받은 roomId로 DB 조회 후 저장
         GameRoom enterRoom = gameQuery.findGameRoomByRoomId(roomId);
@@ -339,6 +327,7 @@ public class GameRoomService {
         return ownerInfo;
     }
 
+    // signalHandler에서 세션 끊김을 감지했을 때 게임방에서 참가자 정보를 정리
     public void exitGameRoomAboutSession(String nickname, Long roomId) {
         Member member = memberQuery.findMemberByNickname(nickname);
         List<GameRoomAttendee> gameRoomAttendeeList = gameQuery.findAttendeeByRoomId(roomId);

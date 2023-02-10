@@ -51,17 +51,4 @@ public class PostResponseDto {
         this.createdAt    =     post.getCreatedAt();
         this.modifiedAt   =     post.getModifiedAt();
     }
-
-    public PostResponseDto(Post post, List<String> imageFileList, List<CommentResponseDto> commentList) {
-        this.id           =     post.getId();
-        this.title        =     post.getTitle();
-        this.content      =     post.getContent();
-        this.cmtCnt       =     post.getCommentList().size();
-        this.nickname     =     post.getNickname();
-        this.category     =     post.getCategory();
-        this.createdAt    =     post.getCreatedAt();
-        this.modifiedAt   =     post.getModifiedAt();
-        this.commentList  =     commentList;
-        this.imageList    =     imageFileList;
-    }
 }

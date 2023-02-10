@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+// 기능 : 리워드 서비스
 @Slf4j
 @Service
 @RequiredArgsConstructor

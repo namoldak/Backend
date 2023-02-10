@@ -6,11 +6,9 @@ import com.example.namoldak.repository.GameRoomRepository;
 import com.example.namoldak.repository.GameStartSetRepository;
 import com.example.namoldak.repository.RewardReposiroty;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+// 기능 : 게임 도메인 관련 DB CUD 관리
 @Service
 @RequiredArgsConstructor
 public class GameCommand {

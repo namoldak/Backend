@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.util.Optional;
 
 // 기능 : 게임룸과 유저를 연결하는 중간 Entity
 @Getter
@@ -14,8 +13,9 @@ import java.util.Optional;
 @Entity
 @Builder
 public class GameRoomAttendee extends Timestamped{
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long gameRoomMemberId;
 
     @JoinColumn(name="gameroomid")

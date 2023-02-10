@@ -1,9 +1,9 @@
 package com.example.namoldak.dto.ResponseDto;
 
 import lombok.Getter;
-
 import java.util.List;
 
+// 기능 : 포스트 List 반환 Dto
 @Getter
 public class PostResponseListDto{
     private int totalPage;

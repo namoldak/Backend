@@ -2,9 +2,9 @@ package com.example.namoldak.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
+// 기능 : S3에 저장한 이미지 정보 저장 Entity
 @Getter
 @Entity
 @NoArgsConstructor

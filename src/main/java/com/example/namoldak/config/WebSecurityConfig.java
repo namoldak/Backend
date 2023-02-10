@@ -1,7 +1,7 @@
 package com.example.namoldak.config;
 
 import com.example.namoldak.util.jwt.JwtAuthFilter;
-import com.example.namoldak.util.GlobalResponse.SecurityExceptionFilter;
+import com.example.namoldak.util.security.SecurityExceptionFilter;
 import com.example.namoldak.util.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Collections;
-
 
 // 기능 : Spring Security 사용에 필요한 설정
 @Configuration
@@ -81,7 +79,6 @@ public class WebSecurityConfig {
         config.addAllowedHeader("*");
         config.setAllowedOriginPatterns(Collections.singletonList("*"));
         config.setAllowCredentials(true);
-//        config.setMaxAge(24*60*60L); // 쿠키 만료 시간 : 24시간
         config.validateAllowCredentials();
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

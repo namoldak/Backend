@@ -4,11 +4,11 @@ import com.example.namoldak.domain.Member;
 import com.example.namoldak.repository.MemberRepository;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.NOT_FOUND_MEMBER;
 
+// 기능 : 회원 도메인 관련 DB Read 관리
 @Service
 @RequiredArgsConstructor
 public class MemberQuery {

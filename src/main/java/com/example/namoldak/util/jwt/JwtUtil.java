@@ -1,6 +1,5 @@
 package com.example.namoldak.util.jwt;
 
-import com.example.namoldak.domain.RefreshToken;
 import com.example.namoldak.service.RefreshTokenService;
 import com.example.namoldak.util.GlobalResponse.CustomException;
 import com.example.namoldak.util.security.UserDetailsServiceImpl;
@@ -18,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
-
 import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 
 // 기능 : JWT 유틸
@@ -60,6 +57,7 @@ public class JwtUtil {
         return new KakaoTokenDto(createToken(email, "Access"),createToken(email, "Refresh"), kakaoAccessToken);
     }
 
+    // 토큰 생성 (용도에 따라 만료시간 지정)
     public String createToken(String email, String type) {
         //현재 시각
         Date date = new Date();
@@ -74,6 +72,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    // 토큰 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);

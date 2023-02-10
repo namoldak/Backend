@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
+// 기능 : 마이페이지 반환 Dto
 @Getter
 @Setter
 @NoArgsConstructor

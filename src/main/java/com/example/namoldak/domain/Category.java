@@ -2,6 +2,7 @@ package com.example.namoldak.domain;
 
 import lombok.Getter;
 
+// 기능 : 게임 랜덤 Category 지정
 @Getter
 public enum Category {
 
