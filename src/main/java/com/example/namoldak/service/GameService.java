@@ -130,7 +130,7 @@ public class GameService {
 
         } else if (gameStartSet.getSpotNum() == memberListInGame.size()) {
 
-            if (gameStartSet.getRound() < 1) {
+            if (gameStartSet.getRound() < 7) {
                 // 한 라운드 종료, 라운드 +1 , 위치 정보 초기화
                 gameStartSet.setRound(gameStartSet.getRound() +1);
                 gameStartSet.setSpotNum(0);
@@ -138,7 +138,7 @@ public class GameService {
                 spotlight(roomId);
 
                 // 0번부터 시작이다
-            } else if (gameStartSet.getRound() == 1) {
+            } else if (gameStartSet.getRound() == 7) {
                 // 메세지 알림
                 String msg = "너흰 전부 바보닭!!!";
                 sendGameMessage(roomId, GameMessage.MessageType.STUPID, msg, null, null);
