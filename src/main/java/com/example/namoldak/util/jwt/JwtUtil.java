@@ -26,7 +26,7 @@ import static com.example.namoldak.util.GlobalResponse.code.StatusCode.*;
 public class JwtUtil {
     private final RefreshTokenService refreshTokenService;
     private final UserDetailsServiceImpl userDetailsService;
-    private static final long ACCESS_TIME =  10 * 60 * 60 * 1000L; // ACCESS_TIME = 30분
+    private static final long ACCESS_TIME =  30 * 60 * 1000L; // ACCESS_TIME = 30분
     private static final long REFRESH_TIME =  7 * 24 * 60 * 60 * 1000L;  // REFRESH_TIME = 7일
     public static final String ACCESS_TOKEN = "AccessToken";
     public static final String REFRESH_TOKEN = "RefreshToken";
