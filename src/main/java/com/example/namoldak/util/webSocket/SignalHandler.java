@@ -167,7 +167,7 @@ public class SignalHandler extends TextWebSocketHandler {
     }
 
     // 메세지 발송
-    private synchronized void sendMessage(WebSocketSession session, WebSocketResponseMessage message) {
+    private void sendMessage(final WebSocketSession session, final WebSocketResponseMessage message) {
         try {
             String json = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(json));
